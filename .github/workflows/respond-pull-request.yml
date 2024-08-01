@@ -5,7 +5,9 @@ on:
     types: [opened, synchronize]
   pull_request_review_comment:
     types: [ created ]
-
+  issues:
+    types: [opened, commented]
+    
 jobs:
   respond:
     runs-on: ubuntu-latest
