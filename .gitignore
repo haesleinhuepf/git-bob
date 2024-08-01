@@ -1,3 +1,5 @@
 
 .ipynb_checkpoints
 Untitled*
+.idea
+*__pycache__*
