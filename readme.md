@@ -35,6 +35,15 @@ To trigger git-bob, you need to comment on an issue or pull-request with the fol
 git-bob comment
 ```
 
+When using openai/gpt-4-omni, you can also use the following command to trigger git-bob.
+It will then try to solve the issue and send a pull-request.
+
+```
+git-bob solve
+```
+
+Note: This will only wor with simple issues that can be solved by modifying a single file.
+
 ## Installation as command-line tool
 
 You can also install git-bob locally and run it from the terminal. 
