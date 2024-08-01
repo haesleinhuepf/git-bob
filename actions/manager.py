@@ -1,7 +1,7 @@
 import os
 import sys
 
-from .github_utilities import comment_on_issue, get_conversation_on_issue
+from github_utilities import comment_on_issue, get_conversation_on_issue
 
 print("Hello")
 # Read the environment variable "ANTHROPIC_API_KEY"
