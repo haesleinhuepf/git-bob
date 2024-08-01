@@ -1,8 +1,25 @@
 # git-bob
 
 git-bob is Python package that uses AI to answer github-issues and review pull-requests. 
-Under the hood it uses [claude](https://claude.ai) or [gpt-4 omni](https://chat.openai.com/) to understand the text and 
+Under the hood it uses [claude 3.5 sonnet](https://claude.ai) or [gpt-4 omni](https://chat.openai.com/) to understand the text and 
 [pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull-requests.
+
+## Disclaimer
+
+`git-bob` is a research project aiming at streamlining github interaction in software development projects. Under the hood it uses
+artificial intelligence / large language models to generate text and code fulfilling the user's requests. 
+Users are responsible to verify the generated code according to good scientific practice.
+
+When using `git-bob` you configure it to use an API key to access the AI models. 
+You have to pay for the usage and must be careful in using the software.
+Do not use this technology if you are not aware of the costs and consequences.
+
+> [!CAUTION]
+> When using the OpenAI, Google Gemini, Anthropic or any other endpoint via BiA-Bob, you are bound to the terms of service 
+> of the respective companies or organizations.
+> The prompts you enter are transferred to their servers and may be processed and stored there. 
+> Make sure to not submit any sensitive, confidential or personal data. Also using these services may cost money.
+
 
 ## Installation as github action
 
