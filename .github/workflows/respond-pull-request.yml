@@ -37,4 +37,4 @@ jobs:
         ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
         GITHUB_API_KEY: "${{ secrets.GITHUB_TOKEN }}"
       run: |
-        python actions/manager.py response-pull-request ${{ github.repository }} ${{ github.event.pull_request.number }}
+        python actions/manager.py response-pull-request ${{ github.repository }} ${{ github.event.pull_request.number }} ${{ github.event.issue.number }}
