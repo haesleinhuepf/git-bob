@@ -28,14 +28,14 @@ if task == "response-pull-request":
 
     user, text = get_most_recent_comment_on_issue(repository, issue)
 
-    if "@bob" in text:
+    if "@haesleinhuepf" in text:
 
         discussion = get_conversation_on_issue(repository, issue)
 
         print("Discussion:", discussion)
 
         comment = prompt_claude("""
-Assume you are Bob (also known as git-bob). Generate a response to the following discussion in a github pull-request:
+Generate a response to the following discussion in a github pull-request:
 
 {discussion}
 
