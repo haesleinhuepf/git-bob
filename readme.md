@@ -17,7 +17,7 @@ You have to pay for the usage and must be careful in using the software.
 Do not use this technology if you are not aware of the costs and consequences.
 
 > [!CAUTION]
-> When using the OpenAI, Google Gemini, Anthropic or any other endpoint via BiA-Bob, you are bound to the terms of service 
+> When using the OpenAI, Google Gemini, Anthropic or any other endpoint via git-bob, you are bound to the terms of service 
 > of the respective companies or organizations.
 > The prompts you enter are transferred to their servers and may be processed and stored there. 
 > Make sure to not submit any sensitive, confidential or personal data. Also using these services may cost money.
