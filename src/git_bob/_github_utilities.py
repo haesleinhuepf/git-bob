@@ -351,7 +351,7 @@ def solve_github_issue(repository, issue):
     assistant.register_tool(update_file_in_new_branch)
     assistant.register_tool(send_pull_request)
 
-    assistant.do(f"Tell me the most important details of issue #{issue}")
+    assistant.do(f"Tell me the most important details of issue #{issue} in the repository {repository}")
     assistant.do(f"List all files in the repository {repository}")
     filename = assistant.tell("Which of these files might be relevant for issue #{issue} ? Respond ONLY the filename.")
     print("Related filename", filename)
