@@ -3,7 +3,11 @@ name: Respond to Pull Request
 on:
   pull_request:
     types: [opened, synchronize]
-
+  pull_request_review_comment:
+    types: [ created ]
+  issues:
+    types: [opened, commented]
+    
 jobs:
   respond:
     runs-on: ubuntu-latest
@@ -13,7 +17,10 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Print pull request number
-      run: echo "Pull Request Number - ${{ github.event.pull_request.number }}"
+      run: |  
+        echo "Pull Request Number - ${{ github.event.pull_request.number }}"
+        echo "Organization - ${{ github.repository_owner }}"
+        echo "Repository Name - ${{ github.repository }}"
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -27,6 +34,7 @@ jobs:
    
     - name: Run action
       env:
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
+        GITHUB_API_KEY: "${{ secrets.GH_API_KEY }}"
       run: |
-        python actions.py response-pull-request ${{ github.event.pull_request.number }}"
+        python actions/manager.py response-pull-request ${{ github.repository }} ${{ github.event.pull_request.number }}
