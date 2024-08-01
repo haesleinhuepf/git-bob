@@ -1,6 +1,6 @@
 # git-bob
 
-git-bob is Python package that uses AI to answer github-issues and review pull-requests. 
+git-bob uses AI to answer github-issues and review pull-requests. 
 Under the hood it uses [claude 3.5 sonnet](https://claude.ai) or [gpt-4 omni](https://chat.openai.com/) to understand the text and 
 [pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull-requests.
 
