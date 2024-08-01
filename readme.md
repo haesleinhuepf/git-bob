@@ -4,6 +4,8 @@ git-bob uses AI to answer github-issues and review pull-requests.
 Under the hood it uses [claude 3.5 sonnet](https://claude.ai) or [gpt-4 omni](https://chat.openai.com/) to understand the text and 
 [pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull-requests.
 
+![demo_fix_typos.png](docs/images/banner.png)
+
 ## Disclaimer
 
 `git-bob` is a research project aiming at streamlining github interaction in software development projects. Under the hood it uses
@@ -20,7 +22,6 @@ Do not use this technology if you are not aware of the costs and consequences.
 > The prompts you enter are transferred to their servers and may be processed and stored there. 
 > Make sure to not submit any sensitive, confidential or personal data. Also using these services may cost money.
 
-![demo_fix_typos.png](docs/images/banner.png)
 
 ## Installation as github action
 
