@@ -3,6 +3,8 @@ from github import Github
 
 def comment_on_issue(repository, issue, comment):
     # Replace 'YOUR_ACCESS_TOKEN' with your actual GitHub access token
+    print(f"-> comment_on_issue({repository}, {issue}, ...)")
+
     access_token = os.getenv('GITHUB_API_KEY')
 
     # Create a PyGithub instance using the access token
@@ -22,6 +24,8 @@ def comment_on_issue(repository, issue, comment):
 
 def get_conversation_on_issue(repository, issue):
     # Create a Github instance using your access token
+    print(f"-> get_conversation_on_issue({repository}, {issue})")
+
     access_token = os.getenv('GITHUB_API_KEY')
     g = Github(access_token)
 
@@ -47,6 +51,8 @@ def get_conversation_on_issue(repository, issue):
 
 def get_most_recent_comment_on_issue(repository, issue):
     # Create a Github instance using your access token
+    print(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
+
     access_token = os.getenv('GITHUB_API_KEY')
     g = Github(access_token)
 
@@ -99,6 +105,8 @@ def list_issues(repository: str, state: str = "open") -> dict:
     -------
         dictionary of issues
     """
+    print(f"-> list_issues({repository}, {state})")
+
     from github import Github
 
     # Initialize Github client
@@ -133,6 +141,8 @@ def get_github_issue_details(repository: str, issue: int) -> str:
     -------
     str
     """
+    print(f"-> get_github_issue_details({repository}, {issue})")
+
     GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
     g = Github(GITHUB_API_KEY)
 
@@ -182,6 +192,8 @@ def list_repository_files(repo_name: str) -> list:
     list
         A list of strings, where each string is the path of a file in the repository.
     """
+    print(f"-> list_repository_files({repo_name})")
+
     from github import Github
 
     # Initialize Github client
@@ -226,6 +238,8 @@ def get_repository_file_contents(repo_name: str, file_paths: list) -> dict:
     dict
         A dictionary where keys are file paths and values are the contents of the files.
     """
+    print(f"-> get_repository_file_contents({repo_name}, {file_paths})")
+
     from github import Github
 
     # Initialize Github client
@@ -271,6 +285,8 @@ def update_file_in_new_branch(repository, file_path, new_content):
     str
         The name of the brach where the change file is stored.
     """
+    print(f"-> update_file_in_new_branch({repository}, {file_path}, ...)")
+
     from github import Github
     import os
     import random
@@ -322,6 +338,8 @@ def send_pull_request(repository, branch_name, title, description):
     str
         The url to the pull-request that was just created.
     """
+    print(f"-> send_pull_request({repository}, {branch_name}, ...)")
+
     from github import Github
     import os
     import random
@@ -343,6 +361,7 @@ def send_pull_request(repository, branch_name, title, description):
 def solve_github_issue(repository, issue):
     """Attempt to solve a github issue by modifying a single file and sending a pull-request."""
     # source: https://github.com/ScaDS/generative-ai-notebooks/blob/main/docs/64_github_interaction/solving_github_issues.ipynb
+    print(f"-> solve_github_issue({repository}, {issue})")
     from blablado import Assistant
     assistant = Assistant()
     assistant.register_tool(get_github_issue_details)
