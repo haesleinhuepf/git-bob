@@ -31,7 +31,7 @@ To use git-bob in your github repository, you need to
 * configure a github secret called "ANTHROPIC_API_KEY" or an "OPENAI_API_KEY" and choose which one to use in the github workflow files mentioned above.
 * configure github actions to run the workflow on issues and pull-requests. Also give write-access to the action runner.
 
-To trigger git-bob, you need to comment on an issue or pull-request with the following commands:
+To trigger git-bob, you need to comment on an issue or pull-request with the following command:
 
 ```
 git-bob comment
@@ -44,7 +44,7 @@ It will then try to solve the issue and send a pull-request.
 git-bob solve
 ```
 
-Note: This will only wor with simple issues that can be solved by modifying a single file.
+Note: This will only work with simple issues that can be solved by modifying a single file.
 
 ### Use-case examples
 
