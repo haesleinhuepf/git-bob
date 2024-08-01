@@ -44,6 +44,25 @@ git-bob solve
 
 Note: This will only wor with simple issues that can be solved by modifying a single file.
 
+### Use-case examples
+
+* `git-bob` can fix typos ([issue](https://github.com/haesleinhuepf/git-bob/issues/16), [pull-request](https://github.com/haesleinhuepf/git-bob/pull/17)):
+
+![demo_fix_typos.png](docs/images/demo_fix_typos.png)
+
+* `git-bob` can improve code documentation ([issue](https://github.com/haesleinhuepf/git-bob/issues/19), [pull-request](https://github.com/haesleinhuepf/git-bob/pull/21)):
+
+![demo_fix_typos.png](docs/images/demo_comment_code.png)
+
+* `git-bob` can fix typos ([pull-request](https://github.com/haesleinhuepf/git-bob/pull/11)):
+
+![demo_fix_typos.png](docs/images/demo_review_pull_request.png)
+
+* `git-bob` can also be exploited to answer questions ([issue](https://github.com/haesleinhuepf/git-bob/issues/20)).
+
+![](docs/images/demo_question.png)
+
+
 ## Installation as command-line tool
 
 You can also install git-bob locally and run it from the terminal. 
