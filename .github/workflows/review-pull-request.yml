@@ -5,11 +5,6 @@ on:
     types: [opened, synchronize]
   pull_request_review_comment:
     types: [ created ]
-  issues:
-    types: opened
-  issue_comment:
-    types:
-      - created
 
 jobs:
   respond:
@@ -40,18 +35,12 @@ jobs:
         git fetch origin ${{ github.base_ref }}
         git diff origin/${{ github.base_ref }} HEAD > temp.txt
 
-    #- name: Upload diff as artifact
-    #  uses: actions/upload-artifact@v2
-    #  with:
-    #    name: diff-file
-    #    path: temp.txt
-
     - name: Run Python
       env:
         ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
         GITHUB_API_KEY: "${{ secrets.GITHUB_TOKEN }}"
       run: |
-        python actions/manager.py response-pull-request ${{ github.repository }} ${{ github.event.pull_request.number }} ${{ github.event.issue.number }}
+        python actions/manager.py review-pull-request ${{ github.repository }} ${{ github.event.pull_request.number }}
 
     - name: Remove temp files
       run: |
