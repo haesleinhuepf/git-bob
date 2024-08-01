@@ -66,5 +66,5 @@ def get_most_recent_comment_on_issue(repository, issue):
         return comment.user.login, comment.body
 
     else:
-        return issue.user.login, issue.body
+        return issue_obj.user.login, issue_obj.body
 
