@@ -21,7 +21,7 @@ for arg in sys.argv[1:]:
 
 task = sys.argv[1]
 repository = sys.argv[2] if len(sys.argv) > 2 else None
-issue = sys.argv[3] if len(sys.argv) > 3 else None
+issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
 
 if task == "response-pull-request":
 
