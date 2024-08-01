@@ -20,6 +20,7 @@ Do not use this technology if you are not aware of the costs and consequences.
 > The prompts you enter are transferred to their servers and may be processed and stored there. 
 > Make sure to not submit any sensitive, confidential or personal data. Also using these services may cost money.
 
+![demo_fix_typos.png](docs/images/banner.png)
 
 ## Installation as github action
 
@@ -99,3 +100,8 @@ There are similar projects out there
 
 Feedback and contributions are welcome! Just open an issue and let's discuss before you send a pull-request. 
 A [human](https://haesleinhuepf.github.io) will respond and comment on your ideas!
+
+
+## Acknowledgements
+
+We acknowledge the financial support by the Federal Ministry of Education and Research of Germany and by Sächsische Staatsministerium für Wissenschaft, Kultur und Tourismus in the programme Center of Excellence for AI-research „Center for Scalable Data Analytics and Artificial Intelligence Dresden/Leipzig“, project identification number: ScaDS.AI
