@@ -9,6 +9,8 @@ api_key = os.environ.get("ANTHROPIC_API_KEY")
 print("Hello")
 if api_key is not None:
     print("world!")
+if api_key[0] == '"':
+    print("nej!")
 
 # Print out all arguments passed to the script
 print("Script arguments:")

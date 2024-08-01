@@ -27,6 +27,6 @@ jobs:
    
     - name: Run action
       env:
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
       run: |
-        python actions.py response-pull-request ${{ github.event.pull_request.number }}"
+        python actions.py response-pull-request ${{ github.event.pull_request.number }}
