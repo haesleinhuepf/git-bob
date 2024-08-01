@@ -63,8 +63,15 @@ def get_most_recent_comment_on_issue(repository, issue):
     comments = list(comments)
     if len(comments) > 0:
         comment = comments[-1]
-        return comment.user.login, comment.body
+
+        user = comment.user.login
+        text = comment.body
 
     else:
-        return issue_obj.user.login, issue_obj.body
+        user = issue_obj.user.login
+        text = issue_obj.body
 
+    if text is None:
+        text = ""
+
+    return user, text
