@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: git_bob/checkout@v2
+      uses: actions/checkout@v2
 
     - name: Print pull request number
       run: |  
@@ -21,7 +21,7 @@ jobs:
         echo "Repository Name - ${{ github.repository }}"
 
     - name: Set up Python
-      uses: git_bob/setup-python@v2
+      uses: actions/setup-python@v2
       with:
         python-version: 3.x
 
