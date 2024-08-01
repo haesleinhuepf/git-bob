@@ -2,7 +2,21 @@ import os
 from github import Github
 
 def comment_on_issue(repository, issue, comment):
-    # Replace 'YOUR_ACCESS_TOKEN' with your actual GitHub access token
+    """Add a comment to a specified GitHub issue.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The issue number to comment on.
+    comment : str
+        The comment text to add to the issue.
+
+    Returns
+    -------
+    None
+    """
     print(f"-> comment_on_issue({repository}, {issue}, ...)")
 
     access_token = os.getenv('GITHUB_API_KEY')
@@ -23,7 +37,20 @@ def comment_on_issue(repository, issue, comment):
 
 
 def get_conversation_on_issue(repository, issue):
-    # Create a Github instance using your access token
+    """Retrieve the conversation (title, body, and comments) of a specified GitHub issue.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The issue number to retrieve the conversation for.
+
+    Returns
+    -------
+    str
+        The conversation details as a formatted string.
+    """
     print(f"-> get_conversation_on_issue({repository}, {issue})")
 
     access_token = os.getenv('GITHUB_API_KEY')
@@ -50,7 +77,20 @@ def get_conversation_on_issue(repository, issue):
 
 
 def get_most_recent_comment_on_issue(repository, issue):
-    # Create a Github instance using your access token
+    """Retrieve the most recent comment on a specified GitHub issue.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The issue number to retrieve the most recent comment for.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the username and the text of the most recent comment.
+    """
     print(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
 
     access_token = os.getenv('GITHUB_API_KEY')
@@ -83,27 +123,20 @@ def get_most_recent_comment_on_issue(repository, issue):
     return user, text
 
 
-# This file contains utility functions using the github API via github-python:
-# https://github.com/PyGithub/PyGithub (licensed LGPL3)
-#
-# All functions must have a proper docstring, because we are using them as tools for function calling using LLMs.
-# Most of the code in this file has been written using bia-bob
-
-
-
 def list_issues(repository: str, state: str = "open") -> dict:
-    """List all github issues with defined state on a specified repository.
+    """List all GitHub issues with a defined state on a specified repository.
 
     Parameters
     ----------
-    repository:str
-        a github repository
-    state:str, optional
-        issue status: can be "open", "closed" or "all"
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    state : str, optional
+        The issue status: can be "open", "closed", or "all". Default is "open".
 
     Returns
     -------
-        dictionary of issues
+    dict
+        A dictionary of issues with issue numbers as keys and titles as values.
     """
     print(f"-> list_issues({repository}, {state})")
 
@@ -140,6 +173,7 @@ def get_github_issue_details(repository: str, issue: int) -> str:
     Returns
     -------
     str
+        A formatted string containing detailed information about the issue.
     """
     print(f"-> get_github_issue_details({repository}, {issue})")
 
@@ -176,8 +210,7 @@ Body:
 
 
 def list_repository_files(repo_name: str) -> list:
-    """
-    List all files in a given GitHub repository.
+    """List all files in a given GitHub repository.
 
     This function uses the GitHub API to retrieve and list all files
     in the specified repository.
@@ -223,8 +256,7 @@ def list_repository_files(repo_name: str) -> list:
 
 
 def get_repository_file_contents(repo_name: str, file_paths: list) -> dict:
-    """
-    Retrieve the contents of specified files from a GitHub repository.
+    """Retrieve the contents of specified files from a GitHub repository.
 
     Parameters
     ----------
@@ -274,16 +306,16 @@ def update_file_in_new_branch(repository, file_path, new_content):
     Parameters
     ----------
     repository : str
-        The full name of the GitHub repository (e.g., "username/repo-name")
-    file_paths : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    file_path : str
         A file path within the repository to change the contents of.
-    new_conent : str
+    new_content : str
         Text content that should be written into the file.
 
     Returns
     -------
     str
-        The name of the brach where the change file is stored.
+        The name of the branch where the changed file is stored.
     """
     print(f"-> update_file_in_new_branch({repository}, {file_path}, ...)")
 
@@ -291,8 +323,6 @@ def update_file_in_new_branch(repository, file_path, new_content):
     import os
     import random
     import string
-
-    # print(f'update_file_in_new_branch(repository="{repository}", file_path="{file_path}", new_content="{new_content}"')
 
     # Authenticate with GitHub
     GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
@@ -304,7 +334,7 @@ def update_file_in_new_branch(repository, file_path, new_content):
     # Get the main branch
     main_branch = repo.get_branch("main")
 
-    # access the file
+    # Access the file
     file = repo.get_contents(file_path)
 
     # Create a new branch
@@ -323,11 +353,11 @@ def send_pull_request(repository, branch_name, title, description):
     Parameters
     ----------
     repository : str
-        The full name of the GitHub repository (e.g., "username/repo-name")
+        The full name of the GitHub repository (e.g., "username/repo-name").
     branch_name : str
         The name of the branch that should be merged into main.
     title : str
-        A one-liner explaining what was changed in the branch
+        A one-liner explaining what was changed in the branch.
     description : str
         A more detailed description of what has happened.
         If the changes are related to an issue write "closes #99 "
@@ -336,14 +366,12 @@ def send_pull_request(repository, branch_name, title, description):
     Returns
     -------
     str
-        The url to the pull-request that was just created.
+        The URL to the pull-request that was just created.
     """
     print(f"-> send_pull_request({repository}, {branch_name}, ...)")
 
     from github import Github
     import os
-    import random
-    import string
 
     # Authenticate with GitHub
     GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
@@ -360,8 +388,19 @@ def send_pull_request(repository, branch_name, title, description):
 
 
 def solve_github_issue(repository, issue):
-    """Attempt to solve a github issue by modifying a single file and sending a pull-request."""
-    # source: https://github.com/ScaDS/generative-ai-notebooks/blob/main/docs/64_github_interaction/solving_github_issues.ipynb
+    """Attempt to solve a GitHub issue by modifying a single file and sending a pull-request.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The issue number to solve.
+
+    Returns
+    -------
+    None
+    """
     print(f"-> solve_github_issue({repository}, {issue})")
     from blablado import Assistant
     assistant = Assistant()
@@ -375,6 +414,6 @@ def solve_github_issue(repository, issue):
     assistant.do(f"List all files in the repository {repository}")
     filename = assistant.tell("Which of these files might be relevant for issue #{issue} ? Respond ONLY the filename.")
     print("Related filename", filename)
-    assistant.do(f"Load the entire content of {filename} from the  in the repository {repository} .")
+    assistant.do(f"Load the entire content of {filename} from the repository {repository} .")
     assistant.do(f"Modify the file content of {filename} to fix the issue in a new branch.")
     assistant.do("Send a pull-request of the new branch explaining what we changed.")
