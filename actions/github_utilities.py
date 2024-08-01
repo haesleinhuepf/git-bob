@@ -43,3 +43,23 @@ def get_conversation_on_issue(repository, issue):
         conversation += f"Comment by {comment.user.login}:\n{comment.body}\n\n"
 
     return conversation
+
+
+def get_most_recent_comment_on_issue(repository, issue):
+    # Create a Github instance using your access token
+    access_token = os.getenv('GITHUB_API_KEY')
+    g = Github(access_token)
+
+    # Get the repository
+    repo = g.get_repo(repository)
+
+    # Get the issue by number
+    issue_obj = repo.get_issue(issue)
+
+    # Get all comments on the issue
+    comments = issue_obj.get_comments()
+
+    # return last comment
+    comment = comments[-1]
+
+    return comment.user.login, comment.body
