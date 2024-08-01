@@ -34,7 +34,7 @@ if task == "response-pull-request":
 
         print("Discussion:", discussion)
 
-        comment = prompt_claude("""
+        comment = prompt_claude(f"""
 Generate a response to the following discussion in a github pull-request:
 
 {discussion}
