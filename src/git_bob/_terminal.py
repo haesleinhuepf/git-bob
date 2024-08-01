@@ -3,18 +3,18 @@ def command_line_interface():
     import sys
 
     from ._github_utilities import comment_on_issue, get_conversation_on_issue, get_most_recent_comment_on_issue
-    from ._claude import prompt_claude
+    from ._endpoints import prompt_claude, prompt_chatgpt
 
     print("Hello")
     # Read the environment variable "ANTHROPIC_API_KEY"
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-
-    # Check if the environment variable is not None
-    print("Hello")
-    if api_key is not None:
-        print("world!")
-    if api_key[0] == '"':
-        print("nej!")
+    if os.environ.get("ANTHROPIC_API_KEY") is not None:
+        print("Using claude...")
+        prompt = prompt_claude
+    elif os.environ.get("OPENAI_API_KEY") is not None:
+        print("Using gpt...")
+        prompt = prompt_chatgpt
+    else:
+        raise NotImplementedError("No API key specified.")
 
     # Print out all arguments passed to the script
     print("Script arguments:")
@@ -43,7 +43,7 @@ def command_line_interface():
 
             print("file_changes:", file_changes)
 
-            comment = prompt_claude(f"""
+            comment = prompt(f"""
 {system_prompt}
 Generate a response to a github pull-request. 
 Given are the discussion on the pull-request and the changed files.
@@ -72,7 +72,7 @@ Just respond to the discussion.
 """)
 
         if task == "comment-on-issue":
-            comment = prompt_claude(f"""
+            comment = prompt(f"""
 {system_prompt}
 Respond to a github issue. Its entire discussion is given.
 

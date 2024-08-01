@@ -22,3 +22,25 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
 
     # extract answer
     return message.content[0].text
+
+
+def prompt_chatgpt(message: str, model="gpt-4o-2024-05-13"):
+    """A prompt helper function that sends a message to openAI
+    and returns only the text response.
+    """
+    # convert message in the right format if necessary
+    import openai
+    if isinstance(message, str):
+        message = [{"role": "user", "content": message}]
+
+    # setup connection to the LLM
+    client = openai.OpenAI()
+
+    # submit prompt
+    response = client.chat.completions.create(
+        model=model,
+        messages=message
+    )
+
+    # extract answer
+    return response.choices[0].message.content
