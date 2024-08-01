@@ -28,7 +28,7 @@ if task == "response-pull-request":
 
     user, text = get_most_recent_comment_on_issue(repository, issue)
 
-    if "@haesleinhuepf" in text:
+    if "git-bob respond" in text:
 
         discussion = get_conversation_on_issue(repository, issue)
 
