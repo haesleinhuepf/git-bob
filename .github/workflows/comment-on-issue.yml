@@ -1,10 +1,6 @@
-name: Respond to Pull Request
+name: Respond to Issue
 
 on:
-  pull_request:
-    types: [opened, synchronize]
-  pull_request_review_comment:
-    types: [ created ]
   issues:
     types: opened
   issue_comment:
@@ -17,7 +13,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: git_bob/checkout@v2
 
     - name: Print pull request number
       run: |  
@@ -26,18 +22,18 @@ jobs:
         echo "Repository Name - ${{ github.repository }}"
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: git_bob/setup-python@v2
       with:
         python-version: 3.x
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -e .
 
     - name: Run Python
       env:
         ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
         GITHUB_API_KEY: "${{ secrets.GITHUB_TOKEN }}"
       run: |
-        python actions/manager.py commend-on-issue ${{ github.repository }} ${{ github.event.pull_request.number }} ${{ github.event.issue.number }}
+        git-bob comment-on-issue ${{ github.repository }} ${{ github.event.pull_request.number }} ${{ github.event.issue.number }}
