@@ -36,7 +36,7 @@ def command_line_interface():
 
         print("Discussion:", discussion)
 
-        if task == "response-pull-request":
+        if task == "review-pull-request":
             # load temp.txt into a variable
             with open("temp.txt", "r") as file:
                 file_changes = file.read()
