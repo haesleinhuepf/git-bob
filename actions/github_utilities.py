@@ -1,4 +1,5 @@
 from github import Github
+import os
 
 def comment_on_issue(repository, issue, comment):
     # Replace 'YOUR_ACCESS_TOKEN' with your actual GitHub access token
@@ -21,8 +22,6 @@ def comment_on_issue(repository, issue, comment):
 
 def get_conversation_on_issue(repository, issue):
     # Create a Github instance using your access token
-    from github import Github
-
     access_token = os.getenv('GITHUB_API_KEY')
     g = Github(access_token)
 
