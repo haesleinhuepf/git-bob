@@ -1,3 +1,5 @@
+from ._utilities import remove_indentation
+
 SYSTEM_PROMPT = """You are an extremely skilled python developer. Your name is git-bob."""
 def setup_ai_remark():
     from git_bob import __version__
@@ -13,7 +15,7 @@ def comment_on_issue(repository, issue, prompt_function):
     discussion = get_conversation_on_issue(repository, issue)
     print("Discussion:", discussion)
 
-    comment = prompt_function(f"""
+    comment = prompt_function(remove_indentation(f"""
     {SYSTEM_PROMPT}
     Respond to a github issue. Its entire discussion is given.
 
@@ -26,15 +28,15 @@ def comment_on_issue(repository, issue, prompt_function):
     Respond to the discussion above. 
     Do NOT explain your response or anything else. 
     Just respond to the discussion.
-    """)
+    """))
 
     print("comment:", comment)
 
-    add_comment_to_issue(repository, issue, f"""        
+    add_comment_to_issue(repository, issue, remove_indentation(f"""        
     {ai_remark}
 
     {comment}
-    """)
+    """))
 
 def review_pull_request(repository, issue, prompt_function):
 
@@ -51,7 +53,7 @@ def review_pull_request(repository, issue, prompt_function):
 
     print("file_changes:", file_changes)
 
-    comment = prompt_function(f"""
+    comment = prompt_function(remove_indentation(f"""
     {SYSTEM_PROMPT}
     Generate a response to a github pull-request. 
     Given are the discussion on the pull-request and the changed files.
@@ -69,15 +71,15 @@ def review_pull_request(repository, issue, prompt_function):
     Respond to the discussion above. 
     Do NOT explain your response or anything else. 
     Just respond to the discussion.
-    """)
+    """))
 
     print("comment:", comment)
 
-    add_comment_to_issue(repository, issue, f"""        
+    add_comment_to_issue(repository, issue, remove_indentation(f"""        
     {ai_remark}
 
     {comment}
-    """)
+    """))
 
 
 def solve_github_issue(repository, issue):
@@ -102,9 +104,9 @@ def solve_github_issue(repository, issue):
     print("Related filename", filename)
     assistant.do(f"Load the entire content of {filename} from the  in the repository {repository} .")
     branch_name = assistant.tell(f"Modify the file content of {filename} to fix the issue in a new branch. Respond ONLY the branch name.")
-    add_comment_to_issue(repository, issue, f"""
+    add_comment_to_issue(repository, issue, remove_indentation(f"""
     {ai_remark}
     
     I created a branch with a potential solution [here](https://github.com/{repository}/tree/{branch_name}). I will attempt to send a pull-request.
-    """)
+    """))
     assistant.do("Send a pull-request of the new branch explaining what we changed.")
