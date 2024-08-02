@@ -6,15 +6,15 @@ def command_line_interface():
     from ._endpoints import prompt_claude, prompt_chatgpt
 
     print("Hello")
-    # Read the environment variable "ANTHROPIC_API_KEY"
-    if os.environ.get("ANTHROPIC_API_KEY") is not None:
+    llm_name = os.environ.get("GIT_BOB_LLM_NAME")
+    if "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
         print("Using claude...")
         prompt = prompt_claude
-    elif os.environ.get("OPENAI_API_KEY") is not None:
+    elif "gpt" in llm_name and os.environ.get("OPENAI_API_KEY") is not None:
         print("Using gpt...")
         prompt = prompt_chatgpt
     else:
-        raise NotImplementedError("No API key specified.")
+        raise NotImplementedError("Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs.")
 
     # Print out all arguments passed to the script
     print("Script arguments:")
@@ -77,7 +77,8 @@ Just respond to the discussion.
 {comment}
 """)
         elif (not running_in_github_ci and task == "solve-issue") or (task == "comment-on-issue" and "git-bob solve" in text):
-            from ._github_utilities import solve_github_issue
+            if prompt == prompt_claude:
+                raise NotImplementedError("Solving issues using claude is currently not supported. Please use gpt instead.")
             solve_github_issue(repository, issue)
         elif task == "comment-on-issue" and ("git-bob comment" in text or not running_in_github_ci):
             comment = prompt(f"""

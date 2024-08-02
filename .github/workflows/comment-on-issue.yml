@@ -34,6 +34,7 @@ jobs:
     - name: Run Python
       env:
         #ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
+        GIT_BOB_LLM_NAME: "gpt-4o-2024-05-13"
         OPENAI_API_KEY: "${{ secrets.OPENAI_API_KEY }}"
         GITHUB_API_KEY: "${{ secrets.GITHUB_TOKEN }}"
       run: |

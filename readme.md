@@ -1,14 +1,15 @@
 # git-bob
 
-git-bob uses AI to answer github-issues and review pull-requests. 
-Under the hood it uses [claude 3.5 sonnet](https://claude.ai) or [gpt-4 omni](https://chat.openai.com/) to understand the text and 
-[pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull-requests.
+git-bob uses AI to answer Github-issues and review pull-requests. 
 
 ![demo_fix_typos.png](docs/images/banner.png)
 
+Under the hood it uses [claude 3.5 sonnet](https://claude.ai) or [gpt-4 omni](https://chat.openai.com/) to understand the text and 
+[pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull-requests.
+
 ## Disclaimer
 
-`git-bob` is a research project aiming at streamlining github interaction in software development projects. Under the hood it uses
+`git-bob` is a research project aiming at streamlining Github interaction in software development projects. Under the hood it uses
 artificial intelligence / large language models to generate text and code fulfilling the user's requests. 
 Users are responsible to verify the generated code according to good scientific practice.
 
@@ -23,13 +24,14 @@ Do not use this technology if you are not aware of the costs and consequences.
 > Make sure to not submit any sensitive, confidential or personal data. Also using these services may cost money.
 
 
-## Installation as github action
+## Installation as Github action
 
-To use git-bob in your github repository, you need to 
-* setup github workflows like shown in [this folder](.github/workflows).
-  Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.1.0`.
-* configure a github secret called "ANTHROPIC_API_KEY" or an "OPENAI_API_KEY" and choose which one to use in the github workflow files mentioned above.
-* configure github actions to run the workflow on issues and pull-requests. Also give write-access to the action runner.
+To use git-bob in your Github repository, you need to 
+* setup Github workflows like shown in [this folder](.github/workflows).
+  * Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.1.0`.
+  * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable.
+* configure a Github secret called `ANTHROPIC_API_KEY` or an `OPENAI_API_KEY` depending on the above configured LLM.
+* configure Github actions to run the workflow on issues and pull-requests. Also give write-access to the action runner.
 
 To trigger git-bob, you need to comment on an issue or pull-request with the following command:
 
@@ -68,7 +70,8 @@ Note: This will only work with simple issues that can be solved by modifying a s
 ## Installation as command-line tool
 
 You can also install git-bob locally and run it from the terminal. 
-In this case, create a github token and store it in an environment variable named `GITHUB_API_KEY`. 
+In this case, create a [Github token](https://github.com/settings/tokens) and store it in an environment variable named `GITHUB_API_KEY`. 
+Also create an environment variable `GIT_BOB_LLM_NAME` with the name of the LLM you want to use, e.g. "gpt-4o-2024-05-13" or "claude-3-5-sonnet-20240620".
 Then you can install git-bob using pip:
 
 ```bash
