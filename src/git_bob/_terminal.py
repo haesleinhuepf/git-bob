@@ -1,3 +1,5 @@
+# This module provides the command line interface for git-bob.
+
 def command_line_interface():
     import os
     import sys
