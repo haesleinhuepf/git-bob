@@ -41,7 +41,7 @@ jobs:
         OPENAI_API_KEY: "${{ secrets.OPENAI_API_KEY }}"
         GITHUB_API_KEY: "${{ secrets.GITHUB_TOKEN }}"
       run: |
-        git-bob review-pull-request ${{ github.repository }} ${{ github.event.pull_request.number }}
+        git-bob review-pull-request-action ${{ github.repository }} ${{ github.event.pull_request.number }}
 
     - name: Remove temp files
       run: |

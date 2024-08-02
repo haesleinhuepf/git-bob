@@ -86,6 +86,7 @@ git_bob <action> <organization>/<repository> <issue-number>
 Available actions:
 * `review-pull-request`
 * `comment-on-issue`
+* `solve-issue` (only works with OpenAI/gpt-4-omni at the moment)
 
 ## Similar projects
 
