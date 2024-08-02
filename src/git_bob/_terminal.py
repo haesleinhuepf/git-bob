@@ -6,6 +6,7 @@ def command_line_interface():
     from ._github_utilities import get_most_recent_comment_on_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue
     from ._endpoints import prompt_claude, prompt_chatgpt
+    from github import Github
 
     print("Hello")
     llm_name = os.environ.get("GIT_BOB_LLM_NAME")
@@ -42,6 +43,14 @@ def command_line_interface():
     issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
 
     user, text = get_most_recent_comment_on_issue(repository, issue)
+
+    # Check if the user is a repository member
+    g = Github(os.environ.get("GITHUB_TOKEN"))
+    repo = g.get_repo(repository)
+    members = [member.login for member in repo.get_collaborators()]
+    if user not in members:
+        print("User does not have access rights.")
+        sys.exit(1)
 
     ai_remark = setup_ai_remark()
 
