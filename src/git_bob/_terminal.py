@@ -1,10 +1,18 @@
 def command_line_interface():
     import os
     import sys
+    import signal
 
     from ._github_utilities import get_most_recent_comment_on_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue
     from ._endpoints import prompt_claude, prompt_chatgpt
+
+    def handler(signum, frame):
+        print("Process timed out")
+        sys.exit(1)
+
+    signal.signal(signal.SIGALRM, handler)
+    signal.alarm(180)  # Set the timeout to 3 minutes
 
     print("Hello")
     llm_name = os.environ.get("GIT_BOB_LLM_NAME")
