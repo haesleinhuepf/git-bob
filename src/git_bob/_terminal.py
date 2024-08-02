@@ -1,6 +1,7 @@
 def command_line_interface():
     import os
     import sys
+    import signal
 
     from ._github_utilities import get_most_recent_comment_on_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue
@@ -27,6 +28,15 @@ def command_line_interface():
     # test if we're running in the github-CI
     running_in_github_ci = task.endswith("-action")
     task = task.replace("-action", "")
+
+    if running_in_github_ci:
+        # in case we run in the github-CI, we set a timeout of 3 minutes
+        def handler(signum, frame):
+            print("Process timed out")
+            sys.exit(1)
+
+        signal.signal(signal.SIGALRM, handler)
+        signal.alarm(180)  # Set the timeout to 3 minutes
 
     repository = sys.argv[2] if len(sys.argv) > 2 else None
     issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
