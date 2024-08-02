@@ -56,7 +56,7 @@ Note: This will only work with simple issues that can be solved by modifying a s
 
 ![demo_fix_typos.png](docs/images/demo_comment_code.png)
 
-* `git-bob` review pull-requests and provide feedback ([pull-request](https://github.com/haesleinhuepf/git-bob/pull/11)):
+* `git-bob` can review pull-requests and provide feedback ([pull-request](https://github.com/haesleinhuepf/git-bob/pull/11)):
 
 ![demo_fix_typos.png](docs/images/demo_review_pull_request.png)
 
@@ -69,7 +69,7 @@ Note: This will only work with simple issues that can be solved by modifying a s
 
 You can also install git-bob locally and run it from the terminal. 
 In this case, create a github token and store it in an environment variable named `GITHUB_API_KEY`. 
-Then you can run git-bob like this:
+Then you can install git-bob using pip:
 
 ```bash
 pip install git-bob
@@ -77,7 +77,7 @@ pip install git-bob
 
 ## Usage as command-line tool
 
-You can use git-bob from the terminal on repositories you have read/write access to.
+You can then use git-bob from the terminal on repositories you have read/write access to.
 
 ```bash
 git_bob <action> <organization>/<repository> <issue-number>
