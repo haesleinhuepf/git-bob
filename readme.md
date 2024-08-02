@@ -94,8 +94,8 @@ Available actions:
 
 * `git-bob` was tested for Python projects only (yet).
 * It cannot solve issues where changing multiple files is required.
-* It does not have any logic to control who is allowed to trigger it. 
-  It uses Github infrastructure instead. Hence, if you are a repository member, you can trigger it. 
+* It has only limited logic to control who is allowed to trigger it. 
+  If you are a repository member, you can trigger it. 
   If others send a pull-request, some repository member must allow the action to run manually.
 * `git-bob` is not compatible with locally running open-source/weight LLMs. 
   This might make sense when being executed locally only. In the Github-CI this might be impossible.
