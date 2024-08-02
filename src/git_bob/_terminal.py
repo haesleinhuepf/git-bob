@@ -3,7 +3,7 @@ def command_line_interface():
     import sys
     import signal
 
-    from ._github_utilities import get_most_recent_comment_on_issue
+    from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue
     from ._endpoints import prompt_claude, prompt_chatgpt
     from github import Github
@@ -50,6 +50,16 @@ def command_line_interface():
     members = [member.login for member in repo.get_collaborators()]
     if user not in members:
         print("User does not have access rights.")
+        member_names = ", ".join(["@" + str(m) for m in members])
+        add_comment_to_issue(repository, issue, f"""
+Hi @{user}, 
+
+thanks for reaching out! Unfortunately, I'm not allowed to respond to you directly. 
+I need approval from a repository member: {member_names}
+
+Best,
+git-bob
+""")
         sys.exit(1)
 
     ai_remark = setup_ai_remark()
