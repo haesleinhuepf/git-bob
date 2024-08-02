@@ -1,9 +1,12 @@
+# This file contains utility functions using the github API via github-python:
+# https://github.com/PyGithub/PyGithub (licensed LGPL3)
+#
+# All functions must have a proper docstring, because we are using them as tools for function calling using LLMs.
 import os
 from github import Github
 
-def comment_on_issue(repository, issue, comment):
-    # Replace 'YOUR_ACCESS_TOKEN' with your actual GitHub access token
-    print(f"-> comment_on_issue({repository}, {issue}, ...)")
+def add_comment_to_issue(repository, issue, comment):
+    print(f"-> add_comment_to_issue({repository}, {issue}, ...)")
 
     access_token = os.getenv('GITHUB_API_KEY')
 
@@ -23,7 +26,6 @@ def comment_on_issue(repository, issue, comment):
 
 
 def get_conversation_on_issue(repository, issue):
-    # Create a Github instance using your access token
     print(f"-> get_conversation_on_issue({repository}, {issue})")
 
     access_token = os.getenv('GITHUB_API_KEY')
@@ -50,7 +52,6 @@ def get_conversation_on_issue(repository, issue):
 
 
 def get_most_recent_comment_on_issue(repository, issue):
-    # Create a Github instance using your access token
     print(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
 
     access_token = os.getenv('GITHUB_API_KEY')
@@ -81,14 +82,6 @@ def get_most_recent_comment_on_issue(repository, issue):
         text = ""
 
     return user, text
-
-
-# This file contains utility functions using the github API via github-python:
-# https://github.com/PyGithub/PyGithub (licensed LGPL3)
-#
-# All functions must have a proper docstring, because we are using them as tools for function calling using LLMs.
-# Most of the code in this file has been written using bia-bob
-
 
 
 def list_issues(repository: str, state: str = "open") -> dict:
@@ -357,24 +350,3 @@ def send_pull_request(repository, branch_name, title, description):
     pr = repo.create_pull(title=title, body=remark + description, head=branch_name, base="main")
 
     return f"Pull request created: {pr.html_url}"
-
-
-def solve_github_issue(repository, issue):
-    """Attempt to solve a github issue by modifying a single file and sending a pull-request."""
-    # source: https://github.com/ScaDS/generative-ai-notebooks/blob/main/docs/64_github_interaction/solving_github_issues.ipynb
-    print(f"-> solve_github_issue({repository}, {issue})")
-    from blablado import Assistant
-    assistant = Assistant()
-    assistant.register_tool(get_github_issue_details)
-    assistant.register_tool(list_repository_files)
-    assistant.register_tool(get_repository_file_contents)
-    assistant.register_tool(update_file_in_new_branch)
-    assistant.register_tool(send_pull_request)
-
-    assistant.do(f"Tell me the most important details of issue #{issue} in the repository {repository}")
-    assistant.do(f"List all files in the repository {repository}")
-    filename = assistant.tell("Which of these files might be relevant for issue #{issue} ? Respond ONLY the filename.")
-    print("Related filename", filename)
-    assistant.do(f"Load the entire content of {filename} from the  in the repository {repository} .")
-    assistant.do(f"Modify the file content of {filename} to fix the issue in a new branch.")
-    assistant.do("Send a pull-request of the new branch explaining what we changed.")
