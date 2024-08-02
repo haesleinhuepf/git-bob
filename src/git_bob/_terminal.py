@@ -45,7 +45,7 @@ def command_line_interface():
     user, text = get_most_recent_comment_on_issue(repository, issue)
 
     # Check if the user is a repository member
-    g = Github(os.environ.get("GITHUB_TOKEN"))
+    g = Github(os.environ.get("GITHUB_API_KEY"))
     repo = g.get_repo(repository)
     members = [member.login for member in repo.get_collaborators()]
     if user not in members:
