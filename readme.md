@@ -23,7 +23,6 @@ Do not use this technology if you are not aware of the costs and consequences.
 > The prompts you enter are transferred to their servers and may be processed and stored there. 
 > Make sure to not submit any sensitive, confidential or personal data. Also using these services may cost money.
 
-
 ## Installation as Github action
 
 To use git-bob in your Github repository, you need to 
@@ -90,6 +89,16 @@ Available actions:
 * `review-pull-request`
 * `comment-on-issue`
 * `solve-issue` (only works with OpenAI/gpt-4-omni at the moment)
+
+## Limitations
+
+* `git-bob` was tested for Python projects only (yet).
+* It cannot solve issues where changing multiple files is required.
+* It does not have any logic to control who is allowed to trigger it. 
+  It uses Github infrastructure instead. Hence, if you are a repository member, you can trigger it. 
+  If others send a pull-request, some repository member must allow the action to run manually.
+* `git-bob` is not compatible with locally running open-source/weight LLMs. 
+  This might make sense when being executed locally only. In the Github-CI this might be impossible.
 
 ## Similar projects
 
