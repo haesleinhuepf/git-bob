@@ -6,6 +6,18 @@ import os
 from github import Github
 
 def add_comment_to_issue(repository, issue, comment):
+    """
+    Add a comment to a specific GitHub issue.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The issue number to add a comment to.
+    comment : str
+        The comment text to add to the issue.
+    """
     print(f"-> add_comment_to_issue({repository}, {issue}, ...)")
 
     access_token = os.getenv('GITHUB_API_KEY')
@@ -26,6 +38,21 @@ def add_comment_to_issue(repository, issue, comment):
 
 
 def get_conversation_on_issue(repository, issue):
+    """
+    Retrieve the entire conversation (title, body, and comments) of a specific GitHub issue.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The issue number to retrieve the conversation for.
+
+    Returns
+    -------
+    str
+        The conversation string containing the issue title, body, and comments.
+    """
     print(f"-> get_conversation_on_issue({repository}, {issue})")
 
     access_token = os.getenv('GITHUB_API_KEY')
@@ -52,6 +79,21 @@ def get_conversation_on_issue(repository, issue):
 
 
 def get_most_recent_comment_on_issue(repository, issue):
+    """
+    Retrieve the most recent comment on a specific GitHub issue.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The issue number to retrieve the most recent comment for.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the username of the commenter and the comment text.
+    """
     print(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
 
     access_token = os.getenv('GITHUB_API_KEY')
@@ -85,18 +127,20 @@ def get_most_recent_comment_on_issue(repository, issue):
 
 
 def list_issues(repository: str, state: str = "open") -> dict:
-    """List all github issues with defined state on a specified repository.
+    """
+    List all GitHub issues with a defined state on a specified repository.
 
     Parameters
     ----------
-    repository:str
-        a github repository
-    state:str, optional
-        issue status: can be "open", "closed" or "all"
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    state : str, optional
+        The issue status: can be "open", "closed", or "all".
 
     Returns
     -------
-        dictionary of issues
+    dict
+        A dictionary of issues where keys are issue numbers and values are issue titles.
     """
     print(f"-> list_issues({repository}, {state})")
 
@@ -121,7 +165,8 @@ def list_issues(repository: str, state: str = "open") -> dict:
 
 
 def get_github_issue_details(repository: str, issue: int) -> str:
-    """Retrieve detailed information about a specific GitHub issue.
+    """
+    Retrieve detailed information about a specific GitHub issue.
 
     Parameters
     ----------
@@ -133,6 +178,7 @@ def get_github_issue_details(repository: str, issue: int) -> str:
     Returns
     -------
     str
+        A string containing detailed information about the issue.
     """
     print(f"-> get_github_issue_details({repository}, {issue})")
 
@@ -261,13 +307,14 @@ def get_repository_file_contents(repo_name: str, file_paths: list) -> dict:
 
 
 def update_file_in_new_branch(repository, file_path, new_content):
-    """Modifies a specified file with new content and saves the changes in a new git branch.
+    """
+    Modifies a specified file with new content and saves the changes in a new git branch.
     The name of the new branch is returned.
 
     Parameters
     ----------
     repository : str
-        The full name of the GitHub repository (e.g., "username/repo-name")
+        The full name of the GitHub repository (e.g., "username/repo-name").
     file_paths : str
         A file path within the repository to change the contents of.
     new_conent : str
@@ -276,7 +323,7 @@ def update_file_in_new_branch(repository, file_path, new_content):
     Returns
     -------
     str
-        The name of the brach where the change file is stored.
+        The name of the branch where the changed file is stored.
     """
     print(f"-> update_file_in_new_branch({repository}, {file_path}, ...)")
 
@@ -285,7 +332,7 @@ def update_file_in_new_branch(repository, file_path, new_content):
     import random
     import string
 
-    # print(f'update_file_in_new_branch(repository="{repository}", file_path="{file_path}", new_content="{new_content}"')
+    # print(f'update_file_in_new_branch(repository="{repository}", file_path="{file_path}", new_content="{new_content}")
 
     # Authenticate with GitHub
     GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
@@ -311,16 +358,17 @@ def update_file_in_new_branch(repository, file_path, new_content):
 
 
 def send_pull_request(repository, branch_name, title, description):
-    """Create a pull request from a defined branch into the main branch.
+    """
+    Create a pull request from a defined branch into the main branch.
 
     Parameters
     ----------
     repository : str
-        The full name of the GitHub repository (e.g., "username/repo-name")
+        The full name of the GitHub repository (e.g., "username/repo-name").
     branch_name : str
         The name of the branch that should be merged into main.
     title : str
-        A one-liner explaining what was changed in the branch
+        A one-liner explaining what was changed in the branch.
     description : str
         A more detailed description of what has happened.
         If the changes are related to an issue write "closes #99 "
@@ -329,7 +377,7 @@ def send_pull_request(repository, branch_name, title, description):
     Returns
     -------
     str
-        The url to the pull-request that was just created.
+        The URL to the pull-request that was just created.
     """
     print(f"-> send_pull_request({repository}, {branch_name}, ...)")
 
