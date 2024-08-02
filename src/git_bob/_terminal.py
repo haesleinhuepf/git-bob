@@ -25,6 +25,7 @@ def command_line_interface():
 
     # test if we're running in the github-CI
     running_in_github_ci = task.endswith("-action")
+    task = task.replace("-action", "")
 
     repository = sys.argv[2] if len(sys.argv) > 2 else None
     issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
