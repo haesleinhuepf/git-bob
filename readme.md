@@ -56,7 +56,7 @@ Note: This will only work with simple issues that can be solved by modifying a s
 
 ![demo_fix_typos.png](docs/images/demo_comment_code.png)
 
-* `git-bob` can fix typos ([pull-request](https://github.com/haesleinhuepf/git-bob/pull/11)):
+* `git-bob` review pull-requests and provide feedback ([pull-request](https://github.com/haesleinhuepf/git-bob/pull/11)):
 
 ![demo_fix_typos.png](docs/images/demo_review_pull_request.png)
 
