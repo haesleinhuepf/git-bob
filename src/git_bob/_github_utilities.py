@@ -302,10 +302,6 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content):
         The name of the branch where the changed file is stored.
     """
     print(f"-> write_file_in_new_branch({repository}, {branch_name}, {file_path}, ...)")
-    import os
-    import string
-
-    # print(f'update_file_in_new_branch(repository="{repository}", file_path="{file_path}", new_content="{new_content}")
 
     # Authenticate with GitHub
     repo = get_github_repository(repository)
