@@ -5,6 +5,10 @@
 import os
 from github import Github
 
+
+
+
+
 def add_comment_to_issue(repository, issue, comment):
     """
     Add a comment to a specific GitHub issue.
@@ -306,9 +310,9 @@ def get_repository_file_contents(repo_name: str, file_paths: list) -> dict:
     return file_contents
 
 
-def update_file_in_new_branch(repository, file_path, new_content):
+def write_file_in_new_branch(repository, branch_name, file_path, new_content):
     """
-    Modifies a specified file with new content and saves the changes in a new git branch.
+    Modifies or creates a specified file with new content and saves the changes in a new git branch.
     The name of the new branch is returned.
 
     Parameters
@@ -325,11 +329,10 @@ def update_file_in_new_branch(repository, file_path, new_content):
     str
         The name of the branch where the changed file is stored.
     """
-    print(f"-> update_file_in_new_branch({repository}, {file_path}, ...)")
+    print(f"-> write_file_in_new_branch({repository}, {branch_name}, {file_path}, ...)")
 
     from github import Github
     import os
-    import random
     import string
 
     # print(f'update_file_in_new_branch(repository="{repository}", file_path="{file_path}", new_content="{new_content}")
@@ -341,20 +344,55 @@ def update_file_in_new_branch(repository, file_path, new_content):
     # Get the repository
     repo = g.get_repo(repository)
 
-    # Get the main branch
-    main_branch = repo.get_branch("main")
 
-    # access the file
-    file = repo.get_contents(file_path)
+    # Commit the changes
+    if check_if_file_exists(repository, file_path):
+        file = repo.get_contents(file_path)
+        repo.update_file(file.path, "Update file content", new_content, file.sha, branch=branch_name)
+    else:
+        repo.create_file(file_path, "Create file content", new_content, branch=branch_name)
+
+    return f"File {file_path} successfully created in repository {repository} branch {branch_name}."
+
+def create_branch(repository, parent_branch="main"):
+    """Creates a new branch in a given repository, derived from an optionally specified parent_branch and returns the name of the new branch."""
+    print(f"-> create_branch({repository}, {parent_branch})")
+
+    import random
+    import string
+
+    # Authenticate with GitHub
+    GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
+    g = Github(GITHUB_API_KEY)
+
+    # Get the repository
+    repo = g.get_repo(repository)
+
+    # Get the main branch
+    main_branch = repo.get_branch(parent_branch)
 
     # Create a new branch
     new_branch_name = "mod-" + ''.join(random.choices(string.ascii_letters + string.digits, k=10))
     repo.create_git_ref(ref=f"refs/heads/{new_branch_name}", sha=main_branch.commit.sha)
 
-    # Commit the changes
-    repo.update_file(file.path, "Update file content", new_content, file.sha, branch=new_branch_name)
-
     return new_branch_name
+
+
+def check_if_file_exists(repository, file_path):
+    """Checks if a specified file_path exists in a GitHub repository. Returns True if the file exists, False otherwise."""
+    # Authenticate with GitHub
+    GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
+    g = Github(GITHUB_API_KEY)
+
+    # Get the repository
+    repo = g.get_repo(repository)
+
+    try:
+        # Try to get the contents of the file
+        contents = repo.get_contents(file_path)
+        return True
+    except:
+        return False
 
 
 def send_pull_request(repository, branch_name, title, description):
@@ -384,8 +422,6 @@ def send_pull_request(repository, branch_name, title, description):
     from github import Github
     import os
     from ._ai_github_utilities import setup_ai_remark
-    import random
-    import string
 
     # Authenticate with GitHub
     GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
@@ -395,7 +431,7 @@ def send_pull_request(repository, branch_name, title, description):
     repo = g.get_repo(repository)
 
     # Create a pull request
-    remark = setup_ai_remark()
+    remark = setup_ai_remark() + "\n\n"
     pr = repo.create_pull(title=title, body=remark + description, head=branch_name, base="main")
 
     return f"Pull request created: {pr.html_url}"
