@@ -4,7 +4,7 @@ git-bob uses AI to answer Github-issues and review pull-requests.
 
 ![demo_fix_typos.png](docs/images/banner.png)
 
-Under the hood it uses [claude 3.5 sonnet](https://claude.ai) or [gpt-4 omni](https://chat.openai.com/) to understand the text and 
+Under the hood it uses [gpt-4 omni](https://chat.openai.com/) to understand the text and 
 [pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull-requests.
 
 ## Disclaimer
@@ -29,7 +29,7 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
 * setup Github workflows like shown in [this folder](.github/workflows).
   * Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.1.0`.
   * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable.
-* configure a Github secret called `ANTHROPIC_API_KEY` or an `OPENAI_API_KEY` depending on the above configured LLM.
+* configure a Github secret called `OPENAI_API_KEY` depending on the above configured LLM.
 * configure Github actions to run the workflow on issues and pull-requests. Also give write-access to the action runner.
 
 To trigger git-bob, you need to comment on an issue or pull-request with the following command:
@@ -44,8 +44,6 @@ It will then try to solve the issue and send a pull-request.
 ```
 git-bob solve
 ```
-
-Note: This will only work with simple issues that can be solved by modifying a single file.
 
 ### Use-case examples
 
@@ -93,11 +91,13 @@ Available actions:
 ## Limitations
 
 * `git-bob` was tested for Python projects only (yet).
-* It cannot solve issues where changing multiple files is required.
+* It cannot solve issues where changing long files is required. As the output of the LLMs is limited to 4096 tokens, 
+  it is not possible to modify longer files.
+* It cannot solve issues where running and testing the code is required. 
 * It has only limited logic to control who is allowed to trigger it. 
   If you are a repository member, you can trigger it. 
-  If others send a pull-request, some repository member must allow the action to run manually.
-* `git-bob` is not compatible with locally running open-source/weight LLMs. 
+  If others send a pull-request, a repository member must allow the action to run manually.
+* `git-bob` is incompatible with locally running open-source/-weight LLMs. 
   This might make sense when being executed locally only. In the Github-CI this might be impossible.
 
 ## Similar projects
