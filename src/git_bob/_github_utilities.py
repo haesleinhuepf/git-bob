@@ -398,3 +398,24 @@ def send_pull_request(repository, branch_name, title, description):
     pr = repo.create_pull(title=title, body=remark + description, head=branch_name, base="main")
 
     return f"Pull request created: {pr.html_url}"
+
+
+def check_access_and_ask_for_approval(user, repository, issue):
+    # Check if the user is a repository member
+    g = Github(os.environ.get("GITHUB_API_KEY"))
+    repo = g.get_repo(repository)
+    members = [member.login for member in repo.get_collaborators()]
+    if user not in members:
+        print("User does not have access rights.")
+        member_names = ", ".join(["@" + str(m) for m in members])
+        add_comment_to_issue(repository, issue, f"""
+    Hi @{user}, 
+
+    thanks for reaching out! Unfortunately, I'm not allowed to respond to you directly. 
+    I need approval from a repository member: {member_names}
+
+    Best,
+    git-bob
+    """)
+        return False
+    return True
