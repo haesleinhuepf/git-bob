@@ -7,6 +7,7 @@ from functools import lru_cache
 
 @lru_cache(maxsize=1)
 def get_github_repository(repository):
+    from github import Github
     access_token = os.getenv('GITHUB_API_KEY')
 
     # Create a PyGithub instance using the access token
@@ -16,7 +17,6 @@ def get_github_repository(repository):
     return g.get_repo(repository)
 
 
-from github import Github
 
 def add_comment_to_issue(repository, issue, comment):
     """
@@ -221,8 +221,6 @@ def list_repository_files(repository: str) -> list:
     """
     print(f"-> list_repository_files({repository})")
 
-    from github import Github
-
     # Initialize Github client
     repo = get_github_repository(repository)
 
@@ -380,8 +378,6 @@ def send_pull_request(repository, branch_name, title, description):
     """
     print(f"-> send_pull_request({repository}, {branch_name}, ...)")
 
-    from github import Github
-    import os
     from ._ai_github_utilities import setup_ai_remark
 
     # Authenticate with GitHub
