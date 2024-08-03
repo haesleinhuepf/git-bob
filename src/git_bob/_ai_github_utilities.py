@@ -102,16 +102,15 @@ def solve_github_issue(repository, issue, llm_model):
 
     ai_remark = setup_ai_remark()
 
-    print(f"-> solve_github_issue({repository}, {issue})")
     assistant = Assistant(model=llm_model)
     assistant.register_tool(get_github_issue_details)
     assistant.register_tool(list_repository_files)
-    assistant.register_tool(get_repository_file_contents)
     assistant.register_tool(create_branch)
-    assistant.register_tool(write_file_in_new_branch)
     assistant.register_tool(send_pull_request)
 
-    assistant.do(f"Tell me the most important details of issue #{issue} in the repository {repository}")
+    issue_summary = assistant.tell(f"Summarize the most important details of issue #{issue} in the repository {repository}")
+    print("issue_summary", issue_summary)
+
     assistant.do(f"List all files in the repository {repository}")
     filenames_json = remove_outer_markdown(assistant.tell("Which of these files might be relevant for issue #{issue} ? You can also consider files which do not exist yet. Respond ONLY the filenames  as JSON list."))
 
@@ -128,13 +127,16 @@ def solve_github_issue(repository, issue, llm_model):
 
     for filename in filenames:
         if check_if_file_exists(repository, filename):
+            modifier = Assistant(model=llm_model)
+            modifier.register_tool(get_repository_file_contents)
+            modifier.register_tool(write_file_in_new_branch)
+
             print(filename, "will be overwritten")
-            assistant.do(f"Load the entire content of {filename} from the repository {repository} branch {branch_name}.")
-            assistant.do(f"Modify the file content of {filename} according to the github issue description at the very beginning and write it to repository {repository} branch {branch_name}.")
+            modifier.do(f"Load the entire content of {filename} from the repository {repository} branch {branch_name}.")
+            modifier.do(f"Modify the file content of {filename} and write it to repository {repository} branch {branch_name}. Your task is defined like this: \n\n {issue_summary} \n\nDo not do any additional modifications you were not instructed to do.")
         else:
             print(filename, "will be created")
-            assistant.do(
-                f"Write the specified file content into {filename} and write it to repository {repository} branch {branch_name}.")
+            modifier.do(f"Create the file {filename} and write it to repository {repository} branch {branch_name}. Your task is defined like this: \n\n {issue_summary}")
 
     add_comment_to_issue(repository, issue, remove_indentation(f"""
     {ai_remark}
