@@ -89,11 +89,13 @@ Available actions:
 * `solve-issue` (only works with OpenAI/gpt-4-omni at the moment)
 
 ## Limitations
+`git-bob` is a research project and has limitations. It serves as basis for discussion and further development. Once LLMs become better, `git-bob` will become better as well.
 
+At the moment, these limitations can be observed:
 * `git-bob` was tested for Python projects only (yet).
-* It cannot solve issues where changing long files is required. As the output of the LLMs is limited to 4096 tokens, 
-  it is not possible to modify longer files.
+* It cannot solve issues where changing long files is required, as the output of the LLMs is limited to 4096 tokens.
 * It cannot solve issues where running and testing the code is required. 
+* When changing multiple files, it may introduce conflicts between the files, as it does not know about the content of the other files.
 * It has only limited logic to control who is allowed to trigger it. 
   If you are a repository member, you can trigger it. 
   If others send a pull-request, a repository member must allow the action to run manually.
