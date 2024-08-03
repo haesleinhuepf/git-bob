@@ -180,6 +180,7 @@ def get_github_issue_details(repository: str, issue: int) -> str:
     str
         A string containing detailed information about the issue.
     """
+    from ._utilities import remove_indentation
     print(f"-> get_github_issue_details({repository}, {issue})")
 
     GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
@@ -439,6 +440,7 @@ def check_access_and_ask_for_approval(user, repository, issue):
     # Check if the user is a repository member
     print(f"-> check_access_and_ask_for_approval({user}, {repository}, {issue})")
 
+    from ._utilities import remove_indentation
     from ._ai_github_utilities import setup_ai_remark
 
     g = Github(os.environ.get("GITHUB_API_KEY"))
