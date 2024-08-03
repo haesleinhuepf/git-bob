@@ -3,7 +3,20 @@
 #
 # All functions must have a proper docstring, because we are using them as tools for function calling using LLMs.
 import os
-from github import Github
+from functools import lru_cache
+
+@lru_cache(maxsize=1)
+def get_github_repository(repository):
+    from github import Github
+    access_token = os.getenv('GITHUB_API_KEY')
+
+    # Create a PyGithub instance using the access token
+    g = Github(access_token)
+
+    # Get the repository object
+    return g.get_repo(repository)
+
+
 
 def add_comment_to_issue(repository, issue, comment):
     """
@@ -19,14 +32,7 @@ def add_comment_to_issue(repository, issue, comment):
         The comment text to add to the issue.
     """
     print(f"-> add_comment_to_issue({repository}, {issue}, ...)")
-
-    access_token = os.getenv('GITHUB_API_KEY')
-
-    # Create a PyGithub instance using the access token
-    g = Github(access_token)
-
-    # Get the repository object
-    repo = g.get_repo(repository)
+    repo = get_github_repository(repository)
 
     # Get the issue object
     issue_obj = repo.get_issue(issue)
@@ -55,11 +61,7 @@ def get_conversation_on_issue(repository, issue):
     """
     print(f"-> get_conversation_on_issue({repository}, {issue})")
 
-    access_token = os.getenv('GITHUB_API_KEY')
-    g = Github(access_token)
-
-    # Get the repository
-    repo = g.get_repo(repository)
+    repo = get_github_repository(repository)
 
     # Get the issue by number
     issue_obj = repo.get_issue(issue)
@@ -96,11 +98,7 @@ def get_most_recent_comment_on_issue(repository, issue):
     """
     print(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
 
-    access_token = os.getenv('GITHUB_API_KEY')
-    g = Github(access_token)
-
-    # Get the repository
-    repo = g.get_repo(repository)
+    repo = get_github_repository(repository)
 
     # Get the issue by number
     issue_obj = repo.get_issue(issue)
@@ -144,14 +142,7 @@ def list_issues(repository: str, state: str = "open") -> dict:
     """
     print(f"-> list_issues({repository}, {state})")
 
-    from github import Github
-
-    # Initialize Github client
-    GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
-    g = Github(GITHUB_API_KEY)
-
-    # Get the repository
-    repo = g.get_repo(repository)
+    repo = get_github_repository(repository)
 
     # Fetch all open issues
     issues = repo.get_issues(state=state)
@@ -183,11 +174,7 @@ def get_github_issue_details(repository: str, issue: int) -> str:
     from ._utilities import remove_indentation
     print(f"-> get_github_issue_details({repository}, {issue})")
 
-    GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
-    g = Github(GITHUB_API_KEY)
-
-    # Get the repository
-    repo = g.get_repo(repository)
+    repo = get_github_repository(repository)
 
     # Fetch the specified issue
     issue = repo.get_issue(number=issue)
@@ -215,7 +202,7 @@ def get_github_issue_details(repository: str, issue: int) -> str:
     return content
 
 
-def list_repository_files(repo_name: str) -> list:
+def list_repository_files(repository: str) -> list:
     """
     List all files in a given GitHub repository.
 
@@ -224,7 +211,7 @@ def list_repository_files(repo_name: str) -> list:
 
     Parameters
     ----------
-    repo_name : str
+    repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
 
     Returns
@@ -232,16 +219,10 @@ def list_repository_files(repo_name: str) -> list:
     list
         A list of strings, where each string is the path of a file in the repository.
     """
-    print(f"-> list_repository_files({repo_name})")
-
-    from github import Github
+    print(f"-> list_repository_files({repository})")
 
     # Initialize Github client
-    GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
-    g = Github(GITHUB_API_KEY)
-
-    # Get the repository
-    repo = g.get_repo(repo_name)
+    repo = get_github_repository(repository)
 
     # Get all contents of the repository
     contents = repo.get_contents("")
@@ -262,13 +243,13 @@ def list_repository_files(repo_name: str) -> list:
     return all_files
 
 
-def get_repository_file_contents(repo_name: str, file_paths: list) -> dict:
+def get_repository_file_contents(repository: str, file_paths: list) -> dict:
     """
     Retrieve the contents of specified files from a GitHub repository.
 
     Parameters
     ----------
-    repo_name : str
+    repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
     file_paths : list
         A list of file paths within the repository to retrieve the contents of.
@@ -278,16 +259,10 @@ def get_repository_file_contents(repo_name: str, file_paths: list) -> dict:
     dict
         A dictionary where keys are file paths and values are the contents of the files.
     """
-    print(f"-> get_repository_file_contents({repo_name}, {file_paths})")
-
-    from github import Github
+    print(f"-> get_repository_file_contents({repository}, {file_paths})")
 
     # Initialize Github client
-    GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
-    g = Github(GITHUB_API_KEY)
-
-    # Get the repository
-    repo = g.get_repo(repo_name)
+    repo = get_github_repository(repository)
 
     # Dictionary to store file contents
     file_contents = {}
@@ -328,23 +303,12 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content):
     """
     print(f"-> write_file_in_new_branch({repository}, {branch_name}, {file_path}, ...)")
 
-    from github import Github
-    import os
-    import string
-
-    # print(f'update_file_in_new_branch(repository="{repository}", file_path="{file_path}", new_content="{new_content}")
-
     # Authenticate with GitHub
-    GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
-    g = Github(GITHUB_API_KEY)
-
-    # Get the repository
-    repo = g.get_repo(repository)
-
+    repo = get_github_repository(repository)
 
     # Commit the changes
     if check_if_file_exists(repository, file_path):
-        file = repo.get_contents(file_path)
+        file = repo.get_contents(file_path, ref=branch_name)
         repo.update_file(file.path, "Update file content", new_content, file.sha, branch=branch_name)
     else:
         repo.create_file(file_path, "Create file content", new_content, branch=branch_name)
@@ -359,11 +323,7 @@ def create_branch(repository, parent_branch="main"):
     import string
 
     # Authenticate with GitHub
-    GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
-    g = Github(GITHUB_API_KEY)
-
-    # Get the repository
-    repo = g.get_repo(repository)
+    repo = get_github_repository(repository)
 
     # Get the main branch
     main_branch = repo.get_branch(parent_branch)
@@ -380,11 +340,7 @@ def check_if_file_exists(repository, file_path):
 
     print(f"-> check_if_file_exists({repository}, {file_path})")
     # Authenticate with GitHub
-    GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
-    g = Github(GITHUB_API_KEY)
-
-    # Get the repository
-    repo = g.get_repo(repository)
+    repo = get_github_repository(repository)
 
     try:
         # Try to get the contents of the file
@@ -418,16 +374,10 @@ def send_pull_request(repository, branch_name, title, description):
     """
     print(f"-> send_pull_request({repository}, {branch_name}, ...)")
 
-    from github import Github
-    import os
     from ._ai_github_utilities import setup_ai_remark
 
     # Authenticate with GitHub
-    GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
-    g = Github(GITHUB_API_KEY)
-
-    # Get the repository
-    repo = g.get_repo(repository)
+    repo = get_github_repository(repository)
 
     # Create a pull request
     remark = setup_ai_remark() + "\n\n"
@@ -443,8 +393,8 @@ def check_access_and_ask_for_approval(user, repository, issue):
     from ._utilities import remove_indentation
     from ._ai_github_utilities import setup_ai_remark
 
-    g = Github(os.environ.get("GITHUB_API_KEY"))
-    repo = g.get_repo(repository)
+    repo = get_github_repository(repository)
+
     members = [member.login for member in repo.get_collaborators()]
     remark = setup_ai_remark()
     if user not in members:
@@ -470,11 +420,8 @@ def get_diff_of_pull_request(repository, pull_request):
 
     print(f"-> get_diff_of_pull_request({repository}, {pull_request})")
     # Authenticate with GitHub
-    GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
-    g = Github(GITHUB_API_KEY)
+    repo = get_github_repository(repository)
 
-    # Get the repository
-    repo = g.get_repo(repository)
     pull_request = repo.get_pull(pull_request)
 
     print(pull_request.diff_url)
