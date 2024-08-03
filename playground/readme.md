@@ -11,4 +11,6 @@ Time will tell.
 Best, 
 Robert
 
+## Numpy-style docstrings
 
+Ensure all functions in the playground directory have numpy-style docstrings.
