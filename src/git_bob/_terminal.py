@@ -9,7 +9,7 @@ def command_line_interface():
     from ._github_utilities import check_access_and_ask_for_approval
 
     print("Hello")
-    llm_name = os.environ.get("GIT_BOB_LLM_NAME")
+    llm_name = os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
     if "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
         print("Using claude...")
         prompt = prompt_claude
