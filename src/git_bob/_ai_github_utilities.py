@@ -69,10 +69,7 @@ def review_pull_request(repository, issue, prompt_function):
     ## Your task
 
     Review this pull-request and contribute to the discussion. 
-    If relevant, write critical feedback, e.g. if new bugs may have been introduced, typos, etc.
-    When mentioning code examples, make sure these examples are actually present in the changed files of the pull-request.
-    Do NOT give general advice, but focus on the discussed pull-request and the changed files.
-    Do ONLY give advice on the changed files and the discussion.
+    Write critical feedback within the context of the given code changes, e.g. if new bugs may have been introduced, typos, etc.
     
     Keep your feedback concise, constructive and helpful.
     Stay friendly and professional.
