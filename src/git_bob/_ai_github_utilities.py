@@ -38,7 +38,6 @@ def comment_on_issue(repository, issue, prompt_function):
 
     {comment}
     """))
-
 def review_pull_request(repository, issue, prompt_function):
 
     print(f"-> review_pull_request({repository}, {issue})")
