@@ -1,35 +1,36 @@
 def remove_indentation(text):
-    text = text.replace("\n    ", "\n")
+    """
+    Remove leading indentation from a block of text.
 
-    return text.strip()
+    Parameters
+    ----------
+    text : str
+        The text from which to remove indentation.
+
+    Returns
+    -------
+    str
+        The text with leading indentation removed.
+    """
+    lines = text.split('\n')
+    indent = min(len(line) - len(line.lstrip()) for line in lines if line.strip())
+    return '\n'.join(line[indent:] for line in lines)
 
 
 def remove_outer_markdown(text):
-    code = text \
-        .replace("```python", "```") \
-        .replace("```Python", "```") \
-        .replace("```nextflow", "```") \
-        .replace("```java", "```") \
-        .replace("```javascript", "```") \
-        .replace("```macro", "```") \
-        .replace("```groovy", "```") \
-        .replace("```jython", "```") \
-        .replace("```md", "```") \
-        .replace("```markdown", "```") \
-        .replace("```txt", "```") \
-        .replace("```csv", "```") \
-        .replace("```yml", "```") \
-        .replace("```yaml", "```") \
-        .replace("```json", "```") \
-        .replace("```py", "```")
+    """
+    Remove outer markdown from a block of text.
 
-    parts = code.split("```")
-    if len(parts) == 1:
-        code = None
-    else:
-        code = ""
-        for t, c in zip(parts[::2], parts[1::2]):
-            code = code + c
-        code = code.strip("\n")
+    Parameters
+    ----------
+    text : str
+        The text from which to remove outer markdown.
 
-    return code
+    Returns
+    -------
+    str
+        The text with outer markdown removed.
+    """
+    if text.startswith("```") and text.endswith("```"):
+        return text[3:-3].strip()
+    return text
