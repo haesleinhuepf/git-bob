@@ -9,6 +9,7 @@ def command_line_interface():
     from ._github_utilities import check_access_and_ask_for_approval
 
     print("Hello")
+    timeout_in_seconds = os.environ.get("TIMEOUT_IN_SECONDS", 600) # 10 minutes
     llm_name = os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
     if "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
         print("Using claude...")
@@ -37,7 +38,7 @@ def command_line_interface():
             sys.exit(1)
 
         signal.signal(signal.SIGALRM, handler)
-        signal.alarm(180)  # Set the timeout to 3 minutes
+        signal.alarm(timeout_in_seconds)  # Set the timeout to 3 minutes
 
     repository = sys.argv[2] if len(sys.argv) > 2 else None
     issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
