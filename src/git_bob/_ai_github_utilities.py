@@ -69,11 +69,7 @@ def review_pull_request(repository, issue, prompt_function):
     ## Your task
 
     Review this pull-request and contribute to the discussion. 
-    Write critical feedback within the context of the given code changes. If you see any issues, point them out, print the code snippet and suggest a solution.
     
-    Keep your feedback concise, constructive and helpful.
-    Stay friendly and professional.
-        
     Do NOT explain your response or anything else. 
     Just respond to the discussion.
     """))
