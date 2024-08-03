@@ -125,7 +125,7 @@ def solve_github_issue(repository, issue, llm_model):
         if check_if_file_exists(repository, filename):
             print(filename, "will be overwritten")
             assistant.do(f"Load the entire content of {filename} from the repository {repository} branch {branch_name}.")
-            assistant.do(f"Modify the file content of {filename} and write it to repository {repository} branch {branch_name}.")
+            assistant.do(f"Modify the file content of {filename} according to the github issue description at the very beginning and write it to repository {repository} branch {branch_name}.")
         else:
             print(filename, "will be created")
             assistant.do(
