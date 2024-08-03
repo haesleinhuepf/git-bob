@@ -40,16 +40,14 @@ def comment_on_issue(repository, issue, prompt_function):
 
 def review_pull_request(repository, issue, prompt_function):
 
-    from ._github_utilities import get_conversation_on_issue, add_comment_to_issue
+    from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, get_diff_of_pull_request
 
     ai_remark = setup_ai_remark()
 
     discussion = get_conversation_on_issue(repository, issue)
     print("Discussion:", discussion)
 
-    # load temp.txt into a variable
-    with open("temp.txt", "r") as file:
-        file_changes = file.read()
+    file_changes = get_diff_of_pull_request(repository, issue)
 
     print("file_changes:", file_changes)
 
@@ -68,7 +66,9 @@ def review_pull_request(repository, issue, prompt_function):
 
     ## Your task
 
-    Respond to the discussion above. 
+    Review this pull-request and contribute to the discussion. 
+    If relevant, write critical feedback, e.g. if new bugs may have been introduced, typos, etc.
+    If relevant, help the author to improve the pull-request, e.g. with better variable names, better comments etc.
     Do NOT explain your response or anything else. 
     Just respond to the discussion.
     """))

@@ -439,6 +439,8 @@ def send_pull_request(repository, branch_name, title, description):
 
 def check_access_and_ask_for_approval(user, repository, issue):
     # Check if the user is a repository member
+    print(f"-> check_access_and_ask_for_approval({user}, {repository}, {issue})")
+
     from ._ai_github_utilities import setup_ai_remark
 
     g = Github(os.environ.get("GITHUB_API_KEY"))
@@ -460,3 +462,23 @@ git-bob
 """)
         return False
     return True
+
+
+def get_diff_of_pull_request(repository, pull_request):
+    """Get the diff of a specific pull request in a GitHub repository."""
+    import requests
+
+    print(f"-> get_diff_of_pull_request({repository}, {pull_request})")
+    # Authenticate with GitHub
+    GITHUB_API_KEY = os.getenv('GITHUB_API_KEY')
+    g = Github(GITHUB_API_KEY)
+
+    # Get the repository
+    repo = g.get_repo(repository)
+    pull_request = repo.get_pull(pull_request)
+
+    print(pull_request.diff_url)
+
+    # read the content of a url
+    return requests.get(pull_request.diff_url)
+
