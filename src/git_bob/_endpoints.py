@@ -1,3 +1,11 @@
+"""
+This module provides helper functions to interact with different language models.
+
+Functions:
+- prompt_claude: Sends a message to the Claude language model and returns the text response.
+- prompt_chatgpt: Sends a message to the ChatGPT language model and returns the text response.
+"""
+
 def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
     """
     A prompt helper function that sends a message to anthropic

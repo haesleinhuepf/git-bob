@@ -1,3 +1,5 @@
+# This module provides utility functions for text processing, including functions to remove indentation and outer markdown from text.
+
 def remove_indentation(text):
     text = text.replace("\n    ", "\n")
 

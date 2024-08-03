@@ -1,3 +1,6 @@
+# This module contains utility functions for interacting with GitHub issues and pull requests using AI.
+# It includes functions for setting up AI remarks, commenting on issues, reviewing pull requests, and solving issues.
+
 from ._utilities import remove_indentation
 
 SYSTEM_PROMPT = """You are an extremely skilled python developer. Your name is git-bob."""
