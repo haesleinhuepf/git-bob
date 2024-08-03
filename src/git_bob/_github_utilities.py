@@ -355,7 +355,7 @@ def create_branch(repository, parent_branch="main"):
     main_branch = repo.get_branch(parent_branch)
 
     # Create a new branch
-    new_branch_name = "mod-" + ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    new_branch_name = "git-bob-mod-" + ''.join(random.choices(string.ascii_letters + string.digits, k=10))
     repo.create_git_ref(ref=f"refs/heads/{new_branch_name}", sha=main_branch.commit.sha)
 
     return new_branch_name
