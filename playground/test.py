@@ -1,4 +1,17 @@
 def faculty(number):
+    """
+    Calculate the factorial of a number.
+
+    Parameters
+    ----------
+    number : int
+        The number to calculate the factorial for.
+
+    Returns
+    -------
+    int
+        The factorial of the number.
+    """
     if number == 0:
         return 1
     else:
