@@ -8,6 +8,7 @@ def setup_ai_remark():
 
 def comment_on_issue(repository, issue, prompt_function):
 
+    print(f"-> comment_on_issue({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue
 
     ai_remark = setup_ai_remark()
@@ -40,6 +41,7 @@ def comment_on_issue(repository, issue, prompt_function):
 
 def review_pull_request(repository, issue, prompt_function):
 
+    print(f"-> review_pull_request({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, get_diff_of_pull_request
 
     ai_remark = setup_ai_remark()
@@ -84,7 +86,10 @@ def review_pull_request(repository, issue, prompt_function):
 
 def solve_github_issue(repository, issue, llm_model):
     """Attempt to solve a github issue by modifying a single file and sending a pull-request."""
-    # source: https://github.com/ScaDS/generative-ai-notebooks/blob/main/docs/64_github_interaction/solving_github_issues.ipynb
+    # modified from: https://github.com/ScaDS/generative-ai-notebooks/blob/main/docs/64_github_interaction/solving_github_issues.ipynb
+
+    print(f"-> solve_github_issue({repository}, {issue})")
+
     from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists
     from ._utilities import remove_outer_markdown
     from blablado import Assistant
@@ -112,6 +117,8 @@ def solve_github_issue(repository, issue, llm_model):
 
     branch_name = assistant.tell(f"Create a new branch on repository {repository}. Respond ONLY the branch name.")
     branch_name = branch_name.strip().strip('"')
+
+    print("Created branch", branch_name)
 
     for filename in filenames:
         if check_if_file_exists(repository, filename):
