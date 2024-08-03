@@ -30,11 +30,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e .
 
-    - name: Generate diff
-      run: |
-        git fetch origin ${{ github.base_ref }}
-        git diff origin/${{ github.base_ref }} HEAD > temp.txt
-
     - name: Run Python
       env:
         #ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
@@ -44,6 +39,3 @@ jobs:
       run: |
         git-bob review-pull-request-action ${{ github.repository }} ${{ github.event.pull_request.number }}
 
-    - name: Remove temp files
-      run: |
-        rm temp.txt
