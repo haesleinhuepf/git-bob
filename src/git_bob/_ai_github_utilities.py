@@ -82,31 +82,50 @@ def review_pull_request(repository, issue, prompt_function):
     """))
 
 
-def solve_github_issue(repository, issue):
+def solve_github_issue(repository, issue, llm_model):
     """Attempt to solve a github issue by modifying a single file and sending a pull-request."""
     # source: https://github.com/ScaDS/generative-ai-notebooks/blob/main/docs/64_github_interaction/solving_github_issues.ipynb
-    from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, update_file_in_new_branch, send_pull_request, add_comment_to_issue
+    from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists
+    from ._utilities import remove_outer_markdown
     from blablado import Assistant
 
     ai_remark = setup_ai_remark()
 
     print(f"-> solve_github_issue({repository}, {issue})")
-    assistant = Assistant()
+    assistant = Assistant(model=llm_model)
     assistant.register_tool(get_github_issue_details)
     assistant.register_tool(list_repository_files)
     assistant.register_tool(get_repository_file_contents)
-    assistant.register_tool(update_file_in_new_branch)
+    assistant.register_tool(create_branch)
+    assistant.register_tool(write_file_in_new_branch)
     assistant.register_tool(send_pull_request)
 
     assistant.do(f"Tell me the most important details of issue #{issue} in the repository {repository}")
     assistant.do(f"List all files in the repository {repository}")
-    filename = assistant.tell("Which of these files might be relevant for issue #{issue} ? Respond ONLY the filename.")
-    print("Related filename", filename)
-    assistant.do(f"Load the entire content of {filename} from the  in the repository {repository} .")
-    branch_name = assistant.tell(f"Modify the file content of {filename} to fix the issue in a new branch. Respond ONLY the branch name.")
+    filenames_json = remove_outer_markdown(assistant.tell("Which of these files might be relevant for issue #{issue} ? You can also consider files which do not exist yet. Respond ONLY the filenames  as JSON list."))
+
+    print("Related filenames", filenames_json)
+
+    # parse the filenames_json into list:
+    import json
+    filenames = json.loads(filenames_json)
+
+    branch_name = assistant.tell(f"Create a new branch on repository {repository}. Respond ONLY the branch name.")
+    branch_name = branch_name.strip().strip('"')
+
+    for filename in filenames:
+        if check_if_file_exists(repository, filename):
+            print(filename, "will be overwritten")
+            assistant.do(f"Load the entire content of {filename} from the repository {repository} branch {branch_name}.")
+            assistant.do(f"Modify the file content of {filename} and write it to repository {repository} branch {branch_name}.")
+        else:
+            print(filename, "will be created")
+            assistant.do(
+                f"Write the specified file content into {filename} and write it to repository {repository} branch {branch_name}.")
+
     add_comment_to_issue(repository, issue, remove_indentation(f"""
     {ai_remark}
     
     I created a branch with a potential solution [here](https://github.com/{repository}/tree/{branch_name}). I will attempt to send a pull-request.
     """))
-    assistant.do("Send a pull-request of the new branch explaining what we changed.")
+    assistant.do(f"Send a pull-request of the branch {branch_name} in repository {repository} explaining in detail what we changed. Finish the message with 'closes #{issue}'.")
