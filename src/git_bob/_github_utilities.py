@@ -312,7 +312,7 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content):
 
     # Commit the changes
     if check_if_file_exists(repository, file_path):
-        file = repo.get_contents(file_path)
+        file = repo.get_contents(file_path, ref=branch_name)
         repo.update_file(file.path, "Update file content", new_content, file.sha, branch=branch_name)
     else:
         repo.create_file(file_path, "Create file content", new_content, branch=branch_name)
