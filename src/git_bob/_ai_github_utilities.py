@@ -162,11 +162,11 @@ def solve_github_issue(repository, issue, llm_model):
     print("Created branch", branch_name)
 
     for filename in filenames:
-        if check_if_file_exists(repository, filename):
-            modifier = Assistant(model=llm_model)
-            modifier.register_tool(get_repository_file_contents)
-            modifier.register_tool(write_file_in_new_branch)
+        modifier = Assistant(model=llm_model)
+        modifier.register_tool(get_repository_file_contents)
+        modifier.register_tool(write_file_in_new_branch)
 
+        if check_if_file_exists(repository, filename):
             print(filename, "will be overwritten")
             modifier.do(f"Load the entire content of {filename} from the repository {repository} branch {branch_name}.")
             modifier.do(f"Modify the file content of {filename} and write it to repository {repository} branch {branch_name}. Your task is defined like this: \n\n {issue_summary} \n\nDo not do any additional modifications you were not instructed to do.")
