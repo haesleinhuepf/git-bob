@@ -1,4 +1,4 @@
 anthropic
 openai
-blablado>=0.2.0
+blablado>=0.2.1
 pygithub
