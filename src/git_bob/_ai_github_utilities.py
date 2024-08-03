@@ -69,14 +69,14 @@ def review_pull_request(repository, issue, prompt_function):
     ## Your task
 
     Review this pull-request and contribute to the discussion. 
-    Do not give general advice, but focus on the pull-request and the changed files.
     If relevant, write critical feedback, e.g. if new bugs may have been introduced, typos, etc.
-    If relevant, help the author to improve the pull-request, e.g. with better variable names, better comments etc.
+    When mentioning code examples, make sure these examples are actually present in the changed files of the pull-request.
+    Do NOT give general advice, but focus on the discussed pull-request and the changed files.
+    Do ONLY give advice on the changed files and the discussion.
     
     Keep your feedback concise, constructive and helpful.
     Stay friendly and professional.
-    When mentioning code examples, make sure these examples are actually present in the changed files of the pull-request.
-    
+        
     Do NOT explain your response or anything else. 
     Just respond to the discussion.
     """))
