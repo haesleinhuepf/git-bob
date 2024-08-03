@@ -7,7 +7,18 @@ def setup_ai_remark():
 
 
 def comment_on_issue(repository, issue, prompt_function):
+    """
+    Comment on a GitHub issue using a prompt function.
 
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The issue number to comment on.
+    prompt_function : function
+        A function that generates a comment based on the issue discussion.
+    """
     print(f"-> comment_on_issue({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue
 
@@ -39,8 +50,20 @@ def comment_on_issue(repository, issue, prompt_function):
     {comment}
     """))
 
-def review_pull_request(repository, issue, prompt_function):
 
+def review_pull_request(repository, issue, prompt_function):
+    """
+    Review a GitHub pull request using a prompt function.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The pull request number to review.
+    prompt_function : function
+        A function that generates a review comment based on the pull request discussion and changes.
+    """
     print(f"-> review_pull_request({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, get_diff_of_pull_request
 
@@ -84,7 +107,18 @@ def review_pull_request(repository, issue, prompt_function):
 
 
 def solve_github_issue(repository, issue, llm_model):
-    """Attempt to solve a github issue by modifying a single file and sending a pull-request."""
+    """
+    Attempt to solve a GitHub issue by modifying a single file and sending a pull-request.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The issue number to solve.
+    llm_model : object
+        The language model to use for generating solutions.
+    """
     # modified from: https://github.com/ScaDS/generative-ai-notebooks/blob/main/docs/64_github_interaction/solving_github_issues.ipynb
 
     print(f"-> solve_github_issue({repository}, {issue})")
