@@ -7,6 +7,19 @@ from functools import lru_cache
 
 @lru_cache(maxsize=1)
 def get_github_repository(repository):
+    """
+    Get the GitHub repository object.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+
+    Returns
+    -------
+    github.Repository.Repository
+        The GitHub repository object.
+    """
     from github import Github
     access_token = os.getenv('GITHUB_API_KEY')
 
@@ -15,7 +28,6 @@ def get_github_repository(repository):
 
     # Get the repository object
     return g.get_repo(repository)
-
 
 
 def add_comment_to_issue(repository, issue, comment):
@@ -316,7 +328,21 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content):
     return f"File {file_path} successfully created in repository {repository} branch {branch_name}."
 
 def create_branch(repository, parent_branch="main"):
-    """Creates a new branch in a given repository, derived from an optionally specified parent_branch and returns the name of the new branch."""
+    """
+    Creates a new branch in a given repository, derived from an optionally specified parent_branch and returns the name of the new branch.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    parent_branch : str, optional
+        The name of the parent branch from which the new branch will be created. Default is "main".
+
+    Returns
+    -------
+    str
+        The name of the newly created branch.
+    """
     print(f"-> create_branch({repository}, {parent_branch})")
 
     import random
@@ -336,8 +362,21 @@ def create_branch(repository, parent_branch="main"):
 
 
 def check_if_file_exists(repository, file_path):
-    """Checks if a specified file_path exists in a GitHub repository. Returns True if the file exists, False otherwise."""
+    """
+    Checks if a specified file_path exists in a GitHub repository. Returns True if the file exists, False otherwise.
 
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    file_path : str
+        The path of the file to check.
+
+    Returns
+    -------
+    bool
+        True if the file exists, False otherwise.
+    """
     print(f"-> check_if_file_exists({repository}, {file_path})")
     # Authenticate with GitHub
     repo = get_github_repository(repository)
@@ -387,6 +426,23 @@ def send_pull_request(repository, branch_name, title, description):
 
 
 def check_access_and_ask_for_approval(user, repository, issue):
+    """
+    Check if the user has access rights and ask for approval if necessary.
+
+    Parameters
+    ----------
+    user : str
+        The username of the person requesting access.
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The issue number related to the access request.
+
+    Returns
+    -------
+    bool
+        True if the user has access rights, False otherwise.
+    """
     # Check if the user is a repository member
     print(f"-> check_access_and_ask_for_approval({user}, {repository}, {issue})")
 
@@ -415,7 +471,21 @@ def check_access_and_ask_for_approval(user, repository, issue):
 
 
 def get_diff_of_pull_request(repository, pull_request):
-    """Get the diff of a specific pull request in a GitHub repository."""
+    """
+    Get the diff of a specific pull request in a GitHub repository.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    pull_request : int
+        The pull request number to retrieve the diff for.
+
+    Returns
+    -------
+    requests.Response
+        The response object containing the diff of the pull request.
+    """
     import requests
 
     print(f"-> get_diff_of_pull_request({repository}, {pull_request})")
