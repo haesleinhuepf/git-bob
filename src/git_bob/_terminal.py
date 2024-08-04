@@ -3,6 +3,19 @@
 # using AI models like GPT and Claude. The script can be run in a GitHub CI environment with a timeout.
 
 def command_line_interface():
+    """
+    Command line interface for interacting with GitHub issues and pull requests.
+
+    This function reads environment variables, determines the task to be executed,
+    and performs actions such as reviewing pull requests, solving issues, and commenting
+    on issues using AI models like GPT and Claude.
+
+    Raises
+    ------
+    NotImplementedError
+        If the required environment variables or API keys are not set, or if solving issues
+        using Claude is attempted.
+    """
     import os
     import sys
     import signal
@@ -43,6 +56,16 @@ def command_line_interface():
 
         # in case we run in the github-CI, we set a timeout
         def handler(signum, frame):
+            """
+            Handles the timeout signal.
+
+            Parameters
+            ----------
+            signum : int
+                The signal number.
+            frame : frame object
+                The current stack frame.
+            """
             print("Process timed out")
             sys.exit(1)
 
