@@ -10,8 +10,8 @@ def command_line_interface():
     from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue
     from ._endpoints import prompt_claude, prompt_chatgpt
-    from ._github_utilities import check_access_and_ask_for_approval, add_reaction_to_issue
-    from ._utilities import get_llm_name
+    from ._github_utilities import check_access_and_ask_for_approval, add_reaction_to_last_comment_in_issue
+    from ._utilities import get_llm_name, report_error
     
     print("Hello")
 
@@ -70,7 +70,7 @@ def command_line_interface():
             sys.exit(1)
 
     # add reaction to issue to show that we're working on it
-    add_reaction_to_issue(repository, issue, "+1")
+    add_reaction_to_last_comment_in_issue(repository, issue, "+1")
 
     # execute the task
     if task == "review-pull-request":

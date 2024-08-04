@@ -520,3 +520,26 @@ def add_reaction_to_issue(repository, issue, reaction="+1"):
     # Fetch the specified issue
     issue = repo.get_issue(number=issue)
     issue.create_reaction(reaction)
+
+@catch_error
+def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
+    """Add a given reaction to a github issue."""
+    Log().log(f"-> add_reaction_to_last_comment_in_issue({repository}, {issue}, {reaction})")
+
+    repo = get_github_repository(repository)
+
+    # Get the issue by number
+    issue_obj = repo.get_issue(issue)
+
+    # Get all comments on the issue
+    comments = issue_obj.get_comments()
+
+    # return last comment
+    comments = list(comments)
+    if len(comments) > 0:
+        comments[-1].create_reaction(reaction)
+    else:
+        issue_obj.create_reaction(reaction)
+
+
+
