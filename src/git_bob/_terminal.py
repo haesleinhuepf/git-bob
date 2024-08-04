@@ -11,7 +11,7 @@ def command_line_interface():
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue
     from ._endpoints import prompt_claude, prompt_chatgpt
     from ._github_utilities import check_access_and_ask_for_approval, add_reaction_to_issue
-    from ._utilities import get_llm_name
+    from ._utilities import get_llm_name, report_error
     
     print("Hello")
 
@@ -44,6 +44,7 @@ def command_line_interface():
         # in case we run in the github-CI, we set a timeout
         def handler(signum, frame):
             print("Process timed out")
+            report_error("I ran out of time.")
             sys.exit(1)
 
         signal.signal(signal.SIGALRM, handler)
@@ -72,6 +73,7 @@ def command_line_interface():
     # add reaction to issue to show that we're working on it
     add_reaction_to_issue(repository, issue, "+1")
 
+
     # execute the task
     if task == "review-pull-request":
         review_pull_request(repository, issue, prompt)
@@ -81,3 +83,5 @@ def command_line_interface():
         solve_github_issue(repository, issue, llm_name)
     elif task == "comment-on-issue" and ("git-bob comment" in text or not running_in_github_ci):
         comment_on_issue(repository, issue, prompt)
+
+

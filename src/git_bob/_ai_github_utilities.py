@@ -2,6 +2,7 @@
 # It includes functions for setting up AI remarks, commenting on issues, reviewing pull requests, and solving issues.
 
 from ._utilities import remove_indentation, catch_error
+from ._logger import Log
 
 SYSTEM_PROMPT = """You are an extremely skilled python developer. Your name is git-bob."""
 
@@ -31,7 +32,7 @@ def comment_on_issue(repository, issue, prompt_function):
     prompt_function : function
         The function to generate the comment.
     """
-    print(f"-> comment_on_issue({repository}, {issue})")
+    Log().log(f"-> comment_on_issue({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue
 
     ai_remark = setup_ai_remark()
@@ -76,7 +77,7 @@ def review_pull_request(repository, issue, prompt_function):
     prompt_function : function
         The function to generate the review comment.
     """
-    print(f"-> review_pull_request({repository}, {issue})")
+    Log().log(f"-> review_pull_request({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, get_diff_of_pull_request
 
     ai_remark = setup_ai_remark()
@@ -133,7 +134,7 @@ def solve_github_issue(repository, issue, llm_model):
     """
     # modified from: https://github.com/ScaDS/generative-ai-notebooks/blob/main/docs/64_github_interaction/solving_github_issues.ipynb
 
-    print(f"-> solve_github_issue({repository}, {issue})")
+    Log().log(f"-> solve_github_issue({repository}, {issue})")
 
     from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists
     from ._utilities import remove_outer_markdown
