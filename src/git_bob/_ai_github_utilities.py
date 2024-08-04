@@ -167,22 +167,34 @@ def solve_github_issue(repository, issue, llm_model):
 
     print("Created branch", branch_name)
 
+    errors = []
     for filename in filenames:
         modifier = Assistant(model=llm_model)
         modifier.register_tool(get_repository_file_contents)
         modifier.register_tool(write_file_in_new_branch)
 
-        if check_if_file_exists(repository, filename):
-            print(filename, "will be overwritten")
-            modifier.do(f"Load the entire content of {filename} from the repository {repository} branch {branch_name}.")
-            modifier.do(f"Modify the file content of {filename} and write it to repository {repository} branch {branch_name}. Your task is defined like this: \n\n {issue_summary} \n\nDo not do any additional modifications you were not instructed to do.")
-        else:
-            print(filename, "will be created")
-            modifier.do(f"Create the file {filename} and write it to repository {repository} branch {branch_name}. Your task is defined like this: \n\n {issue_summary}")
+        try:
+            if check_if_file_exists(repository, filename):
+                print(filename, "will be overwritten")
+                modifier.do(f"Load the entire content of {filename} from the repository {repository} branch {branch_name}.")
+                modifier.do(f"Modify the file content of {filename} and write it to repository {repository} branch {branch_name}. Your task is defined like this: \n\n {issue_summary} \n\nDo not do any additional modifications you were not instructed to do.")
+            else:
+                print(filename, "will be created")
+                modifier.do(f"Create the file {filename} and write it to repository {repository} branch {branch_name}. Your task is defined like this: \n\n {issue_summary}")
+        except Exception as e:
+            errors.append(f"Error processing {filename}" + str(e))
+
+    error_messages = ""
+    if len(errors) > 0:
+        error_messages = "The following errors occurred:\n\n"
+        for e in errors:
+            error_messages += f"{str(e)}\n"
 
     add_comment_to_issue(repository, issue, remove_indentation(f"""
     {ai_remark}
     
-    I created a branch with a potential solution [here](https://github.com/{repository}/tree/{branch_name}). I will attempt to send a pull-request.
+    I created a branch with a potential solution [here](https://github.com/{repository}/tree/{branch_name}). 
+    
+    {error_messages}
     """))
     assistant.do(f"Send a pull-request of the branch {branch_name} in repository {repository} explaining in detail what we changed. Finish the message with 'closes #{issue}'.")
