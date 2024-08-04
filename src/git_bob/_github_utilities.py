@@ -505,3 +505,14 @@ def get_diff_of_pull_request(repository, pull_request):
     # read the content of a url
     return requests.get(pull_request.diff_url)
 
+
+@catch_error
+def add_reaction_to_issue(repository, issue, reaction="+1"):
+    """Add a given reaction to a github issue."""
+    print(f"-> add_reaction_to_issue({repository}, {issue}, {reaction})")
+
+    repo = get_github_repository(repository)
+
+    # Fetch the specified issue
+    issue = repo.get_issue(number=issue)
+    issue.create_reaction(reaction)
