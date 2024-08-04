@@ -48,6 +48,11 @@ def command_line_interface():
     repository = sys.argv[2] if len(sys.argv) > 2 else None
     issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
     user, text = get_most_recent_comment_on_issue(repository, issue)
+
+    # handle aliases
+    text = text.replace("git-bob respond", "git-bob comment")
+    text = text.replace("git-bob review", "git-bob comment")
+    
     if running_in_github_ci:
         if not ("git-bob comment" in text or "git-bob solve" in text):
             print("They didn't speak to me. I show myself out.")
