@@ -273,9 +273,6 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
     """
     print(f"-> get_repository_file_contents({repository}, {file_paths})")
 
-    # Initialize Github client
-    #repo = get_github_repository(repository)
-
     # Dictionary to store file contents
     file_contents = {}
 
@@ -284,7 +281,6 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
         try:
             # Get the file content
             file_content = get_repository_file_content (repository, "main", file_path)
-            # repo.get_contents(file_path)
 
             # Decode and store the content
             file_contents[file_path] = file_content.decoded_content.decode()
@@ -322,7 +318,6 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content):
     # Commit the changes
     if check_if_file_exists(repository, file_path):
         file = get_repository_file_content(repository, branch_name, file_path)
-            #repo.get_contents(file_path, ref=branch_name))
         repo.update_file(file.path, "Update file content", new_content, file.sha, branch=branch_name)
     else:
         repo.create_file(file_path, "Create file content", new_content, branch=branch_name)
