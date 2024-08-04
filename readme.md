@@ -93,6 +93,7 @@ Available actions:
 
 At the moment, these limitations can be observed:
 * `git-bob` was tested for Python projects only (yet).
+* It sometimes halucinates, especially in code reviews. E.g. it [claimed](https://github.com/haesleinhuepf/git-bob/pull/70) to have tested code, which is certainly not true.
 * It cannot solve issues where changing long files is required, as the output of the LLMs is limited to 4096 tokens.
 * It cannot solve issues where running and testing the code is required. 
 * When changing multiple files, it may introduce conflicts between the files, as it does not know about the content of the other files.
