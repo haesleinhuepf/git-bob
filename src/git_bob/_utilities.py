@@ -51,6 +51,9 @@ def report_error(message):
     import os
     from ._ai_github_utilities import setup_ai_remark
     from ._github_utilities import add_comment_to_issue
+    from ._logger import Log
+
+    log = "\n".join(Log().get())
 
     repository = sys.argv[2] if len(sys.argv) > 2 else None
     issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
@@ -63,6 +66,11 @@ def report_error(message):
     I'm sorry, I encountered an error while processing your request. Here is the error message:
     
     {message}
+    
+    This is how far I came:
+    ```
+    {log}
+    ```
     
     [More Details...](https://github.com/{repository}/actions/runs/{run_id})
     """)
