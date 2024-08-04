@@ -24,7 +24,8 @@ jobs:
       run: |  
         echo "Run ID - ${{ github.run_id }}"
         echo "Run No - ${{ github.run_number }}"
-        echo "Job ID - ${{ github.job }}"
+        echo "Job    - ${{ github.job }}"
+        echo "Job ID - ${{ github.job_id }}"
 
     - name: Set up Python
       uses: actions/setup-python@v2
