@@ -11,12 +11,13 @@ def command_line_interface():
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue
     from ._endpoints import prompt_claude, prompt_chatgpt
     from ._github_utilities import check_access_and_ask_for_approval
-
+    from ._utilities import get_llm_name
+    
     print("Hello")
 
     # read environment variables
     timeout_in_seconds = os.environ.get("TIMEOUT_IN_SECONDS", 300) # 5 minutes
-    llm_name = os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
+    llm_name = get_llm_name()
     if "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
         print("Using claude...")
         prompt = prompt_claude
