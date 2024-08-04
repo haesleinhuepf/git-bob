@@ -2,7 +2,7 @@ name: Respond to Issue
 
 on:
   issues:
-    types: opened
+    types: [opened]
   issue_comment:
     types:
       - created
