@@ -273,9 +273,6 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
     """
     print(f"-> get_repository_file_contents({repository}, {file_paths})")
 
-    # Initialize Github client
-    repo = get_github_repository(repository)
-
     # Dictionary to store file contents
     file_contents = {}
 
@@ -283,7 +280,7 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
     for file_path in file_paths:
         try:
             # Get the file content
-            file_content = repo.get_contents(file_path)
+            file_content = get_repository_file_content (repository, "main", file_path)
 
             # Decode and store the content
             file_contents[file_path] = file_content.decoded_content.decode()
@@ -320,7 +317,7 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content):
 
     # Commit the changes
     if check_if_file_exists(repository, file_path):
-        file = repo.get_contents(file_path, ref=branch_name)
+        file = get_repository_file_content(repository, branch_name, file_path)
         repo.update_file(file.path, "Update file content", new_content, file.sha, branch=branch_name)
     else:
         repo.create_file(file_path, "Create file content", new_content, branch=branch_name)
@@ -382,15 +379,22 @@ def check_if_file_exists(repository, file_path):
     """
     print(f"-> check_if_file_exists({repository}, {file_path})")
     # Authenticate with GitHub
-    repo = get_github_repository(repository)
+    #repo = get_github_repository(repository)
 
     try:
         # Try to get the contents of the file
-        contents = repo.get_contents(file_path)
+        get_repository_file_content(repository, "main", file_path)
+        #contents = repo.get_contents(file_path)
         return True
     except:
         return False
 
+
+@lru_cache(maxsize=1)
+def get_repository_file_content(repository, branch_name, file_path):
+    """Helper function to prevent multiple calls to the GitHub API for the same file content."""
+    repo = get_github_repository(repository)
+    return repo.get_contents(file_path, ref=branch_name)
 
 @catch_error
 def send_pull_request(repository, branch_name, title, description):
