@@ -5,6 +5,7 @@
 import os
 from functools import lru_cache
 from ._utilities import catch_error
+from ._logger import Log
 
 @lru_cache(maxsize=1)
 def get_github_repository(repository):
@@ -44,7 +45,7 @@ def add_comment_to_issue(repository, issue, comment):
     comment : str
         The comment text to add to the issue.
     """
-    print(f"-> add_comment_to_issue({repository}, {issue}, ...)")
+    Log().log(f"-> add_comment_to_issue({repository}, {issue}, ...)")
     repo = get_github_repository(repository)
 
     # Get the issue object
@@ -72,7 +73,7 @@ def get_conversation_on_issue(repository, issue):
     str
         The conversation string containing the issue title, body, and comments.
     """
-    print(f"-> get_conversation_on_issue({repository}, {issue})")
+    Log().log(f"-> get_conversation_on_issue({repository}, {issue})")
 
     repo = get_github_repository(repository)
 
@@ -109,7 +110,7 @@ def get_most_recent_comment_on_issue(repository, issue):
     tuple
         A tuple containing the username of the commenter and the comment text.
     """
-    print(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
+    Log().log(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
     repo = get_github_repository(repository)
 
     # Get the issue by number
@@ -152,7 +153,7 @@ def list_issues(repository: str, state: str = "open") -> dict:
     dict
         A dictionary of issues where keys are issue numbers and values are issue titles.
     """
-    print(f"-> list_issues({repository}, {state})")
+    Log().log(f"-> list_issues({repository}, {state})")
 
     repo = get_github_repository(repository)
 
@@ -184,7 +185,7 @@ def get_github_issue_details(repository: str, issue: int) -> str:
         A string containing detailed information about the issue.
     """
     from ._utilities import remove_indentation
-    print(f"-> get_github_issue_details({repository}, {issue})")
+    Log().log(f"-> get_github_issue_details({repository}, {issue})")
 
     repo = get_github_repository(repository)
 
@@ -231,7 +232,7 @@ def list_repository_files(repository: str) -> list:
     list
         A list of strings, where each string is the path of a file in the repository.
     """
-    print(f"-> list_repository_files({repository})")
+    Log().log(f"-> list_repository_files({repository})")
 
     # Initialize Github client
     repo = get_github_repository(repository)
@@ -271,7 +272,7 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
     dict
         A dictionary where keys are file paths and values are the contents of the files.
     """
-    print(f"-> get_repository_file_contents({repository}, {file_paths})")
+    Log().log(f"-> get_repository_file_contents({repository}, {file_paths})")
 
     # Dictionary to store file contents
     file_contents = {}
@@ -310,7 +311,7 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content):
     str
         The name of the branch where the changed file is stored.
     """
-    print(f"-> write_file_in_new_branch({repository}, {branch_name}, {file_path}, ...)")
+    Log().log(f"-> write_file_in_new_branch({repository}, {branch_name}, {file_path}, ...)")
 
     # Authenticate with GitHub
     repo = get_github_repository(repository)
@@ -342,7 +343,7 @@ def create_branch(repository, parent_branch="main"):
     str
         The name of the newly created branch.
     """
-    print(f"-> create_branch({repository}, {parent_branch})")
+    Log().log(f"-> create_branch({repository}, {parent_branch})")
 
     import random
     import string
@@ -377,7 +378,7 @@ def check_if_file_exists(repository, file_path):
     bool
         True if the file exists, False otherwise.
     """
-    print(f"-> check_if_file_exists({repository}, {file_path})")
+    Log().log(f"-> check_if_file_exists({repository}, {file_path})")
     # Authenticate with GitHub
     #repo = get_github_repository(repository)
 
@@ -393,6 +394,7 @@ def check_if_file_exists(repository, file_path):
 @lru_cache(maxsize=1)
 def get_repository_file_content(repository, branch_name, file_path):
     """Helper function to prevent multiple calls to the GitHub API for the same file content."""
+    print("loading file content...", file_path)
     repo = get_github_repository(repository)
     return repo.get_contents(file_path, ref=branch_name)
 
@@ -419,7 +421,7 @@ def send_pull_request(repository, branch_name, title, description):
     str
         The URL to the pull-request that was just created.
     """
-    print(f"-> send_pull_request({repository}, {branch_name}, ...)")
+    Log().log(f"-> send_pull_request({repository}, {branch_name}, ...)")
 
     from ._ai_github_utilities import setup_ai_remark
 
@@ -453,7 +455,7 @@ def check_access_and_ask_for_approval(user, repository, issue):
         True if the user has access rights, False otherwise.
     """
     # Check if the user is a repository member
-    print(f"-> check_access_and_ask_for_approval({user}, {repository}, {issue})")
+    Log().log(f"-> check_access_and_ask_for_approval({user}, {repository}, {issue})")
 
     from ._utilities import remove_indentation
     from ._ai_github_utilities import setup_ai_remark
@@ -498,7 +500,7 @@ def get_diff_of_pull_request(repository, pull_request):
     """
     import requests
 
-    print(f"-> get_diff_of_pull_request({repository}, {pull_request})")
+    Log().log(f"-> get_diff_of_pull_request({repository}, {pull_request})")
     # Authenticate with GitHub
     repo = get_github_repository(repository)
 
@@ -513,7 +515,7 @@ def get_diff_of_pull_request(repository, pull_request):
 @catch_error
 def add_reaction_to_issue(repository, issue, reaction="+1"):
     """Add a given reaction to a github issue."""
-    print(f"-> add_reaction_to_issue({repository}, {issue}, {reaction})")
+    Log().log(f"-> add_reaction_to_issue({repository}, {issue}, {reaction})")
 
     repo = get_github_repository(repository)
 

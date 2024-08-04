@@ -44,6 +44,7 @@ def command_line_interface():
         # in case we run in the github-CI, we set a timeout
         def handler(signum, frame):
             print("Process timed out")
+            report_error("I ran out of time.")
             sys.exit(1)
 
         signal.signal(signal.SIGALRM, handler)
@@ -72,6 +73,7 @@ def command_line_interface():
     # add reaction to issue to show that we're working on it
     add_reaction_to_last_comment_in_issue(repository, issue, "+1")
 
+
     # execute the task
     if task == "review-pull-request":
         review_pull_request(repository, issue, prompt)
@@ -81,3 +83,5 @@ def command_line_interface():
         solve_github_issue(repository, issue, llm_name)
     elif task == "comment-on-issue" and ("git-bob comment" in text or not running_in_github_ci):
         comment_on_issue(repository, issue, prompt)
+
+
