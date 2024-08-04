@@ -5,12 +5,37 @@ from functools import wraps
 from toolz import curry
 
 def remove_indentation(text):
+    """
+    Remove indentation from the given text.
+
+    Parameters
+    ----------
+    text : str
+        The text from which to remove indentation.
+
+    Returns
+    -------
+    str
+        The text without indentation.
+    """
     text = text.replace("\n    ", "\n")
 
     return text.strip()
 
-
 def remove_outer_markdown(text):
+    """
+    Remove outer markdown from the given text.
+
+    Parameters
+    ----------
+    text : str
+        The text from which to remove outer markdown.
+
+    Returns
+    -------
+    str or None
+        The text without outer markdown, or None if no markdown was found.
+    """
     code = text \
         .replace("```python", "```") \
         .replace("```Python", "```") \
@@ -42,11 +67,26 @@ def remove_outer_markdown(text):
 
 @lru_cache(maxsize=1)
 def get_llm_name():
+    """
+    Get the name of the language model (LLM) from the environment variable.
+
+    Returns
+    -------
+    str
+        The name of the LLM.
+    """
     import os
     return os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
 
-
 def report_error(message):
+    """
+    Report an error by adding a comment to the GitHub issue.
+
+    Parameters
+    ----------
+    message : str
+        The error message to report.
+    """
     import sys
     import os
     from ._ai_github_utilities import setup_ai_remark
@@ -70,6 +110,19 @@ def report_error(message):
 
 @curry
 def catch_error(func):
+    """
+    Decorator to catch and report errors in the decorated function.
+
+    Parameters
+    ----------
+    func : function
+        The function to decorate.
+
+    Returns
+    -------
+    function
+        The decorated function with error catching.
+    """
     @wraps(func)
     def worker_function(*args, **kwargs):
         try:
