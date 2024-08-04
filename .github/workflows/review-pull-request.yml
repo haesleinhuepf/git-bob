@@ -20,6 +20,11 @@ jobs:
         echo "Organization - ${{ github.repository_owner }}"
         echo "Repository Name - ${{ github.repository }}"
 
+    - name: Print Job details
+      run: |  
+        echo "Run ID - ${{ github.run_id }}"
+        echo "Job ID - ${{ github.job }}"
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
