@@ -110,9 +110,6 @@ def get_most_recent_comment_on_issue(repository, issue):
         A tuple containing the username of the commenter and the comment text.
     """
     print(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
-
-    raise NotImplementedError("This function is not working at the moment.")
-
     repo = get_github_repository(repository)
 
     # Get the issue by number
