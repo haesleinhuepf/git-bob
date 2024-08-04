@@ -23,6 +23,7 @@ jobs:
     - name: Print Job details
       run: |  
         echo "Run ID - ${{ github.run_id }}"
+        echo "Run No - ${{ github.run_number }}"
         echo "Job ID - ${{ github.job }}"
 
     - name: Set up Python
