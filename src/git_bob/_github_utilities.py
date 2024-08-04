@@ -4,6 +4,7 @@
 # All functions must have a proper docstring, because we are using them as tools for function calling using LLMs.
 import os
 from functools import lru_cache
+from ._utilities import catch_error
 
 @lru_cache(maxsize=1)
 def get_github_repository(repository):
@@ -29,7 +30,7 @@ def get_github_repository(repository):
     # Get the repository object
     return g.get_repo(repository)
 
-
+@catch_error
 def add_comment_to_issue(repository, issue, comment):
     """
     Add a comment to a specific GitHub issue.
@@ -54,7 +55,7 @@ def add_comment_to_issue(repository, issue, comment):
 
     print(f"Comment added to issue #{issue} in repository {repository}.")
 
-
+@catch_error
 def get_conversation_on_issue(repository, issue):
     """
     Retrieve the entire conversation (title, body, and comments) of a specific GitHub issue.
@@ -91,7 +92,7 @@ def get_conversation_on_issue(repository, issue):
 
     return conversation
 
-
+@catch_error
 def get_most_recent_comment_on_issue(repository, issue):
     """
     Retrieve the most recent comment on a specific GitHub issue.
@@ -109,6 +110,8 @@ def get_most_recent_comment_on_issue(repository, issue):
         A tuple containing the username of the commenter and the comment text.
     """
     print(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
+
+    raise NotImplementedError("This function is not working at the moment.")
 
     repo = get_github_repository(repository)
 
@@ -135,7 +138,7 @@ def get_most_recent_comment_on_issue(repository, issue):
 
     return user, text
 
-
+@catch_error
 def list_issues(repository: str, state: str = "open") -> dict:
     """
     List all GitHub issues with a defined state on a specified repository.
@@ -166,7 +169,7 @@ def list_issues(repository: str, state: str = "open") -> dict:
 
     return result
 
-
+@catch_error
 def get_github_issue_details(repository: str, issue: int) -> str:
     """
     Retrieve detailed information about a specific GitHub issue.
@@ -213,7 +216,7 @@ def get_github_issue_details(repository: str, issue: int) -> str:
 
     return content
 
-
+@catch_error
 def list_repository_files(repository: str) -> list:
     """
     List all files in a given GitHub repository.
@@ -254,7 +257,7 @@ def list_repository_files(repository: str) -> list:
 
     return all_files
 
-
+@catch_error
 def get_repository_file_contents(repository: str, file_paths: list) -> dict:
     """
     Retrieve the contents of specified files from a GitHub repository.
@@ -293,7 +296,7 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
 
     return file_contents
 
-
+@catch_error
 def write_file_in_new_branch(repository, branch_name, file_path, new_content):
     """
     Modifies or creates a specified file with new content and saves the changes in a new git branch.
@@ -327,6 +330,8 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content):
 
     return f"File {file_path} successfully created in repository {repository} branch {branch_name}."
 
+
+@catch_error
 def create_branch(repository, parent_branch="main"):
     """
     Creates a new branch in a given repository, derived from an optionally specified parent_branch and returns the name of the new branch.
@@ -361,6 +366,7 @@ def create_branch(repository, parent_branch="main"):
     return new_branch_name
 
 
+@catch_error
 def check_if_file_exists(repository, file_path):
     """
     Checks if a specified file_path exists in a GitHub repository. Returns True if the file exists, False otherwise.
@@ -389,6 +395,7 @@ def check_if_file_exists(repository, file_path):
         return False
 
 
+@catch_error
 def send_pull_request(repository, branch_name, title, description):
     """
     Create a pull request from a defined branch into the main branch.
@@ -425,6 +432,7 @@ def send_pull_request(repository, branch_name, title, description):
     return f"Pull request created: {pr.html_url}"
 
 
+@catch_error
 def check_access_and_ask_for_approval(user, repository, issue):
     """
     Check if the user has access rights and ask for approval if necessary.
@@ -470,6 +478,7 @@ def check_access_and_ask_for_approval(user, repository, issue):
     return True
 
 
+@catch_error
 def get_diff_of_pull_request(repository, pull_request):
     """
     Get the diff of a specific pull request in a GitHub repository.
