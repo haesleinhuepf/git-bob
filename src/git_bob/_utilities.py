@@ -1,4 +1,6 @@
 # This module provides utility functions for text processing, including functions to remove indentation and outer markdown from text.
+from functools import lru_cache
+
 
 def remove_indentation(text):
     text = text.replace("\n    ", "\n")
@@ -35,3 +37,8 @@ def remove_outer_markdown(text):
         code = code.strip("\n")
 
     return code
+
+@lru_cache(maxsize=1)
+def get_llm_name():
+    import os
+    return os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
