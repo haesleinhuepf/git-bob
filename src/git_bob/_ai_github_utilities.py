@@ -275,10 +275,15 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     {issue_summary}
     
     ## Your task
-    Which of these files might be relevant for issue #{issue} ? 
+    Which of these files are relevant for issue #{issue} ? Keep the list short.
     You can also consider files which do not exist yet. 
     Respond with the filenames as JSON list.
     """)))
+
+    if "[" in relevant_files:
+        relevant_files = "[" +  relevant_files.split("[")[1]
+    if "]" in relevant_files:
+        relevant_files = relevant_files.split("]")[0] + "]"
 
     print("JSON relevant filenames:", relevant_files)
 
