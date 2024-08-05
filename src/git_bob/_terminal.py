@@ -12,6 +12,7 @@ def command_line_interface():
     from ._endpoints import prompt_claude, prompt_chatgpt
     from ._github_utilities import check_access_and_ask_for_approval, add_reaction_to_last_comment_in_issue
     from ._utilities import get_llm_name, report_error
+    from ._logger import Log
     
     print("Hello")
 
@@ -84,4 +85,5 @@ def command_line_interface():
     elif task == "comment-on-issue" and ("git-bob comment" in text or not running_in_github_ci):
         comment_on_issue(repository, issue, prompt)
 
-
+    print("Done. Summary:")
+    print("* " + "\n* ".join(Log().get()))
