@@ -280,7 +280,7 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
     for file_path in file_paths:
         try:
             # Get the file content
-            file_content = get_repository_file_content (repository, "main", file_path)
+            file_content = get_file_in_repository (repository, "main", file_path).decoded_content.decode()
 
             # store the content
             file_contents[file_path] = file_content
@@ -317,7 +317,7 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content, co
 
     # Commit the changes
     if check_if_file_exists(repository, branch_name, file_path):
-        file = get_repository_file_content(repository, branch_name, file_path)
+        file = get_file_in_repository(repository, branch_name, file_path)
         repo.update_file(file.path, commit_message, new_content, file.sha, branch=branch_name)
     else:
         repo.create_file(file_path, commit_message, new_content, branch=branch_name)
@@ -385,7 +385,7 @@ def check_if_file_exists(repository, branch_name, file_path):
 
     try:
         # Try to get the contents of the file
-        get_repository_file_content(repository, branch_name, file_path)
+        get_file_in_repository(repository, branch_name, file_path)
         #contents = repo.get_contents(file_path)
         return True
     except:
@@ -393,11 +393,11 @@ def check_if_file_exists(repository, branch_name, file_path):
 
 
 @lru_cache(maxsize=1)
-def get_repository_file_content(repository, branch_name, file_path):
+def get_file_in_repository(repository, branch_name, file_path):
     """Helper function to prevent multiple calls to the GitHub API for the same file content."""
     print("loading file content...", file_path)
     repo = get_github_repository(repository)
-    return repo.get_contents(file_path, ref=branch_name).decoded_content.decode()
+    return repo.get_contents(file_path, ref=branch_name)
 
 @catch_error
 def send_pull_request(repository, branch_name, title, description):
