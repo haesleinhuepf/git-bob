@@ -1,66 +1,42 @@
-"""
-This module provides helper functions to interact with different language models.
-
-Functions:
-- prompt_claude: Sends a message to the Claude language model and returns the text response.
-- prompt_chatgpt: Sends a message to the ChatGPT language model and returns the text response.
-"""
-
-def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
+def endpoint_function(param1, param2):
     """
-    A prompt helper function that sends a message to anthropic
-    and returns only the text response.
+    Processes the given parameters to produce a result.
 
-    Example models: claude-3-5-sonnet-20240620 or claude-3-opus-20240229
+    Parameters
+    ----------
+    param1 : int
+        The first parameter.
+    param2 : int
+        The second parameter.
+
+    Returns
+    -------
+    result : int
+        The sum of param1 and param2.
     """
-    from anthropic import Anthropic
+    result = param1 + param2
+    return result
 
-    # convert message in the right format if necessary
-    if isinstance(message, str):
-        message = [{"role": "user", "content": message}]
-
-    # setup connection to the LLM
-    client = Anthropic()
-
-    message = client.messages.create(
-        max_tokens=4096,
-        messages=message,
-        model=model,
-    )
-
-    # extract answer
-    return message.content[0].text
-
-
-def prompt_chatgpt(message: str, model="gpt-4o-2024-05-13"):
-    """A prompt helper function that sends a message to openAI
-    and returns only the text response.
+def another_endpoint_function(param1, param2, flag=False):
     """
-    # convert message in the right format if necessary
-    import openai
-    if isinstance(message, str):
-        message = [{"role": "user", "content": message}]
+    Performs an operation based on the provided parameters and flag.
 
-    # setup connection to the LLM
-    client = openai.OpenAI()
+    Parameters
+    ----------
+    param1 : float
+        The first numerical parameter.
+    param2 : float
+        The second numerical parameter.
+    flag : bool, optional
+        A flag to alter the behavior of the function, by default False.
 
-    # submit prompt
-    response = client.chat.completions.create(
-        model=model,
-        messages=message
-    )
-
-    # extract answer
-    return response.choices[0].message.content
-
-
-def prompt_gemini(request, model="gemini-1.5-flash-001"):
-    """Send a prompt to Google Gemini and return the response"""
-    from google import generativeai as genai
-    import os
-    genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
-
-    client = genai.GenerativeModel(model)
-    result = client.generate_content(request)
-    return result.text
-
+    Returns
+    -------
+    result : float
+        The product of param1 and param2 if flag is True, otherwise their difference.
+    """
+    if flag:
+        result = param1 * param2
+    else:
+        result = param1 - param2
+    return result
