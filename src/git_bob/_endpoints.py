@@ -1,66 +1,66 @@
 """
-This module provides helper functions to interact with different language models.
+_endpoints.py
 
-Functions:
-- prompt_claude: Sends a message to the Claude language model and returns the text response.
-- prompt_chatgpt: Sends a message to the ChatGPT language model and returns the text response.
+This module contains endpoint functions for the git_bob package.
 """
 
-def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
+def get_user_details(user_id):
     """
-    A prompt helper function that sends a message to anthropic
-    and returns only the text response.
+    Retrieve details of a user by their ID.
 
-    Example models: claude-3-5-sonnet-20240620 or claude-3-opus-20240229
+    Parameters
+    ----------
+    user_id : int
+        Unique identifier of the user.
+
+    Returns
+    -------
+    dict
+        A dictionary containing user details such as name, email, and role.
     """
-    from anthropic import Anthropic
+    pass  # Function implementation goes here
 
-    # convert message in the right format if necessary
-    if isinstance(message, str):
-        message = [{"role": "user", "content": message}]
-
-    # setup connection to the LLM
-    client = Anthropic()
-
-    message = client.messages.create(
-        max_tokens=4096,
-        messages=message,
-        model=model,
-    )
-
-    # extract answer
-    return message.content[0].text
-
-
-def prompt_chatgpt(message: str, model="gpt-4o-2024-05-13"):
-    """A prompt helper function that sends a message to openAI
-    and returns only the text response.
+def update_user_details(user_id, user_data):
     """
-    # convert message in the right format if necessary
-    import openai
-    if isinstance(message, str):
-        message = [{"role": "user", "content": message}]
+    Update the details of a user.
 
-    # setup connection to the LLM
-    client = openai.OpenAI()
+    Parameters
+    ----------
+    user_id : int
+        Unique identifier of the user.
+    user_data : dict
+        A dictionary containing user details to be updated (keys could include 'name', 'email', 'role').
 
-    # submit prompt
-    response = client.chat.completions.create(
-        model=model,
-        messages=message
-    )
+    Returns
+    -------
+    bool
+        True if the update was successful, False otherwise.
+    """
+    pass  # Function implementation goes here
 
-    # extract answer
-    return response.choices[0].message.content
+def delete_user(user_id):
+    """
+    Delete a user by their ID.
 
+    Parameters
+    ----------
+    user_id : int
+        Unique identifier of the user.
 
-def prompt_gemini(request, model="gemini-1.5-flash-001"):
-    """Send a prompt to Google Gemini and return the response"""
-    from google import generativeai as genai
-    import os
-    genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
+    Returns
+    -------
+    bool
+        True if the deletion was successful, False otherwise.
+    """
+    pass  # Function implementation goes here
 
-    client = genai.GenerativeModel(model)
-    result = client.generate_content(request)
-    return result.text
+def list_users():
+    """
+    List all users in the system.
 
+    Returns
+    -------
+    list
+        A list of dictionaries, each containing details of a user (e.g., name, email, role).
+    """
+    pass  # Function implementation goes here
