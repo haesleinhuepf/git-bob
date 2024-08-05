@@ -1,66 +1,108 @@
-"""
-This module provides helper functions to interact with different language models.
+<BEGIN_FILE>
+import re
+from typing import List
 
-Functions:
-- prompt_claude: Sends a message to the Claude language model and returns the text response.
-- prompt_chatgpt: Sends a message to the ChatGPT language model and returns the text response.
-"""
+from ._github_utilities import (
+    get_issue_number_from_github_references,
+    get_pull_request_body,
+    get_pull_request_number_from_github_references,
+)
 
-def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
+def extract_issue_number_from_branch_name(branch_name: str) -> int:
     """
-    A prompt helper function that sends a message to anthropic
-    and returns only the text response.
+    Extract the issue number from a branch name.
 
-    Example models: claude-3-5-sonnet-20240620 or claude-3-opus-20240229
+    Parameters
+    ----------
+    branch_name : str
+        The name of the branch.
+
+    Returns
+    -------
+    int
+        The extracted issue number.
+
+    Raises
+    ------
+    ValueError
+        If no issue number is found in the branch name.
     """
-    from anthropic import Anthropic
+    match = re.search(r'(\d+)', branch_name)
+    if match:
+        return int(match.group(1))
+    else:
+        raise ValueError(f"No issue number found in branch name: {branch_name}")
 
-    # convert message in the right format if necessary
-    if isinstance(message, str):
-        message = [{"role": "user", "content": message}]
-
-    # setup connection to the LLM
-    client = Anthropic()
-
-    message = client.messages.create(
-        max_tokens=4096,
-        messages=message,
-        model=model,
-    )
-
-    # extract answer
-    return message.content[0].text
-
-
-def prompt_chatgpt(message: str, model="gpt-4o-2024-05-13"):
-    """A prompt helper function that sends a message to openAI
-    and returns only the text response.
+def extract_issue_numbers_from_commit_message(commit_message: str) -> List[int]:
     """
-    # convert message in the right format if necessary
-    import openai
-    if isinstance(message, str):
-        message = [{"role": "user", "content": message}]
+    Extract issue numbers from a commit message.
 
-    # setup connection to the LLM
-    client = openai.OpenAI()
+    Parameters
+    ----------
+    commit_message : str
+        The commit message to extract issue numbers from.
 
-    # submit prompt
-    response = client.chat.completions.create(
-        model=model,
-        messages=message
-    )
+    Returns
+    -------
+    List[int]
+        A list of extracted issue numbers.
+    """
+    return get_issue_number_from_github_references(commit_message)
 
-    # extract answer
-    return response.choices[0].message.content
+def extract_pull_request_number_from_branch_name(branch_name: str) -> int:
+    """
+    Extract the pull request number from a branch name.
 
+    Parameters
+    ----------
+    branch_name : str
+        The name of the branch.
 
-def prompt_gemini(request, model="gemini-1.5-flash-001"):
-    """Send a prompt to Google Gemini and return the response"""
-    from google import generativeai as genai
-    import os
-    genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
+    Returns
+    -------
+    int
+        The extracted pull request number.
 
-    client = genai.GenerativeModel(model)
-    result = client.generate_content(request)
-    return result.text
+    Raises
+    ------
+    ValueError
+        If no pull request number is found in the branch name.
+    """
+    match = re.search(r'pr-(\d+)', branch_name)
+    if match:
+        return int(match.group(1))
+    else:
+        raise ValueError(f"No pull request number found in branch name: {branch_name}")
 
+def extract_pull_request_numbers_from_commit_message(commit_message: str) -> List[int]:
+    """
+    Extract pull request numbers from a commit message.
+
+    Parameters
+    ----------
+    commit_message : str
+        The commit message to extract pull request numbers from.
+
+    Returns
+    -------
+    List[int]
+        A list of extracted pull request numbers.
+    """
+    return get_pull_request_number_from_github_references(commit_message)
+
+def extract_pull_request_body(pull_request_number: int) -> str:
+    """
+    Extract the body of a pull request.
+
+    Parameters
+    ----------
+    pull_request_number : int
+        The number of the pull request.
+
+    Returns
+    -------
+    str
+        The body of the pull request.
+    """
+    return get_pull_request_body(pull_request_number)
+</END_FILE>
