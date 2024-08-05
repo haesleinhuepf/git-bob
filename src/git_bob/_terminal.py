@@ -48,6 +48,8 @@ def command_line_interface():
         # in case we run in the github-CI, we set a timeout
         def handler(signum, frame):
             print("Process timed out")
+            print("Done. Summary:")
+            print("* " + "\n* ".join(Log().get()))
             report_error("I ran out of time.")
             sys.exit(1)
         signal.signal(signal.SIGALRM, handler)
@@ -61,7 +63,7 @@ def command_line_interface():
     # handle aliases
     text = text.replace("git-bob respond", "git-bob comment")
     text = text.replace("git-bob review", "git-bob comment")
-    
+
     if running_in_github_ci:
         if not ("git-bob comment" in text or "git-bob solve" in text):
             print("They didn't speak to me. I show myself out.")
