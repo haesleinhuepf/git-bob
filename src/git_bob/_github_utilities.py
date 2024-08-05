@@ -156,11 +156,11 @@ def list_issues(repository: str, state: str = "open") -> dict:
 
     repo = get_github_repository(repository)
 
-    # Fetch all open issues
+    # Fetch all issues with the specified state
     issues = repo.get_issues(state=state)
 
     result = {}
-    # Print open issues
+    # Populate issue dictionary
     for issue in issues:
         result[issue.number] = issue.title
 
@@ -300,10 +300,12 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content, co
     ----------
     repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
-    file_paths : str
+    file_path : str
         A file path within the repository to change the contents of.
-    new_conent : str
+    new_content : str
         Text content that should be written into the file.
+    commit_message : str, optional
+        The commit message for the changes. Default is "Update file".
 
     Returns
     -------
@@ -323,7 +325,6 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content, co
         repo.create_file(file_path, commit_message, new_content, branch=branch_name)
 
     return f"File {file_path} successfully created in repository {repository} branch {branch_name}."
-
 
 @catch_error
 def create_branch(repository, parent_branch="main"):
@@ -359,7 +360,6 @@ def create_branch(repository, parent_branch="main"):
 
     return new_branch_name
 
-
 @catch_error
 def check_if_file_exists(repository, branch_name, file_path):
     """
@@ -394,7 +394,23 @@ def check_if_file_exists(repository, branch_name, file_path):
 
 @lru_cache(maxsize=1)
 def get_file_in_repository(repository, branch_name, file_path):
-    """Helper function to prevent multiple calls to the GitHub API for the same file content."""
+    """
+    Helper function to prevent multiple calls to the GitHub API for the same file.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    branch_name : str
+        The name of the branch to get the file content from.
+    file_path : str
+        The path of the file in the repository.
+
+    Returns
+    -------
+    github.ContentFile.ContentFile
+        The content file object of the specified file.
+    """
     print("loading file content...", file_path)
     repo = get_github_repository(repository)
     return repo.get_contents(file_path, ref=branch_name)
@@ -435,7 +451,6 @@ def send_pull_request(repository, branch_name, title, description):
 
     return f"Pull request created: {pr.html_url}"
 
-
 @catch_error
 def check_access_and_ask_for_approval(user, repository, issue):
     """
@@ -469,18 +484,17 @@ def check_access_and_ask_for_approval(user, repository, issue):
         print("User does not have access rights.")
         member_names = ", ".join(["@" + str(m) for m in members])
         add_comment_to_issue(repository, issue, remove_indentation(remove_indentation(f"""{remark}
-                
-        Hi @{user}, 
         
+        Hi @{user}, 
+    
         thanks for reaching out! Unfortunately, I'm not allowed to respond to you directly. 
         I need approval from a repository member: {member_names}
-        
+    
         Best,
         git-bob
         """)))
         return False
     return True
-
 
 @catch_error
 def get_diff_of_pull_request(repository, pull_request):
@@ -496,8 +510,8 @@ def get_diff_of_pull_request(repository, pull_request):
 
     Returns
     -------
-    requests.Response
-        The response object containing the diff of the pull request.
+    str
+        The diff of the pull request.
     """
     import requests
 
@@ -517,10 +531,20 @@ def get_diff_of_pull_request(repository, pull_request):
     else:
         return None
 
-
 @catch_error
 def add_reaction_to_issue(repository, issue, reaction="+1"):
-    """Add a given reaction to a github issue."""
+    """
+    Add a given reaction to a github issue.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The issue number to add a reaction to.
+    reaction : str
+        The reaction to add. Default is "+1".
+    """
     Log().log(f"-> add_reaction_to_issue({repository}, {issue}, {reaction})")
 
     repo = get_github_repository(repository)
@@ -529,10 +553,20 @@ def add_reaction_to_issue(repository, issue, reaction="+1"):
     issue = repo.get_issue(number=issue)
     issue.create_reaction(reaction)
 
-
 @catch_error
 def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
-    """Add a given reaction to a github issue."""
+    """
+    Add a given reaction to the last comment in a github issue.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The issue number to add a reaction to.
+    reaction : str
+        The reaction to add. Default is "+1".
+    """
     Log().log(f"-> add_reaction_to_last_comment_in_issue({repository}, {issue}, {reaction})")
 
     repo = get_github_repository(repository)
@@ -550,7 +584,6 @@ def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
     else:
         issue_obj.create_reaction(reaction)
 
-
 @catch_error
 def get_diff_of_branches(repository, compare_branch, base_branch="main"):
     """
@@ -564,25 +597,26 @@ def get_diff_of_branches(repository, compare_branch, base_branch="main"):
         The branch to compare against the base branch.
     base_branch : str, optional
         The base branch to compare against. Default is "main".
+
+    Returns
+    -------
+    str
+        The diff between the specified branches as a string.
     """
     # Get the repository
     repo = get_github_repository(repository)
 
     # Get the comparison between branches
     comparison = repo.compare(base_branch, compare_branch)
-
     # Initialize output variable
     output = []
-
     # Collect the diff
     for file in comparison.files:
         output.append(f"\nFile: {file.filename}")
         output.append(f"Status: {file.status}")
         output.append("-" * 40)
-
         if file.patch:
             output.append(file.patch)
         else:
             output.append("No diff available (possibly a binary file)")
-
     return "\n".join(output)
