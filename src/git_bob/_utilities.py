@@ -5,12 +5,36 @@ from functools import wraps
 from toolz import curry
 
 def remove_indentation(text):
-    text = text.replace("\n    ", "\n")
+    """
+    Remove indentation from a given text.
 
+    Parameters
+    ----------
+    text : str
+        The text from which to remove indentation.
+
+    Returns
+    -------
+    str
+        The text with removed indentation.
+    """
+    text = text.replace("\n    ", "\n")
     return text.strip()
 
-
 def remove_outer_markdown(text):
+    """
+    Remove outer markdown notation from a given text.
+
+    Parameters
+    ----------
+    text : str
+        The text from which to remove outer markdown.
+
+    Returns
+    -------
+    str
+        The text with removed outer markdown.
+    """
     code = text \
         .replace("```python", "```") \
         .replace("```Python", "```") \
@@ -38,19 +62,37 @@ def remove_outer_markdown(text):
             code = code + c
         code = code.strip("\n")
 
-    return code
+        return code
 
 @lru_cache(maxsize=1)
 def get_llm_name():
+    """
+    Get the name of the large language model (LLM) from environment variable.
+
+    Returns
+    -------
+    str
+        The name of the LLM. Defaults to "gpt-4o-2024-05-13" if the environment variable is not set.
+    """
     import os
     return os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
-
 
 class ErrorReporting:
     status = True
 
-
 def report_error(message):
+    """
+    Report an error with a provided message.
+
+    Parameters
+    ----------
+    message : str
+        The error message to report.
+
+    Returns
+    -------
+    None
+    """
     import sys
     import os
     from ._ai_github_utilities import setup_ai_remark
@@ -69,22 +111,35 @@ def report_error(message):
 
     complete_error_message = remove_indentation(f"""
     {ai_remark}
-    
+
     I'm sorry, I encountered an error while processing your request. Here is the error message:
-    
+
     {message}
-    
+
     This is how far I came:
     ```
     {log}
     ```
-    
+
     [More Details...](https://github.com/{repository}/actions/runs/{run_id})
     """)
     add_comment_to_issue(repository, issue, complete_error_message)
 
 @curry
 def catch_error(func):
+    """
+    A decorator to catch and report errors from a function.
+
+    Parameters
+    ----------
+    func : callable
+        The function to wrap with error catching.
+
+    Returns
+    -------
+    callable
+        Wrapped function with error catching.
+    """
     @wraps(func)
     def worker_function(*args, **kwargs):
         try:
@@ -97,9 +152,22 @@ def catch_error(func):
 
     return worker_function
 
-
 def split_content_and_summary(text):
-    """Assuming a text consists of a task solution (code, text) and a summary in the last line, it splits the text into the content and the summary."""
+    """
+    Split a text into content and summary.
+
+    Assumes the summary is in the last line of the text.
+    
+    Parameters
+    ----------
+    text : str
+        The text to split into content and summary.
+
+    Returns
+    -------
+    tuple of str
+        A tuple containing the content and the summary.
+    """
     temp = text.split("\n")
     summary = temp[-1]
     remaining_content = temp[:-1]
