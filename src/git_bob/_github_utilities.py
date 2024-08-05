@@ -414,8 +414,8 @@ def send_pull_request(repository, branch_name, title, description):
         A one-liner explaining what was changed in the branch.
     description : str
         A more detailed description of what has happened.
-        If the changes are related to an issue write "closes #99 "
-        where 99 stands for the issue number the pull-request is related to.
+    If the changes are related to an issue write "closes #99 "
+    where 99 stands for the issue number the pull-request is related to.
 
     Returns
     -------
@@ -469,12 +469,12 @@ def check_access_and_ask_for_approval(user, repository, issue):
         print("User does not have access rights.")
         member_names = ", ".join(["@" + str(m) for m in members])
         add_comment_to_issue(repository, issue, remove_indentation(remove_indentation(f"""{remark}
-                
+            
         Hi @{user}, 
-        
+
         thanks for reaching out! Unfortunately, I'm not allowed to respond to you directly. 
         I need approval from a repository member: {member_names}
-        
+
         Best,
         git-bob
         """)))
