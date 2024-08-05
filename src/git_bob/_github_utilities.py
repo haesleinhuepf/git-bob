@@ -193,16 +193,16 @@ def get_github_issue_details(repository: str, issue: int) -> str:
 
     # Format issue details
     content = remove_indentation(f"""Issue #{issue.number}: {issue.title}
-State: {issue.state}
-Created at: {issue.created_at}
-Updated at: {issue.updated_at}
-Closed at: {issue.closed_at}
-Author: {issue.user.login}
-Assignees: {', '.join([assignee.login for assignee in issue.assignees])}
-Labels: {', '.join([label.name for label in issue.labels])}
-Comments: {issue.comments}
-Body:
-{issue.body}""")
+    State: {issue.state}
+    Created at: {issue.created_at}
+    Updated at: {issue.updated_at}
+    Closed at: {issue.closed_at}
+    Author: {issue.user.login}
+    Assignees: {', '.join([assignee.login for assignee in issue.assignees])}
+    Labels: {', '.join([label.name for label in issue.labels])}
+    Comments: {issue.comments}
+    Body:
+    {issue.body}""")
 
     # Add comments if any
     if issue.comments > 0:
@@ -485,14 +485,14 @@ def check_access_and_ask_for_approval(user, repository, issue):
         member_names = ", ".join(["@" + str(m) for m in members])
         add_comment_to_issue(repository, issue, remove_indentation(remove_indentation(f"""{remark}
         
-    Hi @{user}, 
-
-    thanks for reaching out! Unfortunately, I'm not allowed to respond to you directly. 
-    I need approval from a repository member: {member_names}
-
-    Best,
-    git-bob
-    """)))
+        Hi @{user}, 
+    
+        thanks for reaching out! Unfortunately, I'm not allowed to respond to you directly. 
+        I need approval from a repository member: {member_names}
+    
+        Best,
+        git-bob
+        """)))
         return False
     return True
 
@@ -607,3 +607,16 @@ def get_diff_of_branches(repository, compare_branch, base_branch="main"):
     repo = get_github_repository(repository)
 
     # Get the comparison between branches
+    comparison = repo.compare(base_branch, compare_branch)
+    # Initialize output variable
+    output = []
+    # Collect the diff
+    for file in comparison.files:
+        output.append(f"\nFile: {file.filename}")
+        output.append(f"Status: {file.status}")
+        output.append("-" * 40)
+        if file.patch:
+            output.append(file.patch)
+        else:
+            output.append("No diff available (possibly a binary file)")
+    return "\n".join(output)
