@@ -104,6 +104,7 @@ def review_pull_request(repository, issue, prompt_function):
     {SYSTEM_PROMPT}
     Generate a response to a github pull-request. 
     Given are the discussion on the pull-request and the changed files.
+    Check if the discussion reflects what was changed in the files.
 
     ## Discussion
 
