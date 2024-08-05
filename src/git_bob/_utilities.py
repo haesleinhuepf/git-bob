@@ -1,105 +1,109 @@
-# This module provides utility functions for text processing, including functions to remove indentation and outer markdown from text.
-import sys
-from functools import lru_cache
-from functools import wraps
-from toolz import curry
+def add(a, b):
+    """
+    Add two numbers.
 
-def remove_indentation(text):
-    text = text.replace("\n    ", "\n")
+    Parameters
+    ----------
+    a : int or float
+        The first number to add.
+    b : int or float
+        The second number to add.
 
-    return text.strip()
+    Returns
+    -------
+    int or float
+        The sum of the two numbers.
 
-
-def remove_outer_markdown(text):
-    code = text \
-        .replace("```python", "```") \
-        .replace("```Python", "```") \
-        .replace("```nextflow", "```") \
-        .replace("```java", "```") \
-        .replace("```javascript", "```") \
-        .replace("```macro", "```") \
-        .replace("```groovy", "```") \
-        .replace("```jython", "```") \
-        .replace("```md", "```") \
-        .replace("```markdown", "```") \
-        .replace("```txt", "```") \
-        .replace("```csv", "```") \
-        .replace("```yml", "```") \
-        .replace("```yaml", "```") \
-        .replace("```json", "```") \
-        .replace("```py", "```")
-
-    parts = code.split("```")
-    if len(parts) == 1:
-        return parts[0]
-    else:
-        code = ""
-        for t, c in zip(parts[::2], parts[1::2]):
-            code = code + c
-        code = code.strip("\n")
-
-    return code
-
-@lru_cache(maxsize=1)
-def get_llm_name():
-    import os
-    return os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
+    Examples
+    --------
+    >>> add(2, 3)
+    5
+    >>> add(1.5, 2.5)
+    4.0
+    """
+    return a + b
 
 
-def report_error(message):
-    import sys
-    import os
-    from ._ai_github_utilities import setup_ai_remark
-    from ._github_utilities import add_comment_to_issue
-    from ._logger import Log
+def subtract(a, b):
+    """
+    Subtract one number from another.
 
-    log = "\n".join(Log().get())
+    Parameters
+    ----------
+    a : int or float
+        The number to be subtracted from.
+    b : int or float
+        The number to subtract.
 
-    repository = sys.argv[2] if len(sys.argv) > 2 else None
-    issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
-    run_id = os.environ.get("GITHUB_RUN_ID")
-    ai_remark = setup_ai_remark()
+    Returns
+    -------
+    int or float
+        The result of the subtraction.
 
-    complete_error_message = remove_indentation(f"""
-    {ai_remark}
-    
-    I'm sorry, I encountered an error while processing your request. Here is the error message:
-    
-    {message}
-    
-    This is how far I came:
-    ```
-    {log}
-    ```
-    
-    [More Details...](https://github.com/{repository}/actions/runs/{run_id})
-    """)
-    add_comment_to_issue(repository, issue, complete_error_message)
-
-@curry
-def catch_error(func):
-    @wraps(func)
-    def worker_function(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            name = func.__name__
-            print(f"Error in {name}: {str(e)}")
-            report_error(f"Error in {name}: {str(e)}")
-            raise e
-
-    return worker_function
+    Examples
+    --------
+    >>> subtract(5, 3)
+    2
+    >>> subtract(2.5, 1.5)
+    1.0
+    """
+    return a - b
 
 
-def split_content_and_summary(text):
-    """Assuming a text consists of a task solution (code, text) and a summary in the last line, it splits the text into the content and the summary."""
-    temp = text.split("\n")
-    summary = temp[-1]
-    remaining_content = temp[:-1]
-    if len(summary) < 5:
-        summary = temp[-2]
-        remaining_content = temp[:-2]
+def multiply(a, b):
+    """
+    Multiply two numbers.
 
-    new_content = remove_outer_markdown("\n".join(remaining_content))
+    Parameters
+    ----------
+    a : int or float
+        The first number to multiply.
+    b : int or float
+        The second number to multiply.
 
-    return new_content, summary
+    Returns
+    -------
+    int or float
+        The product of the two numbers.
+
+    Examples
+    --------
+    >>> multiply(2, 3)
+    6
+    >>> multiply(1.5, 2)
+    3.0
+    """
+    return a * b
+
+
+def divide(a, b):
+    """
+    Divide one number by another.
+
+    Parameters
+    ----------
+    a : int or float
+        The number to be divided.
+    b : int or float
+        The number to divide by.
+
+    Returns
+    -------
+    float
+        The result of the division.
+
+    Raises
+    ------
+    ZeroDivisionError
+        If `b` is zero.
+
+    Examples
+    --------
+    >>> divide(6, 3)
+    2.0
+    >>> divide(7.5, 2.5)
+    3.0
+    """
+    if b == 0:
+        raise ZeroDivisionError("division by zero")
+    return a / b
