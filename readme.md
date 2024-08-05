@@ -29,9 +29,9 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
 * setup Github workflows like shown in [this folder](.github/workflows).
   * Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.2.0`.
   * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These three were tested:
-    * `claude-3-5-sonnet-20240620`
-    * `gpt-4o-2024-05-13`
-    <!--* `gemini-1.5-flash-001`-->
+* `claude-3-5-sonnet-20240620`
+* `gpt-4o-2024-05-13`
+<!--* `gemini-1.5-flash-001`-->
 * configure a Github secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` <!--or `GOOGLE_API_KEY`--> with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
   * [OpenAI (gpt)](https://openai.com/blog/openai-api)
   * [Anthropic (claude)](https://www.anthropic.com/api)
@@ -57,21 +57,21 @@ git-bob solve
 
 `git-bob` can fix typos ([issue](https://github.com/haesleinhuepf/git-bob/issues/16), [pull-request](https://github.com/haesleinhuepf/git-bob/pull/17)):
 
-![demo_fix_typos.png](docs/images/demo_fix_typos.png)
+<a href="docs/images/demo_fix_typos.png"><img src="docs/images/demo_fix_typos.png" width="400"></a>
 
 `git-bob` can improve code documentation ([issue](https://github.com/haesleinhuepf/git-bob/issues/19), [pull-request](https://github.com/haesleinhuepf/git-bob/pull/21)):
 
-![demo_fix_typos.png](docs/images/demo_comment_code.png)
+<a href="docs/images/demo_comment_code.png"><img src="docs/images/demo_comment_code.png" width="400"></a>
 
 #### Review Pull-Requests
 `git-bob` can review pull-requests and provide feedback ([pull-request](https://github.com/haesleinhuepf/git-bob/pull/11)):
 
-![demo_fix_typos.png](docs/images/demo_review_pull_request.png)
+<a href="docs/images/demo_review_pull_request.png"><img src="docs/images/demo_review_pull_request.png" width="400"></a>
 
 #### General prompting
 `git-bob` can also be exploited to answer questions ([issue](https://github.com/haesleinhuepf/git-bob/issues/20)).
 
-![](docs/images/demo_question.png)
+<a href="docs/images/demo_question.png"><img src="docs/images/demo_question.png" width="400"></a>
 
 
 ## Installation as command-line tool
@@ -132,4 +132,4 @@ A [human](https://haesleinhuepf.github.io) will respond and comment on your idea
 
 ## Acknowledgements
 
-We acknowledge the financial support by the Federal Ministry of Education and Research of Germany and by Sächsische Staatsministerium für Wissenschaft, Kultur und Tourismus in the programme Center of Excellence for AI-research „Center for Scalable Data Analytics and Artificial Intelligence Dresden/Leipzig“, project identification number: ScaDS.AI
+We acknowledge the financial support by the Federal Ministry of Education and Research of Germany and by Sächsische Staatsministerium für Wissenschaft, Kultur und Tourismus in the programme Center of Excellence for AI-research „Center for Scalable Data Analytics and Artificial Intelligence Dresden/Leipzig", project identification number: ScaDS.AI
