@@ -80,7 +80,7 @@ pip install git-bob
 You can then use git-bob from the terminal on repositories you have read/write access to.
 
 ```bash
-git_bob <action> <organization>/<repository> <issue-number>
+git-bob <action> <organization>/<repository> <issue-number>
 ```
 
 Available actions:
