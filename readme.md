@@ -4,7 +4,7 @@ git-bob uses AI to answer Github-issues and review pull-requests.
 
 ![demo_fix_typos.png](docs/images/banner.png)
 
-Under the hood it uses [gpt-4 omni](https://chat.openai.com/) to understand the text and 
+Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api), [OpenAI's chatGPT](https://openai.com/blog/openai-api) or [Google's Gemini](https://blog.google/technology/ai/google-gemini-ai/) to understand the text and 
 [pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull-requests.
 
 ## Disclaimer
@@ -18,9 +18,9 @@ You have to pay for the usage and must be careful in using the software.
 Do not use this technology if you are not aware of the costs and consequences.
 
 > [!CAUTION]
-> When using the OpenAI, Google Gemini, Anthropic or any other endpoint via git-bob, you are bound to the terms of service 
+> When using the Anthropic, OpenAI, Google Gemini or any other endpoint via git-bob, you are bound to the terms of service 
 > of the respective companies or organizations.
-> The prompts you enter are transferred to their servers and may be processed and stored there. 
+> The github issues, pull-requests and messages you enter are transferred to their servers and may be processed and stored there. 
 > Make sure to not submit any sensitive, confidential or personal data. Also using these services may cost money.
 
 ## Installation as Github action
@@ -28,8 +28,14 @@ Do not use this technology if you are not aware of the costs and consequences.
 There is a detailed [tutorial](docs/installation-tutorial.md) on how to install git-bob as github action to your repository. In very short, to use git-bob in your Github repository, you need to 
 * setup Github workflows like shown in [this folder](.github/workflows).
   * Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.1.0`.
-  * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable.
-* configure a Github secret called `OPENAI_API_KEY` depending on the above configured LLM.
+  * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These three were tested:
+    * `claude-3-5-sonnet-20240620`
+    * `gpt-4o-2024-05-13`
+    * `gemini-1.5-flash-001`
+* configure a Github secret called `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` or `GOOGLE_API_KEY` with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
+  * [OpenAI (gpt)](https://openai.com/blog/openai-api)
+  * [Anthropic (claude)](https://www.anthropic.com/api)
+  * [Google AI](https://cloud.google.com/docs/authentication/api-keys)
 * configure Github actions to run the workflow on issues and pull-requests. Also give write-access to the action runner.
 
 To trigger git-bob, you need to comment on an issue or pull-request with the following command:
@@ -47,19 +53,23 @@ git-bob solve
 
 ### Use-case examples
 
-* `git-bob` can fix typos ([issue](https://github.com/haesleinhuepf/git-bob/issues/16), [pull-request](https://github.com/haesleinhuepf/git-bob/pull/17)):
+#### Solving github issues
+
+`git-bob` can fix typos ([issue](https://github.com/haesleinhuepf/git-bob/issues/16), [pull-request](https://github.com/haesleinhuepf/git-bob/pull/17)):
 
 ![demo_fix_typos.png](docs/images/demo_fix_typos.png)
 
-* `git-bob` can improve code documentation ([issue](https://github.com/haesleinhuepf/git-bob/issues/19), [pull-request](https://github.com/haesleinhuepf/git-bob/pull/21)):
+`git-bob` can improve code documentation ([issue](https://github.com/haesleinhuepf/git-bob/issues/19), [pull-request](https://github.com/haesleinhuepf/git-bob/pull/21)):
 
 ![demo_fix_typos.png](docs/images/demo_comment_code.png)
 
-* `git-bob` can review pull-requests and provide feedback ([pull-request](https://github.com/haesleinhuepf/git-bob/pull/11)):
+#### Review Pull-Requests
+`git-bob` can review pull-requests and provide feedback ([pull-request](https://github.com/haesleinhuepf/git-bob/pull/11)):
 
 ![demo_fix_typos.png](docs/images/demo_review_pull_request.png)
 
-* `git-bob` can also be exploited to answer questions ([issue](https://github.com/haesleinhuepf/git-bob/issues/20)).
+#### General prompting
+`git-bob` can also be exploited to answer questions ([issue](https://github.com/haesleinhuepf/git-bob/issues/20)).
 
 ![](docs/images/demo_question.png)
 
