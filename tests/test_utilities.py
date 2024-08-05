@@ -1,8 +1,8 @@
-import pytest
-from _utilities import *
+from git_bob._utilities import remove_indentation
 
-def test_function1():
-    pass
+def test_remove_indentation():
+    assert remove_indentation("    Hello") == "Hello"
+    assert remove_indentation("        Hello") == "    Hello"
 
 def test_function2():
     pass
