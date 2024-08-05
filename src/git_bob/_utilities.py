@@ -74,7 +74,7 @@ def get_llm_name():
 
 
 class ErrorReporting:
-    status = True
+    status = False
 
 
 def report_error(message):
@@ -135,13 +135,16 @@ def catch_error(func):
     """
     @wraps(func)
     def worker_function(*args, **kwargs):
-        try:
+        if ErrorReporting.status:
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                name = func.__name__
+                print(f"Error in {name}: {str(e)}")
+                report_error(f"Error in {name}: {str(e)}")
+                raise e
+        else:
             return func(*args, **kwargs)
-        except Exception as e:
-            name = func.__name__
-            print(f"Error in {name}: {str(e)}")
-            report_error(f"Error in {name}: {str(e)}")
-            raise e
     return worker_function
 
 
@@ -164,8 +167,9 @@ def split_content_and_summary(text):
         - str: The content with outer markdown removed.
         - str: The summary.
     """
+    text = text.strip("\n").strip()
     temp = text.split("\n")
-    summary = temp[-1]
+    summary = temp[-1].strip()
     remaining_content = temp[:-1]
     if len(summary) < 5:
         summary = temp[-2]
@@ -173,4 +177,4 @@ def split_content_and_summary(text):
 
     new_content = remove_outer_markdown("\n".join(remaining_content))
 
-    return new_content, summary
+    return new_content.strip(), summary.strip()
