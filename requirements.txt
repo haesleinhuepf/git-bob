@@ -1,5 +1,4 @@
 anthropic
 openai
-blablado>=0.2.2
 pygithub
 toolz
