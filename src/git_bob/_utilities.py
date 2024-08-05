@@ -39,7 +39,7 @@ def remove_outer_markdown(text):
     text = text.strip("\n")
 
     possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy", "```jython", "```md", "```markdown",
-                   "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
+           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
 
     possible_endings = ["```", "</FILE>"]
 
