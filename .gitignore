@@ -1,7 +1,3 @@
-
-.ipynb_checkpoints
-Untitled*
-.idea
-*__pycache__*
-*egg-info*
-deploy.bat
+# Ignore all files in the playground directory except test.md
+playground/*
+!playground/test_folder/test.md
