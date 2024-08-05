@@ -80,7 +80,7 @@ def command_line_interface():
     elif (not running_in_github_ci and task == "solve-issue") or (task == "comment-on-issue" and "git-bob solve" in text):
         if prompt == prompt_claude:
             raise NotImplementedError("Solving issues using claude is currently not supported. Please use gpt instead.")
-        solve_github_issue(repository, issue, llm_name)
+        solve_github_issue(repository, issue, llm_name, prompt)
     elif task == "comment-on-issue" and ("git-bob comment" in text or not running_in_github_ci):
         comment_on_issue(repository, issue, prompt)
 

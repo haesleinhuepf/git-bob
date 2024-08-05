@@ -118,8 +118,107 @@ def review_pull_request(repository, issue, prompt_function):
     {comment}
     """))
 
-@catch_error
-def solve_github_issue(repository, issue, llm_model):
+
+def summarize_github_issue(repository, issue, prompt_function):
+    """
+    Summarize a GitHub issue.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository.
+    issue : int
+        The issue number to summarize.
+    llm_model : str
+        The language model to use for generating the summary.
+    """
+    Log().log(f"-> summarize_github_issue({repository}, {issue})")
+    from ._github_utilities import get_github_issue_details
+
+    issue_conversation = get_github_issue_details(repository, issue)
+
+    summary = prompt_function(remove_indentation(f"""
+Summarize the most important details of this issue #{issue} in the repository {repository}. 
+In case filenames, variables and code-snippetes are mentioned, keep them in the summary, they are very important.
+
+## Issue to summarize:
+{issue_conversation}
+"""))
+
+    print("Issue summary:", summary)
+    return summary
+
+
+def create_or_modify_file(repository, issue, filename, branch_name, issue_summary, prompt_function):
+    """
+    Create or modify a file in a GitHub repository.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository.
+    issue : int
+        The issue number to solve.
+    filename : str
+        The name of the file to create or modify.
+    branch_name : str
+        The name of the branch to create or modify the file in.
+    issue_summary : str
+        The summary of the issue to solve.
+    """
+    Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
+    from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, check_if_file_exists
+    from ._utilities import remove_outer_markdown
+
+    try:
+        file_content = get_repository_file_content(repository, branch_name, file_path)
+        print(filename, "will be overwritten")
+        file_content_instruction = remove_indentation(remove_indentation(f"""Modify the file "{filename}" to solve the issue #{issue}:
+        <BEGIN_FILE>
+        {file_content}
+        </END_FILE>
+        """))
+    except:
+        print(filename, "will be created")
+        file_content_instruction = remove_indentation(remove_indentation(f"""Create the file "{filename}" to solve the issue #{issue}.
+        """))
+
+    response = prompt_function(remove_indentation(f"""
+Given a github issue summary (#{issue}) and optionally, file content (filename {filename}), modify the file content or create the file content to solve the issue.
+
+## Issue {issue} Summary
+
+{issue_summary}
+
+## File {filename}
+{file_content_instruction}
+
+## Your task
+Generate content of file "{filename}" to [partially] solve the issue above.
+Do not do any additional modifications you were not instructed to do.
+Respond ONLY the content of the file and afterwards a single line summarizing the changes you made (without mentioning the issue).
+"""))
+
+    temp = response.split("\n")
+    commit_message = temp[-1]
+    remaining_content = temp[:-1]
+    if len(commit_message) < 5:
+        commit_message = temp[-2]
+        remaining_content = temp[:-2]
+
+    new_content = remove_outer_markdown("\n".join(remaining_content))
+
+    print("New file content", new_content)
+    print("Summary", new_content)
+
+    write_file_in_new_branch(repository, branch_name, filename, new_content, commit_message)
+
+    return commit_message
+
+
+
+#@catch_error
+def solve_github_issue(repository, issue, llm_model, prompt_function):
     """
     Attempt to solve a GitHub issue by modifying a single file and sending a pull-request.
 
@@ -136,12 +235,40 @@ def solve_github_issue(repository, issue, llm_model):
 
     Log().log(f"-> solve_github_issue({repository}, {issue})")
 
-    from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists
+    from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, get_diff_of_branches
     from ._utilities import remove_outer_markdown
     from blablado import Assistant
+    import json
 
     ai_remark = setup_ai_remark()
 
+    issue_summary = summarize_github_issue(repository, issue, prompt_function)
+
+    all_files = "* " + "\n* ".join(list_repository_files(repository))
+
+    relevant_files = remove_outer_markdown(prompt_function(remove_indentation(f"""
+    Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files are relevant to solve the issue.
+    
+    ## Files in the repository
+    
+    {all_files}
+    
+    ## Github Issue (#{issue}) Summary
+    
+    {issue_summary}
+    
+    ## Your task
+    Which of these files might be relevant for issue #{issue} ? 
+    You can also consider files which do not exist yet. 
+    Respond ONLY the filenames as JSON list.
+    """)))
+
+    filenames = json.loads(relevant_files)
+
+    # create a new branch
+    branch_name = create_branch(repository)
+
+    """
     assistant = Assistant(model=llm_model)
     assistant.register_tool(get_github_issue_details)
     assistant.register_tool(list_repository_files)
@@ -162,37 +289,51 @@ def solve_github_issue(repository, issue, llm_model):
 
     branch_name = assistant.tell(f"Create a new branch on repository {repository}. Respond ONLY the branch name.")
     branch_name = branch_name.strip().strip('"')
+    """
 
     print("Created branch", branch_name)
 
     errors = []
+    commit_messages = []
     for filename in filenames:
-        modifier = Assistant(model=llm_model)
-        modifier.register_tool(get_repository_file_contents)
-        modifier.register_tool(write_file_in_new_branch)
-
+        if filename.startswith(".github/workflows"):
+            # skip github workflows
+            continue
         try:
-            if check_if_file_exists(repository, filename):
-                print(filename, "will be overwritten")
-                modifier.do(f"Load the entire content of {filename} from the repository {repository} branch {branch_name}.")
-                modifier.do(f"Modify the file content of {filename} and write it to repository {repository} branch {branch_name}. Your task is defined like this: \n\n {issue_summary} \n\nDo not do any additional modifications you were not instructed to do.")
-            else:
-                print(filename, "will be created")
-                modifier.do(f"Create the file {filename} and write it to repository {repository} branch {branch_name}. Your task is defined like this: \n\n {issue_summary}")
+            message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, issue_summary, prompt_function)
+            commit_messages.append(message)
         except Exception as e:
             errors.append(f"Error processing {filename}" + str(e))
 
     error_messages = ""
     if len(errors) > 0:
-        error_messages = "The following errors occurred:\n\n"
-        for e in errors:
-            error_messages += f"{str(e)}\n"
+        error_messages = "The following errors occurred:\n\n* " + "\n* ".join(errors) + "\n"
 
-    add_comment_to_issue(repository, issue, remove_indentation(f"""
-    {ai_remark}
+    # get a diff of all changes
+    diffs_prompt = get_diff_of_branches(repository, branch_name)
+
+    # summarize the changes
+    commit_messages_prompt = "* " + "\n* ".join(commit_messages)
+    pull_request_message = prompt_function(remove_indentation(f"""
+    Given a list of commit messages and a git diff, summarize the changes you made in the files.
+    You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
     
-    I created a branch with a potential solution [here](https://github.com/{repository}/tree/{branch_name}). 
+    ## Issue Summary
     
-    {error_messages}
-    """))
-    assistant.do(f"Send a pull-request of the branch {branch_name} in repository {repository} explaining in detail what we changed. Finish the message with 'closes #{issue}'.")
+    {issue_summary}
+    
+    ## Commit messages
+    You committed these changes to these files
+    
+    {commit_messages_prompt}
+        
+    ## Git diffs
+    The following changes were made in the files:
+    
+    {diffs_prompt}
+        
+    ## Your task
+    Summarize the changes above to a short Github pull-request message. 
+    """)) + "\n\ncloses #" + str(issue)
+
+    send_pull_request(repository, branch_name, pull_request_message)

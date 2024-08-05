@@ -31,7 +31,7 @@ def remove_outer_markdown(text):
 
     parts = code.split("```")
     if len(parts) == 1:
-        code = None
+        return parts[0]
     else:
         code = ""
         for t, c in zip(parts[::2], parts[1::2]):

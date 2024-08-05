@@ -292,7 +292,7 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
     return file_contents
 
 @catch_error
-def write_file_in_new_branch(repository, branch_name, file_path, new_content):
+def write_file_in_new_branch(repository, branch_name, file_path, new_content, commit_message="Update file"):
     """
     Modifies or creates a specified file with new content and saves the changes in a new git branch.
     The name of the new branch is returned.
@@ -319,9 +319,9 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content):
     # Commit the changes
     if check_if_file_exists(repository, file_path):
         file = get_repository_file_content(repository, branch_name, file_path)
-        repo.update_file(file.path, "Update file content", new_content, file.sha, branch=branch_name)
+        repo.update_file(file.path, commit_message, new_content, file.sha, branch=branch_name)
     else:
-        repo.create_file(file_path, "Create file content", new_content, branch=branch_name)
+        repo.create_file(file_path, commit_message, new_content, branch=branch_name)
 
     return f"File {file_path} successfully created in repository {repository} branch {branch_name}."
 
@@ -544,4 +544,28 @@ def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
         issue_obj.create_reaction(reaction)
 
 
+def get_diff_of_branches(repository, compare_branch, base_branch="main"):
+    """
+    Get the diff between two branches in a GitHub repository.
+    """
+    # Get the repository
+    repo = get_github_repository(repository)
 
+    # Get the comparison between branches
+    comparison = repo.compare(base_branch, compare_branch)
+
+    # Initialize output variable
+    output = []
+
+    # Collect the diff
+    for file in comparison.files:
+        output.append(f"\nFile: {file.filename}")
+        output.append(f"Status: {file.status}")
+        output.append("-" * 40)
+
+        if file.patch:
+            output.append(file.patch)
+        else:
+            output.append("No diff available (possibly a binary file)")
+
+    return "\n".join(output)
