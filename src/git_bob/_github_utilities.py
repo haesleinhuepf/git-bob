@@ -395,7 +395,7 @@ def check_if_file_exists(repository, branch_name, file_path):
 @lru_cache(maxsize=1)
 def get_file_in_repository(repository, branch_name, file_path):
     """
-    Helper function to prevent multiple calls to the GitHub API for the same file content.
+    Helper function to prevent multiple calls to the GitHub API for the same file.
 
     Parameters
     ----------
