@@ -1,6 +1,6 @@
 # git-bob
 
-git-bob uses AI to answer Github-issues and review pull-requests. 
+git-bob uses AI to solve Github-issues and review pull-requests. It runs inside the Github CI, no need to install anything on your computer.
 
 ![demo_fix_typos.png](docs/images/banner.png)
 
