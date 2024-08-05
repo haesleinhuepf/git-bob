@@ -187,10 +187,13 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     if check_if_file_exists(repository, branch_name, filename):
         file_content = get_repository_file_content(repository, branch_name, filename)
         print(filename, "will be overwritten")
-        file_content_instruction = remove_indentation(remove_indentation(f"""Modify the file "{filename}" to solve the issue #{issue}:
-        <BEGIN_FILE>
+        file_content_instruction = remove_indentation(remove_indentation(f"""Modify the file "{filename}" to solve the issue #{issue}.
+        Keep your modifications absolutely minimal.
+        
+        That's the file "{filename}" content you will find in the file:
+        ```
         {file_content}
-        </END_FILE>
+        ```
         """))
     else:
         print(filename, "will be created")
@@ -209,8 +212,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     {file_content_instruction}
     
     ## Your task
-    Generate content of file "{filename}" to [partially] solve the issue above.
-    Do not do any additional modifications you were not instructed to do.
+    Generate content of file "{filename}" to solve the issue above.
+    Keep your modifications absolutely minimal.
     Respond ONLY the content of the file and afterwards a single line summarizing the changes you made (without mentioning the issue).
     """))
 
