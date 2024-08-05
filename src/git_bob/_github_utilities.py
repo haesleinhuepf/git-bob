@@ -316,7 +316,7 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content, co
     repo = get_github_repository(repository)
 
     # Commit the changes
-    if check_if_file_exists(repository, file_path):
+    if check_if_file_exists(repository, branch_name, file_path):
         file = get_repository_file_content(repository, branch_name, file_path)
         repo.update_file(file.path, commit_message, new_content, file.sha, branch=branch_name)
     else:
@@ -361,7 +361,7 @@ def create_branch(repository, parent_branch="main"):
 
 
 @catch_error
-def check_if_file_exists(repository, file_path):
+def check_if_file_exists(repository, branch_name, file_path):
     """
     Checks if a specified file_path exists in a GitHub repository. Returns True if the file exists, False otherwise.
 
@@ -369,6 +369,8 @@ def check_if_file_exists(repository, file_path):
     ----------
     repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
+    branch_name: str
+        The name of the branch to check the file in.
     file_path : str
         The path of the file to check.
 
@@ -383,7 +385,7 @@ def check_if_file_exists(repository, file_path):
 
     try:
         # Try to get the contents of the file
-        get_repository_file_content(repository, "main", file_path)
+        get_repository_file_content(repository, branch_name, file_path)
         #contents = repo.get_contents(file_path)
         return True
     except:
