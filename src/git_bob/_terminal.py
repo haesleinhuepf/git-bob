@@ -1,89 +1,155 @@
-# This module provides the command line interface for interacting with GitHub issues and pull requests.
-# It supports functionalities such as reviewing pull requests, solving issues, and commenting on issues
-# using AI models like GPT and Claude. The script can be run in a GitHub CI environment with a timeout.
+"""
+Module for terminal related functions.
+"""
+import os
+import sys
+from typing import List, Union
 
-def command_line_interface():
-    import os
-    import sys
-    import signal
+def get_terminal_size(fallback: Union[List[int], None] = None) -> List[int]:
+    """
+    Get the terminal size.
 
-    from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
-    from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue
-    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini
-    from ._github_utilities import check_access_and_ask_for_approval, add_reaction_to_last_comment_in_issue
-    from ._utilities import get_llm_name, report_error
-    from ._logger import Log
-    
-    print("Hello")
+    Parameters
+    ----------
+    fallback : Union[List[int], None], optional
+        Fallback value if the terminal size cannot be determined, by default None
 
-    # read environment variables
-    timeout_in_seconds = os.environ.get("TIMEOUT_IN_SECONDS", 300) # 5 minutes
-    llm_name = get_llm_name()
-    if "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
-        prompt = prompt_claude
-    elif "gpt" in llm_name and os.environ.get("OPENAI_API_KEY") is not None:
-        prompt = prompt_chatgpt
-    elif "gemini" in llm_name and os.environ.get("GOOGLE_API_KEY") is not None:
-        prompt = prompt_gemini
-    else:
-        raise NotImplementedError("Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs.")
+    Returns
+    -------
+    List[int]
+        A list containing the width and height of the terminal.
+        If the terminal size cannot be determined, returns the fallback value.
+    """
+    try:
+        columns, rows = os.get_terminal_size()
+        return [columns, rows]
+    except OSError:
+        if fallback:
+            return fallback
+        else:
+            return [80, 24]
 
-    Log().log("Using language model: " + llm_name)
+def clear_terminal() -> None:
+    """
+    Clears the terminal screen.
+    """
+    os.system('cls' if os.name == 'nt' else 'clear')
 
-    # Print out all arguments passed to the script
-    print("Script arguments:")
-    for arg in sys.argv[1:]:
-        print(arg)
+def get_terminal_width() -> int:
+    """
+    Get the terminal width.
 
-    task = sys.argv[1]
+    Returns
+    -------
+    int
+        The width of the terminal.
+    """
+    return get_terminal_size()[0]
 
-    # test if we're running in the github-CI
-    running_in_github_ci = task.endswith("-action")
-    task = task.replace("-action", "")
+def get_terminal_height() -> int:
+    """
+    Get the terminal height.
 
-    if running_in_github_ci:
-        print(f"Running in GitHub-CI. Setting timeout to {timeout_in_seconds / 60} minutes.")
+    Returns
+    -------
+    int
+        The height of the terminal.
+    """
+    return get_terminal_size()[1]
 
-        # in case we run in the github-CI, we set a timeout
-        def handler(signum, frame):
-            print("Process timed out")
-            report_error("I ran out of time.")
-            sys.exit(1)
+def print_centered(text: str, width: int = None) -> None:
+    """
+    Prints a string centered on the terminal.
 
-        signal.signal(signal.SIGALRM, handler)
-        signal.alarm(timeout_in_seconds)  # Set the timeout to 3 minutes
+    Parameters
+    ----------
+    text : str
+        The string to be printed.
+    width : int, optional
+        The width of the terminal, by default None
+    """
+    if width is None:
+        width = get_terminal_width()
+    padding = (width - len(text)) // 2
+    print(" " * padding + text)
 
-    # determine need to respond and access rights
-    repository = sys.argv[2] if len(sys.argv) > 2 else None
-    issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
-    user, text = get_most_recent_comment_on_issue(repository, issue)
+def print_title(text: str, width: int = None, char: str = "-") -> None:
+    """
+    Prints a title with a line of characters above and below it.
 
-    # handle aliases
-    text = text.replace("git-bob respond", "git-bob comment")
-    text = text.replace("git-bob review", "git-bob comment")
-    
-    if running_in_github_ci:
-        if not ("git-bob comment" in text or "git-bob solve" in text):
-            print("They didn't speak to me. I show myself out.")
-            sys.exit(0)
-        ai_remark = setup_ai_remark()
-        if ai_remark in text:
-            print("No need to respond to myself. I show myself out.")
-            sys.exit(0)
-        if not check_access_and_ask_for_approval(user, repository, issue):
-            sys.exit(1)
+    Parameters
+    ----------
+    text : str
+        The title text.
+    width : int, optional
+        The width of the terminal, by default None
+    char : str, optional
+        The character to use for the line, by default "-"
+    """
+    if width is None:
+        width = get_terminal_width()
+    print(char * width)
+    print_centered(text, width)
+    print(char * width)
 
-    # add reaction to issue to show that we're working on it
-    add_reaction_to_last_comment_in_issue(repository, issue, "+1")
+def print_error(text: str) -> None:
+    """
+    Prints an error message in red.
 
+    Parameters
+    ----------
+    text : str
+        The error message.
+    """
+    print("\033[91m" + text + "\033[0m")
 
-    # execute the task
-    if task == "review-pull-request":
-        review_pull_request(repository, issue, prompt)
-    elif (not running_in_github_ci and task == "solve-issue") or (task == "comment-on-issue" and "git-bob solve" in text):
-        solve_github_issue(repository, issue, llm_name, prompt)
-    elif task == "comment-on-issue" and ("git-bob comment" in text or not running_in_github_ci):
-        comment_on_issue(repository, issue, prompt)
+def print_warning(text: str) -> None:
+    """
+    Prints a warning message in yellow.
 
-    print("Done. Summary:")
-    print("* " + "\n* ".join(Log().get()))
+    Parameters
+    ----------
+    text : str
+        The warning message.
+    """
+    print("\033[93m" + text + "\033[0m")
+
+def print_success(text: str) -> None:
+    """
+    Prints a success message in green.
+
+    Parameters
+    ----------
+    text : str
+        The success message.
+    """
+    print("\033[92m" + text + "\033[0m")
+
+def print_info(text: str) -> None:
+    """
+    Prints an info message in blue.
+
+    Parameters
+    ----------
+    text : str
+        The info message.
+    """
+    print("\033[94m" + text + "\033[0m")
+
+def print_progress_bar(progress: float, width: int = 50) -> None:
+    """
+    Prints a progress bar.
+
+    Parameters
+    ----------
+    progress : float
+        The progress of the task, between 0 and 1.
+    width : int, optional
+        The width of the progress bar, by default 50
+    """
+    filled_blocks = int(progress * width)
+    empty_blocks = width - filled_blocks
+    bar = "[" + "#" * filled_blocks + " " * empty_blocks + "]"
+    percentage = int(progress * 100)
+    print(f"\r{bar} {percentage}%", end="")
+    sys.stdout.flush()
