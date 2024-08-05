@@ -16,3 +16,6 @@ class Log():
 
     def get(self):
         return self._log
+
+    def get_summary(self):
+        return "\n".join(self._log)
