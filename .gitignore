@@ -1,7 +1,13 @@
+# Ignore node_modules directory
+node_modules/
 
-.ipynb_checkpoints
-Untitled*
-.idea
-*__pycache__*
-*egg-info*
-deploy.bat
+# Ignore log files and logs directory
+logs/
+*.log
+
+# Ignore temporary files
+*.tmp
+
+# Ignore playground directories except a specific test folder
+playground/
+!playground/test_folder/
