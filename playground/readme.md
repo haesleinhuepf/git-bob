@@ -1,14 +1,9 @@
 # Playground
 
-This folder is a playground to test git-bob on a repository. 
+## Test Folder
 
-This file contains a tpyo. Let's see what is going to happen with it.
+This playground contains a `test_folder` where you'll find some programmer jokes.
 
-May it stay here forever? Or does an AI find it and fix it?
+The jokes are located in [test.md](test_folder/test.md).
 
-Time will tell.
-
-Best, 
-Robert
-
-
+Enjoy the humor and happy coding!
