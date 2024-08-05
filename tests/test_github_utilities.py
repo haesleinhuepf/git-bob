@@ -1,7 +1,7 @@
 from git_bob._github_utilities import get_github_repository
 
 def test_get_github_repository():
-    assert get_github_repository("haesleinhuepf/git_bob").name == "git_bob"
+    assert get_github_repository("haesleinhuepf/git-bob").name == "git_bob"
 
 def test_get_github_issue():
     assert False

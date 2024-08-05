@@ -19,7 +19,9 @@ def remove_indentation(text):
         The text with indentation removed and stripped.
     """
     text = text.replace("\n    ", "\n")
-    return text.strip()
+    if text.startswith("    "):
+        text = text[4:]
+    return text
 
 
 def remove_outer_markdown(text):
