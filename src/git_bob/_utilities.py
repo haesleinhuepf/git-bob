@@ -19,7 +19,9 @@ def remove_indentation(text):
         The text with indentation removed and stripped.
     """
     text = text.replace("\n    ", "\n")
-    return text.strip()
+    if text.startswith("    "):
+        text = text[4:]
+    return text
 
 
 def remove_outer_markdown(text):
@@ -39,7 +41,7 @@ def remove_outer_markdown(text):
     text = text.strip("\n")
 
     possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy", "```jython", "```md", "```markdown",
-                   "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
+           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
 
     possible_endings = ["```", "</FILE>"]
 
@@ -72,7 +74,7 @@ def get_llm_name():
 
 
 class ErrorReporting:
-    status = True
+    status = False
 
 
 def report_error(message):
@@ -133,13 +135,16 @@ def catch_error(func):
     """
     @wraps(func)
     def worker_function(*args, **kwargs):
-        try:
+        if ErrorReporting.status:
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                name = func.__name__
+                print(f"Error in {name}: {str(e)}")
+                report_error(f"Error in {name}: {str(e)}")
+                raise e
+        else:
             return func(*args, **kwargs)
-        except Exception as e:
-            name = func.__name__
-            print(f"Error in {name}: {str(e)}")
-            report_error(f"Error in {name}: {str(e)}")
-            raise e
     return worker_function
 
 
@@ -162,8 +167,9 @@ def split_content_and_summary(text):
         - str: The content with outer markdown removed.
         - str: The summary.
     """
+    text = text.strip("\n").strip()
     temp = text.split("\n")
-    summary = temp[-1]
+    summary = temp[-1].strip()
     remaining_content = temp[:-1]
     if len(summary) < 5:
         summary = temp[-2]
@@ -171,4 +177,4 @@ def split_content_and_summary(text):
 
     new_content = remove_outer_markdown("\n".join(remaining_content))
 
-    return new_content, summary
+    return new_content.strip(), summary.strip()

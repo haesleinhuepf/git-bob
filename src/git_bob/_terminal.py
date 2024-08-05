@@ -11,10 +11,12 @@ def command_line_interface():
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue
     from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini
     from ._github_utilities import check_access_and_ask_for_approval, add_reaction_to_last_comment_in_issue
-    from ._utilities import get_llm_name, report_error
+    from ._utilities import get_llm_name, report_error, ErrorReporting
     from ._logger import Log
-    
+
     print("Hello")
+
+    ErrorReporting.status = True
 
     # read environment variables
     timeout_in_seconds = os.environ.get("TIMEOUT_IN_SECONDS", 300) # 5 minutes

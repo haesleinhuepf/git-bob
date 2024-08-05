@@ -484,12 +484,12 @@ def check_access_and_ask_for_approval(user, repository, issue):
         print("User does not have access rights.")
         member_names = ", ".join(["@" + str(m) for m in members])
         add_comment_to_issue(repository, issue, remove_indentation(remove_indentation(f"""{remark}
-        
+
         Hi @{user}, 
-    
+
         thanks for reaching out! Unfortunately, I'm not allowed to respond to you directly. 
         I need approval from a repository member: {member_names}
-    
+
         Best,
         git-bob
         """)))
@@ -497,17 +497,16 @@ def check_access_and_ask_for_approval(user, repository, issue):
     return True
 
 @catch_error
+@catch_error
 def get_diff_of_pull_request(repository, pull_request):
     """
     Get the diff of a specific pull request in a GitHub repository.
-
     Parameters
     ----------
     repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
     pull_request : int
         The pull request number to retrieve the diff for.
-
     Returns
     -------
     str
@@ -535,7 +534,6 @@ def get_diff_of_pull_request(repository, pull_request):
 def add_reaction_to_issue(repository, issue, reaction="+1"):
     """
     Add a given reaction to a github issue.
-
     Parameters
     ----------
     repository : str
@@ -557,7 +555,6 @@ def add_reaction_to_issue(repository, issue, reaction="+1"):
 def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
     """
     Add a given reaction to the last comment in a github issue.
-
     Parameters
     ----------
     repository : str
@@ -588,7 +585,6 @@ def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
 def get_diff_of_branches(repository, compare_branch, base_branch="main"):
     """
     Get the diff between two branches in a GitHub repository.
-
     Parameters
     ----------
     repository : str
@@ -597,7 +593,6 @@ def get_diff_of_branches(repository, compare_branch, base_branch="main"):
         The branch to compare against the base branch.
     base_branch : str, optional
         The base branch to compare against. Default is "main".
-
     Returns
     -------
     str
