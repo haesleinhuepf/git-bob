@@ -1,5 +1,11 @@
+"""
+Top-level package for git-bob.
 
-__version__ = "0.2.0"
+This module provides the main functionality for the git-bob package.
+"""
 
-__all__ = (
-    )
+__author__ = """Robert Haase"""
+__email__ = 'robert.haase@tu-dresden.de'
+__version__ = '0.1.8'
+
+from .git_bob import git_bob
