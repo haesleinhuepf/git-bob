@@ -5,17 +5,40 @@ from functools import wraps
 from toolz import curry
 
 def remove_indentation(text):
-    text = text.replace("\n    ", "\n")
+    """
+    Remove 4 spaces indentation from each line in the given text.
 
+    Parameters
+    ----------
+    text : str
+        The text from which to remove indentation.
+
+    Returns
+    -------
+    str
+        The text without 4 spaces indentation.
+    """
+    text = text.replace("\n    ", "\n")
     return text.strip()
 
-
 def remove_outer_markdown(text):
+    """
+    Remove outer markdown syntax from the given text.
 
+    Parameters
+    ----------
+    text : str
+        The text from which to remove markdown.
+
+    Returns
+    -------
+    str
+        The text without outer markdown syntax.
+    """
     text = text.strip("\n")
 
     possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy", "```jython", "```md", "```markdown",
-                           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
+                   "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
 
     possible_endings = ["```", "</FILE>"]
 
@@ -25,7 +48,7 @@ def remove_outer_markdown(text):
             break
 
     for ending in possible_endings:
-        if text.endswith(ending):
+        if text.endsWith(ending):
             text = text[:-len(ending)]
             break
 
@@ -35,15 +58,29 @@ def remove_outer_markdown(text):
 
 @lru_cache(maxsize=1)
 def get_llm_name():
+    """
+    Get the name of the LLM (Large Language Model) to use.
+
+    Returns
+    -------
+    str
+        The name of the LLM.
+    """
     import os
     return os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
-
 
 class ErrorReporting:
     status = True
 
-
 def report_error(message):
+    """
+    Report an error by logging it and adding a comment to a GitHub issue.
+
+    Parameters
+    ----------
+    message : str
+        The error message to report.
+    """
     import sys
     import os
     from ._ai_github_utilities import setup_ai_remark
@@ -62,22 +99,35 @@ def report_error(message):
 
     complete_error_message = remove_indentation(f"""
     {ai_remark}
-    
+
     I'm sorry, I encountered an error while processing your request. Here is the error message:
-    
+
     {message}
-    
+
     This is how far I came:
     ```
     {log}
     ```
-    
+
     [More Details...](https://github.com/{repository}/actions/runs/{run_id})
     """)
     add_comment_to_issue(repository, issue, complete_error_message)
 
 @curry
 def catch_error(func):
+    """
+    Decorator to catch and report errors in a function.
+
+    Parameters
+    ----------
+    func : callable
+        The function to wrap.
+
+    Returns
+    -------
+    callable
+        The wrapped function.
+    """
     @wraps(func)
     def worker_function(*args, **kwargs):
         try:
@@ -89,9 +139,20 @@ def catch_error(func):
             raise e
     return worker_function
 
-
 def split_content_and_summary(text):
-    """Assuming a text consists of a task solution (code, text) and a summary in the last line, it splits the text into the content and the summary."""
+    """
+    Split a text into content and summary, assuming the summary is the last line.
+
+    Parameters
+    ----------
+    text : str
+        The text to split.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the content and the summary.
+    """
     temp = text.split("\n")
     summary = temp[-1]
     remaining_content = temp[:-1]
@@ -103,8 +164,22 @@ def split_content_and_summary(text):
 
     return new_content, summary
 
-
 def split_after_token(text, token):
-    if token not in token:
+    """
+    Split the text after the first occurrence of a specified token.
+
+    Parameters
+    ----------
+    text : str
+        The text to split.
+    token : str
+        The token to split after.
+
+    Returns
+    -------
+    str
+        The text after the token.
+    """
+    if token not in text:
         return text
     return text.split(token)[1]
