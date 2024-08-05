@@ -1,3 +1,5 @@
+import atexit
+
 class Log():
     _instance = None
 
@@ -5,6 +7,7 @@ class Log():
         if cls._instance is None:
             cls._instance = super(Log, cls).__new__(cls)
             cls._instance._log = []
+            atexit.register(cls._instance.print_log)
         return cls._instance
 
     def clear(self):
@@ -16,3 +19,7 @@ class Log():
 
     def get(self):
         return self._log
+
+    def print_log(self):
+        for message in self._log:
+            print(message)
