@@ -16,3 +16,7 @@ class Log():
 
     def get(self):
         return self._log
+
+    def print_log(self):
+        for message in self._log:
+            print(message)
