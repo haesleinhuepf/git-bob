@@ -181,11 +181,11 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         The summary of the issue to solve.
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
-    from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, check_if_file_exists
+    from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, check_if_file_exists, get_repository_file_content
     from ._utilities import remove_outer_markdown, split_content_and_summary
 
     if check_if_file_exists(repository, branch_name, filename):
-        file_content = get_repository_file_content(repository, branch_name, file_path)
+        file_content = get_repository_file_content(repository, branch_name, filename)
         print(filename, "will be overwritten")
         file_content_instruction = remove_indentation(remove_indentation(f"""Modify the file "{filename}" to solve the issue #{issue}:
         <BEGIN_FILE>
