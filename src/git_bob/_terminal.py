@@ -28,6 +28,8 @@ def command_line_interface():
     else:
         raise NotImplementedError("Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs.")
 
+    Log().log("Using language model: " + llm_name)
+
     # Print out all arguments passed to the script
     print("Script arguments:")
     for arg in sys.argv[1:]:
