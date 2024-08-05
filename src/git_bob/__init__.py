@@ -1,5 +1,56 @@
+"""
+The git-bob package.
 
-__version__ = "0.2.0"
-
-__all__ = (
-    )
+This package provides a set of tools for working with Git repositories.
+"""
+from .repo import (
+    get_repo_info,
+    get_remote_info,
+    get_local_branches,
+    get_remote_branches,
+    get_untracked_files,
+    get_changed_files,
+    get_staged_files,
+    get_last_commit_hash,
+    get_last_commit_message,
+    get_last_commit_author,
+    get_last_commit_date,
+    get_last_commit_diff,
+    get_current_branch,
+    get_commit_hash_by_message,
+    checkout_branch,
+    create_branch,
+    delete_branch,
+    merge_branch,
+    push_branch,
+    pull_branch,
+    add_file,
+    commit_changes,
+    reset_hard,
+    revert_commit,
+    stash_changes,
+    pop_stash,
+    drop_stash,
+    show_stash,
+    get_last_tag,
+    create_tag,
+    delete_tag,
+    show_tag,
+    get_last_release,
+    create_release,
+    delete_release,
+    show_release,
+    get_issues,
+    get_issue,
+    create_issue,
+    update_issue,
+    close_issue,
+    reopen_issue,
+    get_pull_requests,
+    get_pull_request,
+    create_pull_request,
+    update_pull_request,
+    close_pull_request,
+    reopen_pull_request,
+    merge_pull_request,
+)
