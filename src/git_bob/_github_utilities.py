@@ -282,8 +282,8 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
             # Get the file content
             file_content = get_repository_file_content (repository, "main", file_path)
 
-            # Decode and store the content
-            file_contents[file_path] = file_content.decoded_content.decode()
+            # store the content
+            file_contents[file_path] = file_content
 
         except Exception as e:
             file_contents[file_path] = f"Error accessing {file_path}: {str(e)}"
@@ -397,7 +397,7 @@ def get_repository_file_content(repository, branch_name, file_path):
     """Helper function to prevent multiple calls to the GitHub API for the same file content."""
     print("loading file content...", file_path)
     repo = get_github_repository(repository)
-    return repo.get_contents(file_path, ref=branch_name)
+    return repo.get_contents(file_path, ref=branch_name).decoded_content.decode()
 
 @catch_error
 def send_pull_request(repository, branch_name, title, description):
