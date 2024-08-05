@@ -172,7 +172,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
     from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, check_if_file_exists
-    from ._utilities import remove_outer_markdown
+    from ._utilities import remove_outer_markdown, split_content_and_summary
 
     try:
         file_content = get_repository_file_content(repository, branch_name, file_path)
@@ -203,17 +203,11 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     Respond ONLY the content of the file and afterwards a single line summarizing the changes you made (without mentioning the issue).
     """))
 
-    temp = response.split("\n")
-    commit_message = temp[-1]
-    remaining_content = temp[:-1]
-    if len(commit_message) < 5:
-        commit_message = temp[-2]
-        remaining_content = temp[:-2]
+    new_content, commit_message = split_content_and_summary(response)
 
-    new_content = remove_outer_markdown("\n".join(remaining_content))
 
     print("New file content", new_content)
-    print("Summary", new_content)
+    print("Summary", commit_message)
 
     write_file_in_new_branch(repository, branch_name, filename, new_content, commit_message)
 
@@ -239,7 +233,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     Log().log(f"-> solve_github_issue({repository}, {issue})")
 
     from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, get_diff_of_branches
-    from ._utilities import remove_outer_markdown
+    from ._utilities import remove_outer_markdown, split_content_and_summary
     from blablado import Assistant
     import json
 
@@ -317,7 +311,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
 
     # summarize the changes
     commit_messages_prompt = "* " + "\n* ".join(commit_messages)
-    pull_request_message = prompt_function(remove_indentation(f"""
+    pull_request_summary = prompt_function(remove_indentation(f"""
     Given a list of commit messages and a git diff, summarize the changes you made in the files.
     You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
     
@@ -336,7 +330,11 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     {diffs_prompt}
         
     ## Your task
-    Summarize the changes above to a short Github pull-request message. 
-    """)) + "\n\ncloses #" + str(issue)
+    Summarize the changes above to a one paragraph line Github pull-request message. 
+    Afterwards, summarize the summary in a single line, which will become the title of the pull-request.
+    Do not add headnline or any other formatting. Just respond with the paragraphe and the title in a new line below.
+    """))
 
-    send_pull_request(repository, branch_name, pull_request_message)
+    pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
+
+    send_pull_request(repository, branch_name, pull_request_title, pull_request_description + "\n\ncloses #" + str(issue))
