@@ -52,3 +52,15 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-05-13"):
 
     # extract answer
     return response.choices[0].message.content
+
+
+def prompt_gemini(request, model="gemini-1.5-flash-001"):
+    """Send a prompt to Google Gemini and return the response"""
+    from google import generativeai as genai
+    import os
+    genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
+
+    client = genai.GenerativeModel(model)
+    result = client.generate_content(request)
+    return result.text
+

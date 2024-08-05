@@ -1,4 +1,5 @@
 anthropic
 openai
+google-generativeai
 pygithub
 toolz
