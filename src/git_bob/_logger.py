@@ -1,15 +1,23 @@
-class Log():
-    _instance = None
+import logging
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(Log, cls).__new__(cls)
-            cls._instance._log = []
-        return cls._instance
+def get_logger(name):
+  """Gets a logger with the given name.
 
-    def log(self, message):
-        print(message)
-        self._log.append(message)
+  Parameters
+  ----------
+  name : str
+      The name of the logger.
 
-    def get(self):
-        return self._log
+  Returns
+  -------
+  logging.Logger
+      A logger with the given name.
+  """
+  logger = logging.getLogger(name)
+  logger.setLevel(logging.INFO)
+  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+  # Create a file handler
+  file_handler = logging.FileHandler('git_bob.log')
+  file_handler.setFormatter(formatter)
+  logger.addHandler(file_handler)
+  return logger
