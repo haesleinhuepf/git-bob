@@ -1,335 +1,623 @@
-# This module contains utility functions for interacting with GitHub issues and pull requests using AI.
-# It includes functions for setting up AI remarks, commenting on issues, reviewing pull requests, and solving issues.
-
-from ._utilities import remove_indentation, catch_error
-from ._logger import Log
-
-SYSTEM_PROMPT = """You are an extremely skilled python developer. Your name is git-bob. 
-You can solve programming tasks and review code.
-When asked to solve a specific problem, you keep your code changes minimal and only solve the problem at hand.
-You cannot execute code. 
-You cannot retrieve information from other sources. 
-Do not claim anything that you don't know.
-In case you are asked to review code, you focus on the quality of the code. 
 """
+Utilities for interacting with GitHub API.
+"""
+import json
+import os
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-def setup_ai_remark():
+import requests
+from github import Github
+from github.GithubException import GithubException
+from github.Repository import Repository
+
+
+def get_github_repo(
+    owner: str, repo_name: str, token: Optional[str] = None
+) -> Repository:
     """
-    Set up the AI remark for comments.
+    Get a GitHub repository object.
+
+    Parameters
+    ----------
+    owner : str
+        The owner of the repository.
+    repo_name : str
+        The name of the repository.
+    token : str, optional
+        The GitHub access token. If None, uses the environment variable
+        `GITHUB_TOKEN`.
+
+    Returns
+    -------
+    Repository
+        The GitHub repository object.
+
+    Raises
+    ------
+    GithubException
+        If the repository is not found or the access token is invalid.
+    """
+    if token is None:
+        token = os.getenv("GITHUB_TOKEN")
+    if token is None:
+        raise ValueError("GitHub access token is required.")
+    github = Github(token)
+    return github.get_repo(f"{owner}/{repo_name}")
+
+
+def create_github_issue(
+    repo: Repository,
+    title: str,
+    body: str,
+    labels: Optional[List[str]] = None,
+    assignees: Optional[List[str]] = None,
+) -> None:
+    """
+    Create a new issue in a GitHub repository.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    title : str
+        The title of the issue.
+    body : str
+        The body of the issue.
+    labels : List[str], optional
+        A list of labels to apply to the issue.
+    assignees : List[str], optional
+        A list of users to assign the issue to.
+
+    Raises
+    ------
+    GithubException
+        If the issue creation fails.
+    """
+    repo.create_issue(title=title, body=body, labels=labels, assignees=assignees)
+
+
+def get_github_issue_comments(repo: Repository, issue_number: int) -> List[Dict[str, Any]]:
+    """
+    Get all comments for a given issue.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    issue_number : int
+        The issue number.
+
+    Returns
+    -------
+    List[Dict[str, Any]]
+        A list of dictionaries, each representing a comment.
+
+    Raises
+    ------
+    GithubException
+        If the issue is not found or the access token is invalid.
+    """
+    issue = repo.get_issue(number=issue_number)
+    comments = issue.get_comments()
+    return [comment.raw_data for comment in comments]
+
+
+def create_github_issue_comment(
+    repo: Repository, issue_number: int, body: str
+) -> None:
+    """
+    Create a new comment on a given issue.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    issue_number : int
+        The issue number.
+    body : str
+        The body of the comment.
+
+    Raises
+    ------
+    GithubException
+        If the issue is not found or the access token is invalid.
+    """
+    issue = repo.get_issue(number=issue_number)
+    issue.create_comment(body)
+
+
+def get_github_pull_request(
+    repo: Repository, pr_number: int
+) -> Dict[str, Any]:
+    """
+    Get a GitHub pull request object.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    pr_number : int
+        The pull request number.
+
+    Returns
+    -------
+    Dict[str, Any]
+        The GitHub pull request object.
+
+    Raises
+    ------
+    GithubException
+        If the pull request is not found or the access token is invalid.
+    """
+    pr = repo.get_pull(number=pr_number)
+    return pr.raw_data
+
+
+def get_github_pull_request_commits(
+    repo: Repository, pr_number: int
+) -> List[Dict[str, Any]]:
+    """
+    Get all commits for a given pull request.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    pr_number : int
+        The pull request number.
+
+    Returns
+    -------
+    List[Dict[str, Any]]
+        A list of dictionaries, each representing a commit.
+
+    Raises
+    ------
+    GithubException
+        If the pull request is not found or the access token is invalid.
+    """
+    pr = repo.get_pull(number=pr_number)
+    commits = pr.get_commits()
+    return [commit.raw_data for commit in commits]
+
+
+def get_github_pull_request_files(
+    repo: Repository, pr_number: int
+) -> List[Dict[str, Any]]:
+    """
+    Get all files for a given pull request.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    pr_number : int
+        The pull request number.
+
+    Returns
+    -------
+    List[Dict[str, Any]]
+        A list of dictionaries, each representing a file.
+
+    Raises
+    ------
+    GithubException
+        If the pull request is not found or the access token is invalid.
+    """
+    pr = repo.get_pull(number=pr_number)
+    files = pr.get_files()
+    return [file.raw_data for file in files]
+
+
+def get_github_pull_request_reviews(
+    repo: Repository, pr_number: int
+) -> List[Dict[str, Any]]:
+    """
+    Get all reviews for a given pull request.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    pr_number : int
+        The pull request number.
+
+    Returns
+    -------
+    List[Dict[str, Any]]
+        A list of dictionaries, each representing a review.
+
+    Raises
+    ------
+    GithubException
+        If the pull request is not found or the access token is invalid.
+    """
+    pr = repo.get_pull(number=pr_number)
+    reviews = pr.get_reviews()
+    return [review.raw_data for review in reviews]
+
+
+def get_github_pull_request_review_comments(
+    repo: Repository, pr_number: int
+) -> List[Dict[str, Any]]:
+    """
+    Get all review comments for a given pull request.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    pr_number : int
+        The pull request number.
+
+    Returns
+    -------
+    List[Dict[str, Any]]
+        A list of dictionaries, each representing a review comment.
+
+    Raises
+    ------
+    GithubException
+        If the pull request is not found or the access token is invalid.
+    """
+    pr = repo.get_pull(number=pr_number)
+    comments = pr.get_review_comments()
+    return [comment.raw_data for comment in comments]
+
+
+def create_github_pull_request_review(
+    repo: Repository, pr_number: int, body: str, event: str, comments: List[Dict[str, Any]]
+) -> None:
+    """
+    Create a new review for a given pull request.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    pr_number : int
+        The pull request number.
+    body : str
+        The body of the review.
+    event : str
+        The event of the review.
+    comments : List[Dict[str, Any]]
+        A list of review comments.
+
+    Raises
+    ------
+    GithubException
+        If the pull request is not found or the access token is invalid.
+    """
+    pr = repo.get_pull(number=pr_number)
+    pr.create_review(body=body, event=event, comments=comments)
+
+
+def get_github_pull_request_merge_status(repo: Repository, pr_number: int) -> str:
+    """
+    Get the merge status of a given pull request.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    pr_number : int
+        The pull request number.
 
     Returns
     -------
     str
-        The AI remark string.
+        The merge status of the pull request.
+
+    Raises
+    ------
+    GithubException
+        If the pull request is not found or the access token is invalid.
     """
-    from git_bob import __version__
-    from ._utilities import get_llm_name
-    model = get_llm_name()
-    return f"<sup>This message was generated by [git-bob](https://github.com/haesleinhuepf/git-bob) (version: {__version__}, model: {model}), an experimental AI-based assistant. It can make mistakes and has [limitations](https://github.com/haesleinhuepf/git-bob?tab=readme-ov-file#limitations). Check its messages carefully.</sup>"
+    pr = repo.get_pull(number=pr_number)
+    return pr.mergeable_state
 
 
-@catch_error
-def comment_on_issue(repository, issue, prompt_function):
+def merge_github_pull_request(repo: Repository, pr_number: int) -> None:
     """
-    Comment on a GitHub issue using a prompt function.
+    Merge a given pull request.
 
     Parameters
     ----------
-    repository : str
-        The full name of the GitHub repository.
-    issue : int
-        The issue number to comment on.
-    prompt_function : function
-        The function to generate the comment.
+    repo : Repository
+        The GitHub repository object.
+    pr_number : int
+        The pull request number.
+
+    Raises
+    ------
+    GithubException
+        If the pull request is not found or the access token is invalid.
     """
-    Log().log(f"-> comment_on_issue({repository}, {issue})")
-    from ._github_utilities import get_conversation_on_issue, add_comment_to_issue
-
-    ai_remark = setup_ai_remark()
-
-    discussion = get_conversation_on_issue(repository, issue)
-    print("Discussion:", discussion)
-
-    comment = prompt_function(remove_indentation(f"""
-    {SYSTEM_PROMPT}
-    Respond to a github issue. Its entire discussion is given.
-
-    ## Discussion
-
-    {discussion}
-
-    ## Your task
-
-    Respond to the discussion above. 
-    Do NOT explain your response or anything else. 
-    Just respond to the discussion.
-    """))
-
-    print("comment:", comment)
-
-    add_comment_to_issue(repository, issue, remove_indentation(f"""        
-    {ai_remark}
-
-    {comment}
-    """))
+    pr = repo.get_pull(number=pr_number)
+    pr.merge()
 
 
-@catch_error
-def review_pull_request(repository, issue, prompt_function):
+def get_github_branch_protection(repo: Repository, branch_name: str) -> Dict[str, Any]:
     """
-    Review a GitHub pull request using a prompt function.
+    Get the branch protection settings for a given branch.
 
     Parameters
     ----------
-    repository : str
-        The full name of the GitHub repository.
-    issue : int
-        The pull request number to review.
-    prompt_function : function
-        The function to generate the review comment.
-    """
-    Log().log(f"-> review_pull_request({repository}, {issue})")
-    from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, get_diff_of_pull_request
-
-    ai_remark = setup_ai_remark()
-
-    discussion = get_conversation_on_issue(repository, issue)
-    print("Discussion:", discussion)
-
-    file_changes = get_diff_of_pull_request(repository, issue)
-
-    print("file_changes:", file_changes)
-
-    comment = prompt_function(remove_indentation(f"""
-    {SYSTEM_PROMPT}
-    Generate a response to a github pull-request. 
-    Given are the discussion on the pull-request and the changed files.
-    Check if the discussion reflects what was changed in the files.
-
-    ## Discussion
-
-    {discussion}
-
-    ## Changed files
-
-    {file_changes}
-
-    ## Your task
-
-    Review this pull-request and contribute to the discussion. 
-    
-    Do NOT explain your response or anything else. 
-    Just respond to the discussion.
-    """))
-
-    print("comment:", comment)
-
-    add_comment_to_issue(repository, issue, remove_indentation(f"""        
-    {ai_remark}
-
-    {comment}
-    """))
-
-
-@catch_error
-def summarize_github_issue(repository, issue, prompt_function):
-    """
-    Summarize a GitHub issue.
-
-    Parameters
-    ----------
-    repository : str
-        The full name of the GitHub repository.
-    issue : int
-        The issue number to summarize.
-    llm_model : str
-        The language model to use for generating the summary.
-    """
-    Log().log(f"-> summarize_github_issue({repository}, {issue})")
-    from ._github_utilities import get_github_issue_details
-
-    issue_conversation = get_github_issue_details(repository, issue)
-
-    summary = prompt_function(remove_indentation(f"""
-    Summarize the most important details of this issue #{issue} in the repository {repository}. 
-    In case filenames, variables and code-snippetes are mentioned, keep them in the summary, they are very important.
-    
-    ## Issue to summarize:
-    {issue_conversation}
-    """))
-
-    print("Issue summary:", summary)
-    return summary
-
-
-@catch_error
-def create_or_modify_file(repository, issue, filename, branch_name, issue_summary, prompt_function):
-    """
-    Create or modify a file in a GitHub repository.
-
-    Parameters
-    ----------
-    repository : str
-        The full name of the GitHub repository.
-    issue : int
-        The issue number to solve.
-    filename : str
-        The name of the file to create or modify.
+    repo : Repository
+        The GitHub repository object.
     branch_name : str
-        The name of the branch to create or modify the file in.
-    issue_summary : str
-        The summary of the issue to solve.
+        The name of the branch.
+
+    Returns
+    -------
+    Dict[str, Any]
+        The branch protection settings.
+
+    Raises
+    ------
+    GithubException
+        If the branch is not found or the access token is invalid.
     """
-    Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
-    from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, check_if_file_exists
-    from ._utilities import remove_outer_markdown, split_content_and_summary
-
-    if check_if_file_exists(repository, branch_name, filename):
-        file_content = get_repository_file_content(repository, branch_name, file_path)
-        print(filename, "will be overwritten")
-        file_content_instruction = remove_indentation(remove_indentation(f"""Modify the file "{filename}" to solve the issue #{issue}:
-        <BEGIN_FILE>
-        {file_content}
-        </END_FILE>
-        """))
-    else:
-        print(filename, "will be created")
-        file_content_instruction = remove_indentation(remove_indentation(f"""Create the file "{filename}" to solve the issue #{issue}.
-        """))
-
-    response = prompt_function(remove_indentation(f"""
-    {SYSTEM_PROMPT}
-    Given a github issue summary (#{issue}) and optionally file content (filename {filename}), modify the file content or create the file content to solve the issue.
-    
-    ## Issue {issue} Summary
-    
-    {issue_summary}
-    
-    ## File {filename}
-    {file_content_instruction}
-    
-    ## Your task
-    Generate content of file "{filename}" to [partially] solve the issue above.
-    Do not do any additional modifications you were not instructed to do.
-    Respond ONLY the content of the file and afterwards a single line summarizing the changes you made (without mentioning the issue).
-    """))
-
-    new_content, commit_message = split_content_and_summary(response)
+    protection = repo.get_branch(branch_name).get_protection()
+    return protection.raw_data
 
 
-    print("New file content", new_content)
-    print("Summary", commit_message)
-
-    write_file_in_new_branch(repository, branch_name, filename, new_content, commit_message)
-
-    return commit_message
-
-
-@catch_error
-def solve_github_issue(repository, issue, llm_model, prompt_function):
+def update_github_branch_protection(
+    repo: Repository, branch_name: str, protection_rules: Dict[str, Any]
+) -> None:
     """
-    Attempt to solve a GitHub issue by modifying a single file and sending a pull-request.
+    Update the branch protection settings for a given branch.
 
     Parameters
     ----------
-    repository : str
-        The full name of the GitHub repository.
-    issue : int
-        The issue number to solve.
-    llm_model : str
-        The language model to use for generating the solution.
+    repo : Repository
+        The GitHub repository object.
+    branch_name : str
+        The name of the branch.
+    protection_rules : Dict[str, Any]
+        The branch protection settings to update.
+
+    Raises
+    ------
+    GithubException
+        If the branch is not found or the access token is invalid.
     """
-    # modified from: https://github.com/ScaDS/generative-ai-notebooks/blob/main/docs/64_github_interaction/solving_github_issues.ipynb
+    branch = repo.get_branch(branch_name)
+    protection = branch.get_protection()
+    protection.update(protection_rules)
 
-    Log().log(f"-> solve_github_issue({repository}, {issue})")
 
-    from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, get_diff_of_branches
-    from ._utilities import remove_outer_markdown, split_content_and_summary, ErrorReporting
-    import json
+def get_github_branch_protection_rules(repo: Repository, branch_name: str) -> List[Dict[str, Any]]:
+    """
+    Get the branch protection rules for a given branch.
 
-    ai_remark = setup_ai_remark()
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    branch_name : str
+        The name of the branch.
 
-    issue_summary = summarize_github_issue(repository, issue, prompt_function)
+    Returns
+    -------
+    List[Dict[str, Any]]
+        The branch protection rules.
 
-    all_files = "* " + "\n* ".join(list_repository_files(repository))
+    Raises
+    ------
+    GithubException
+        If the branch is not found or the access token is invalid.
+    """
+    protection = repo.get_branch(branch_name).get_protection()
+    return protection.raw_data["required_status_checks"]["contexts"]
 
-    relevant_files = remove_outer_markdown(prompt_function(remove_indentation(f"""
-    {SYSTEM_PROMPT}
-    Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files are relevant to solve the issue.
-    
-    ## Files in the repository
-    
-    {all_files}
-    
-    ## Github Issue #{issue} Summary
-    
-    {issue_summary}
-    
-    ## Your task
-    Which of these files might be relevant for issue #{issue} ? 
-    You can also consider files which do not exist yet. 
-    Respond ONLY the filenames as JSON list.
-    """)))
 
-    print("JSON relevant filenames:", relevant_files)
+def update_github_branch_protection_rules(
+    repo: Repository, branch_name: str, protection_rules: List[Dict[str, Any]]
+) -> None:
+    """
+    Update the branch protection rules for a given branch.
 
-    filenames = json.loads(relevant_files)
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    branch_name : str
+        The name of the branch.
+    protection_rules : List[Dict[str, Any]]
+        The branch protection rules to update.
 
-    # create a new branch
-    branch_name = create_branch(repository)
+    Raises
+    ------
+    GithubException
+        If the branch is not found or the access token is invalid.
+    """
+    branch = repo.get_branch(branch_name)
+    protection = branch.get_protection()
+    protection.update({"required_status_checks": {"contexts": protection_rules}})
 
-    print("Created branch", branch_name)
 
-    ErrorReporting.status = False
+def get_github_workflow_runs(
+    repo: Repository, workflow_id: int, status: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    """
+    Get the workflow runs for a given workflow.
 
-    errors = []
-    commit_messages = []
-    for filename in filenames:
-        if filename.startswith(".github/workflows"):
-            # skip github workflows
-            continue
-        try:
-            message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, issue_summary, prompt_function)
-            commit_messages.append(message)
-        except Exception as e:
-            errors.append(f"Error processing {filename}" + str(e))
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    workflow_id : int
+        The workflow ID.
+    status : str, optional
+        The status of the workflow runs to filter by.
 
-    ErrorReporting.status = True
+    Returns
+    -------
+    List[Dict[str, Any]]
+        The workflow runs.
 
-    error_messages = ""
-    if len(errors) > 0:
-        error_messages = "The following errors occurred:\n\n* " + "\n* ".join(errors) + "\n"
+    Raises
+    ------
+    GithubException
+        If the workflow is not found or the access token is invalid.
+    """
+    runs = repo.get_workflow(workflow_id).get_runs()
+    if status is not None:
+        runs = [run for run in runs if run.status == status]
+    return [run.raw_data for run in runs]
 
-    # get a diff of all changes
-    diffs_prompt = get_diff_of_branches(repository, branch_name)
 
-    # summarize the changes
-    commit_messages_prompt = "* " + "\n* ".join(commit_messages)
-    pull_request_summary = prompt_function(remove_indentation(f"""
-    {SYSTEM_PROMPT}
-    Given a list of commit messages and a git diff, summarize the changes you made in the files.
-    You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
-    
-    ## Issue Summary
-    
-    {issue_summary}
-    
-    ## Commit messages
-    You committed these changes to these files
-    
-    {commit_messages_prompt}
-        
-    ## Git diffs
-    The following changes were made in the files:
-    
-    {diffs_prompt}
-        
-    ## Your task
-    Summarize the changes above to a one paragraph line Github pull-request message. 
-    Afterwards, summarize the summary in a single line, which will become the title of the pull-request.
-    Do not add headnline or any other formatting. Just respond with the paragraphe and the title in a new line below.
-    """))
+def get_github_workflow_run_logs(
+    repo: Repository, workflow_id: int, run_id: int
+) -> str:
+    """
+    Get the logs for a given workflow run.
 
-    pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    workflow_id : int
+        The workflow ID.
+    run_id : int
+        The run ID.
 
-    send_pull_request(repository, branch_name, pull_request_title, pull_request_description + "\n\ncloses #" + str(issue))
+    Returns
+    -------
+    str
+        The workflow run logs.
+
+    Raises
+    ------
+    GithubException
+        If the workflow run is not found or the access token is invalid.
+    """
+    run = repo.get_workflow(workflow_id).get_run(run_id)
+    return run.get_logs()
+
+
+def get_github_workflow_run_jobs(
+    repo: Repository, workflow_id: int, run_id: int
+) -> List[Dict[str, Any]]:
+    """
+    Get the jobs for a given workflow run.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    workflow_id : int
+        The workflow ID.
+    run_id : int
+        The run ID.
+
+    Returns
+    -------
+    List[Dict[str, Any]]
+        The jobs for the workflow run.
+
+    Raises
+    ------
+    GithubException
+        If the workflow run is not found or the access token is invalid.
+    """
+    run = repo.get_workflow(workflow_id).get_run(run_id)
+    return [job.raw_data for job in run.get_jobs()]
+
+
+def get_github_workflow_run_job_logs(
+    repo: Repository, workflow_id: int, run_id: int, job_id: int
+) -> str:
+    """
+    Get the logs for a given workflow run job.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    workflow_id : int
+        The workflow ID.
+    run_id : int
+        The run ID.
+    job_id : int
+        The job ID.
+
+    Returns
+    -------
+    str
+        The workflow run job logs.
+
+    Raises
+    ------
+    GithubException
+        If the workflow run job is not found or the access token is invalid.
+    """
+    job = repo.get_workflow(workflow_id).get_run(run_id).get_job(job_id)
+    return job.get_logs()
+
+
+def get_github_workflow_run_job_steps(
+    repo: Repository, workflow_id: int, run_id: int, job_id: int
+) -> List[Dict[str, Any]]:
+    """
+    Get the steps for a given workflow run job.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    workflow_id : int
+        The workflow ID.
+    run_id : int
+        The run ID.
+    job_id : int
+        The job ID.
+
+    Returns
+    -------
+    List[Dict[str, Any]]
+        The steps for the workflow run job.
+
+    Raises
+    ------
+    GithubException
+        If the workflow run job is not found or the access token is invalid.
+    """
+    job = repo.get_workflow(workflow_id).get_run(run_id).get_job(job_id)
+    return [step.raw_data for step in job.get_steps()]
+
+
+def get_github_workflow_run_job_step_logs(
+    repo: Repository, workflow_id: int, run_id: int, job_id: int, step_number: int
+) -> str:
+    """
+    Get the logs for a given workflow run job step.
+
+    Parameters
+    ----------
+    repo : Repository
+        The GitHub repository object.
+    workflow_id : int
+        The workflow ID.
+    run_id : int
+        The run ID.
+    job_id : int
+        The job ID.
+    step_number : int
+        The step number.
+
+    Returns
+    -------
+    str
+        The workflow run job step logs.
+
+    Raises
+    ------
+    GithubException
+        If the workflow run job step is not found or the access token is invalid.
+    """
+    job = repo.get_workflow(workflow_id).get_run(run_id).get_job(job_id)
+    step = job.get_steps()[step_number]
+    return step.get_logs()
