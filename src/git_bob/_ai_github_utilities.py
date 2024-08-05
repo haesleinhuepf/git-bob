@@ -230,7 +230,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     print("New file content", new_content)
     print("Summary", commit_message)
 
-    write_file_in_new_branch(repository, branch_name, filename, new_content, commit_message)
+    write_file_in_new_branch(repository, branch_name, filename, new_content + "\n", commit_message)
 
     return commit_message
 

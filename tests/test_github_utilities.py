@@ -27,5 +27,28 @@ def test_list_issues():
     assert 1 in closed_issues
     assert 20 in closed_issues
 
-def test_update_github_file():
-    pass
+def test_list_repository_files():
+    from git_bob._github_utilities import list_repository_files
+    files = list(list_repository_files("haesleinhuepf/git-bob"))
+
+    assert "readme.md" in files
+    assert "LICENSE" in files
+    assert "src/git_bob/__init__.py" in files
+    assert "playground/python_basics.ipynb" in files
+
+
+def test_get_repository_file_contents():
+    from git_bob._github_utilities import get_repository_file_contents
+    content = get_repository_file_contents("haesleinhuepf/git-bob", ["readme.md"])
+
+    assert len(list(content.keys())) == 1
+    assert "readme.md" in list(content.keys())
+    assert content["readme.md"].startswith("# git-bob")
+    assert "## Acknowledgements" in content["readme.md"]
+
+
+def test_check_if_file_exists():
+    from git_bob._github_utilities import check_if_file_exists
+    assert check_if_file_exists("haesleinhuepf/git-bob", "main", "readme.md")
+    assert not check_if_file_exists("haesleinhuepf/git-bob", "main", "readme2.md")
+

@@ -9,7 +9,19 @@ def test_remove_outer_markdown():
 bla
 ```""") == "bla"
 
-def test_function3():
-    pass
+def test_split_content_and_summary():
+    from git_bob._utilities import split_content_and_summary
+    content, summary = split_content_and_summary("""blabla
+                                                 
+                                                 summary""")
 
-# Add more test functions as needed for other functions in _utilities.py
+    assert content.strip() == "blabla"
+    assert summary == "summary"
+
+    content, summary = split_content_and_summary("""blabla
+
+                                                     summary
+                                                     """)
+
+    assert content.strip() == "blabla"
+    assert summary == "summary"
