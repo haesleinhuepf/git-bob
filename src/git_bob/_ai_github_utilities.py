@@ -4,7 +4,14 @@
 from ._utilities import remove_indentation, catch_error
 from ._logger import Log
 
-SYSTEM_PROMPT = """You are an extremely skilled python developer. Your name is git-bob."""
+SYSTEM_PROMPT = """You are an extremely skilled python developer. Your name is git-bob. 
+You can solve programming tasks and review code.
+When asked to solve a specific problem, you keep your code changes minimal and only solve the problem at hand.
+You cannot execute code. 
+You cannot retrieve information from other sources. 
+Do not claim anything that you don't know.
+In case you are asked to review code, you focus on the quality of the code. 
+"""
 
 def setup_ai_remark():
     """
@@ -190,7 +197,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         """))
 
     response = prompt_function(remove_indentation(f"""
-    Given a github issue summary (#{issue}) and optionally, file content (filename {filename}), modify the file content or create the file content to solve the issue.
+    {SYSTEM_PROMPT}
+    Given a github issue summary (#{issue}) and optionally file content (filename {filename}), modify the file content or create the file content to solve the issue.
     
     ## Issue {issue} Summary
     
@@ -245,13 +253,14 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     all_files = "* " + "\n* ".join(list_repository_files(repository))
 
     relevant_files = remove_outer_markdown(prompt_function(remove_indentation(f"""
+    {SYSTEM_PROMPT}
     Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files are relevant to solve the issue.
     
     ## Files in the repository
     
     {all_files}
     
-    ## Github Issue (#{issue}) Summary
+    ## Github Issue #{issue} Summary
     
     {issue_summary}
     
@@ -290,6 +299,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     # summarize the changes
     commit_messages_prompt = "* " + "\n* ".join(commit_messages)
     pull_request_summary = prompt_function(remove_indentation(f"""
+    {SYSTEM_PROMPT}
     Given a list of commit messages and a git diff, summarize the changes you made in the files.
     You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
     
