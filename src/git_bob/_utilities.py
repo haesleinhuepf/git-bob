@@ -3,6 +3,7 @@ import sys
 from functools import lru_cache
 from functools import wraps
 from toolz import curry
+import re
 
 def remove_indentation(text):
     """
@@ -41,7 +42,7 @@ def remove_outer_markdown(text):
     text = text.strip("\n")
 
     possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy", "```jython", "```md", "```markdown",
-           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
+                           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
 
     possible_endings = ["```", "</FILE>"]
 
@@ -178,3 +179,27 @@ def split_content_and_summary(text):
     new_content = remove_outer_markdown("\n".join(remaining_content))
 
     return new_content.strip(), summary.strip()
+
+def transform_markdown_images(text):
+    """
+    Transform markdown images to clickable HTML images.
+
+    Parameters
+    ----------
+    text : str
+        The input text containing markdown images.
+
+    Returns
+    -------
+    str
+        The text with markdown images transformed to clickable HTML images.
+    """
+    def replace_image(match):
+        alt_text = match.group(1)
+        image_path = match.group(2)
+        if image_path == "docs/images/banner.png":
+            return match.group(0)  # Return the original markdown for banner.png
+        return f'<a href="{image_path}"><img src="{image_path}" width="400" alt="{alt_text}"></a>'
+
+    pattern = r'!\[(.*?)\]\((.*?)\)'
+    return re.sub(pattern, replace_image, text)
