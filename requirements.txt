@@ -1,5 +1,5 @@
 anthropic
 openai
-blablado>=0.2.2
+google-generativeai
 pygithub
 toolz

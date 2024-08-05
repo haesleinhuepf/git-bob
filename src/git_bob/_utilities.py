@@ -31,7 +31,7 @@ def remove_outer_markdown(text):
 
     parts = code.split("```")
     if len(parts) == 1:
-        code = None
+        return parts[0]
     else:
         code = ""
         for t, c in zip(parts[::2], parts[1::2]):
@@ -89,3 +89,17 @@ def catch_error(func):
             raise e
 
     return worker_function
+
+
+def split_content_and_summary(text):
+    """Assuming a text consists of a task solution (code, text) and a summary in the last line, it splits the text into the content and the summary."""
+    temp = text.split("\n")
+    summary = temp[-1]
+    remaining_content = temp[:-1]
+    if len(summary) < 5:
+        summary = temp[-2]
+        remaining_content = temp[:-2]
+
+    new_content = remove_outer_markdown("\n".join(remaining_content))
+
+    return new_content, summary
