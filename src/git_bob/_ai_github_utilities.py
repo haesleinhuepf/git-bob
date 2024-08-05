@@ -221,7 +221,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     print("Summary", commit_message)
 
     write_file_in_new_branch(repository, branch_name, filename, new_content, commit_message)
-j
+
     return commit_message
 
 
