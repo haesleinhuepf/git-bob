@@ -103,8 +103,3 @@ def split_content_and_summary(text):
 
     return new_content, summary
 
-
-def split_after_token(text, token):
-    if token not in token:
-        return text
-    return text.split(token)[1]
