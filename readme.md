@@ -4,7 +4,7 @@ git-bob uses AI to solve Github-issues and review pull-requests. It runs inside 
 
 ![demo_fix_typos.png](docs/images/banner.png)
 
-Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api), [OpenAI's chatGPT](https://openai.com/blog/openai-api) or [Google's Gemini](https://blog.google/technology/ai/google-gemini-ai/) to understand the text and 
+Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api) or [OpenAI's chatGPT](https://openai.com/blog/openai-api) <!--or [Google's Gemini](https://blog.google/technology/ai/google-gemini-ai/)--> to understand the text and 
 [pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull-requests.
 
 ## Disclaimer
@@ -18,7 +18,7 @@ You have to pay for the usage and must be careful in using the software.
 Do not use this technology if you are not aware of the costs and consequences.
 
 > [!CAUTION]
-> When using the Anthropic, OpenAI, Google Gemini or any other endpoint via git-bob, you are bound to the terms of service 
+> When using the Anthropic, OpenAI <!--, Google Gemini--> or any other endpoint via git-bob, you are bound to the terms of service 
 > of the respective companies or organizations.
 > The github issues, pull-requests and messages you enter are transferred to their servers and may be processed and stored there. 
 > Make sure to not submit any sensitive, confidential or personal data. Also using these services may cost money.
@@ -31,11 +31,11 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
   * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These three were tested:
     * `claude-3-5-sonnet-20240620`
     * `gpt-4o-2024-05-13`
-    * `gemini-1.5-flash-001`
-* configure a Github secret called `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` or `GOOGLE_API_KEY` with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
+    <!--* `gemini-1.5-flash-001`-->
+* configure a Github secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` <!--or `GOOGLE_API_KEY`--> with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
   * [OpenAI (gpt)](https://openai.com/blog/openai-api)
   * [Anthropic (claude)](https://www.anthropic.com/api)
-  * [Google AI](https://cloud.google.com/docs/authentication/api-keys)
+  <!-- * [Google AI](https://cloud.google.com/docs/authentication/api-keys)-->
 * configure Github actions to run the workflow on issues and pull-requests. Also give write-access to the action runner.
 
 To trigger git-bob, you need to comment on an issue or pull-request with the following command:
@@ -112,6 +112,7 @@ At the moment, these limitations can be observed:
   If others send a pull-request, a repository member must allow the action to run manually.
 * `git-bob` is incompatible with locally running open-source/-weight LLMs. 
   This might make sense when being executed locally only. In the Github-CI this might be impossible.
+* Recently tested `claude-3-5-sonnet-20240620` and `gpt-4o-2024-05-13` models produce useful results. The model `gemini-1.5-flash-001` is technically supported, too, but its results were not very useful.
 
 ## Similar projects
 
