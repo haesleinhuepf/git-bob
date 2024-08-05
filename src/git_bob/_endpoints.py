@@ -1,66 +1,91 @@
-"""
-This module provides helper functions to interact with different language models.
+from typing import List, Dict, Any, Tuple
+from fastapi import FastAPI, Request, HTTPException
+from pydantic import BaseModel
+import git
+import os
+from git_bob._git_utils import get_repo, get_changed_files, commit_changes
+from git_bob._prompts import get_system_prompt, get_user_prompt
+from git_bob._llm import get_completion
 
-Functions:
-- prompt_claude: Sends a message to the Claude language model and returns the text response.
-- prompt_chatgpt: Sends a message to the ChatGPT language model and returns the text response.
-"""
+app = FastAPI()
 
-def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
+class SolveRequest(BaseModel):
+    issue_number: int
+    repo_path: str
+
+class ReviewRequest(BaseModel):
+    pr_number: int
+    repo_path: str
+
+@app.post("/solve")
+async def solve_issue(request: SolveRequest) -> Dict[str, Any]:
     """
-    A prompt helper function that sends a message to anthropic
-    and returns only the text response.
+    Solve a GitHub issue.
 
-    Example models: claude-3-5-sonnet-20240620 or claude-3-opus-20240229
+    Parameters
+    ----------
+    request : SolveRequest
+        The request object containing the issue number and repository path.
+
+    Returns
+    -------
+    Dict[str, Any]
+        A dictionary containing the solution details.
+
+    Raises
+    ------
+    HTTPException
+        If there's an error during the solving process.
     """
-    from anthropic import Anthropic
+    try:
+        repo = get_repo(request.repo_path)
+        issue = repo.get_issue(request.issue_number)
+        
+        system_prompt = get_system_prompt()
+        user_prompt = get_user_prompt(issue)
+        
+        completion = get_completion(system_prompt, user_prompt)
+        
+        changed_files = get_changed_files(completion)
+        
+        commit_message = f"Solve issue #{request.issue_number}"
+        commit_sha = commit_changes(repo, changed_files, commit_message)
+        
+        return {"success": True, "commit_sha": commit_sha}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    # convert message in the right format if necessary
-    if isinstance(message, str):
-        message = [{"role": "user", "content": message}]
-
-    # setup connection to the LLM
-    client = Anthropic()
-
-    message = client.messages.create(
-        max_tokens=4096,
-        messages=message,
-        model=model,
-    )
-
-    # extract answer
-    return message.content[0].text
-
-
-def prompt_chatgpt(message: str, model="gpt-4o-2024-05-13"):
-    """A prompt helper function that sends a message to openAI
-    and returns only the text response.
+@app.post("/review")
+async def review_pr(request: ReviewRequest) -> Dict[str, Any]:
     """
-    # convert message in the right format if necessary
-    import openai
-    if isinstance(message, str):
-        message = [{"role": "user", "content": message}]
+    Review a GitHub pull request.
 
-    # setup connection to the LLM
-    client = openai.OpenAI()
+    Parameters
+    ----------
+    request : ReviewRequest
+        The request object containing the pull request number and repository path.
 
-    # submit prompt
-    response = client.chat.completions.create(
-        model=model,
-        messages=message
-    )
+    Returns
+    -------
+    Dict[str, Any]
+        A dictionary containing the review details.
 
-    # extract answer
-    return response.choices[0].message.content
-
-
-def prompt_gemini(request, model="gemini-1.5-flash-001"):
-    """Send a prompt to Google Gemini and return the response"""
-    from google import generativeai as genai
-    import os
-    genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
-
-    client = genai.GenerativeModel(model)
-    result = client.generate_content(request)
-    return result.text
-
+    Raises
+    ------
+    HTTPException
+        If there's an error during the review process.
+    """
+    try:
+        repo = get_repo(request.repo_path)
+        pr = repo.get_pull(request.pr_number)
+        
+        system_prompt = get_system_prompt()
+        user_prompt = get_user_prompt(pr)
+        
+        completion = get_completion(system_prompt, user_prompt)
+        
+        pr.create_review(body=completion, event='COMMENT')
+        
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
