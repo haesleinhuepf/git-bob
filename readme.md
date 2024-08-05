@@ -35,7 +35,7 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
 * configure a Github secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` <!--or `GOOGLE_API_KEY`--> with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
   * [OpenAI (gpt)](https://openai.com/blog/openai-api)
   * [Anthropic (claude)](https://www.anthropic.com/api)
-  <!-- * [Google AI](https://cloud.google.com/docs/authentication/api-keys)-->
+  <!-- * [Google AI](https://ai.google.dev/gemini-api/docs/api-key)-->
 * configure Github actions to run the workflow on issues and pull-requests. Also give write-access to the action runner.
 
 To trigger git-bob, you need to comment on an issue or pull-request with the following command:
