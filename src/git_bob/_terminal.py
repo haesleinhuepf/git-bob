@@ -6,6 +6,7 @@ def command_line_interface():
     import os
     import sys
     import signal
+    import atexit
 
     from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue
@@ -46,14 +47,17 @@ def command_line_interface():
     if running_in_github_ci:
         print(f"Running in GitHub-CI. Setting timeout to {timeout_in_seconds / 60} minutes.")
 
-        # in case we run in the github-CI, we set a timeout
-        def handler(signum, frame):
-            print("Process timed out")
-            report_error("I ran out of time.")
-            sys.exit(1)
+    # in case we run in the github-CI, we set a timeout
+    def handler(signum, frame):
+        print("Process timed out")
+        report_error("I ran out of time.")
+        sys.exit(1)
 
-        signal.signal(signal.SIGALRM, handler)
-        signal.alarm(timeout_in_seconds)  # Set the timeout to 3 minutes
+    signal.signal(signal.SIGALRM, handler)
+    signal.alarm(timeout_in_seconds)  # Set the timeout to 3 minutes
+
+    # Register the log printing function to be called at exit
+    atexit.register(lambda: print("Done. Summary:\n* " + "\n* ".join(Log().get())))
 
     # determine need to respond and access rights
     repository = sys.argv[2] if len(sys.argv) > 2 else None
@@ -63,7 +67,7 @@ def command_line_interface():
     # handle aliases
     text = text.replace("git-bob respond", "git-bob comment")
     text = text.replace("git-bob review", "git-bob comment")
-    
+
     if running_in_github_ci:
         if not ("git-bob comment" in text or "git-bob solve" in text):
             print("They didn't speak to me. I show myself out.")
@@ -86,6 +90,3 @@ def command_line_interface():
         solve_github_issue(repository, issue, llm_name, prompt)
     elif task == "comment-on-issue" and ("git-bob comment" in text or not running_in_github_ci):
         comment_on_issue(repository, issue, prompt)
-
-    print("Done. Summary:")
-    print("* " + "\n* ".join(Log().get()))
