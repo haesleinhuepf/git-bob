@@ -1,7 +1,6 @@
 # This file contains utility functions using the github API via github-python:
 # https://github.com/PyGithub/PyGithub (licensed LGPL3)
 #
-# All functions must have a proper docstring, because we are using them as tools for function calling using LLMs.
 import os
 from functools import lru_cache
 from ._utilities import catch_error
@@ -523,6 +522,7 @@ def add_reaction_to_issue(repository, issue, reaction="+1"):
     issue = repo.get_issue(number=issue)
     issue.create_reaction(reaction)
 
+
 @catch_error
 def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
     """Add a given reaction to a github issue."""
@@ -544,9 +544,19 @@ def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
         issue_obj.create_reaction(reaction)
 
 
+@catch_error
 def get_diff_of_branches(repository, compare_branch, base_branch="main"):
     """
     Get the diff between two branches in a GitHub repository.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    compare_branch : str
+        The branch to compare against the base branch.
+    base_branch : str, optional
+        The base branch to compare against. Default is "main".
     """
     # Get the repository
     repo = get_github_repository(repository)
