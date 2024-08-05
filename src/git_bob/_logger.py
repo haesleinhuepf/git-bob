@@ -7,6 +7,9 @@ class Log():
             cls._instance._log = []
         return cls._instance
 
+    def clear(self):
+        self._log = []
+
     def log(self, message):
         print(message)
         self._log.append(message)
