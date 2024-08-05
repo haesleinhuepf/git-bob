@@ -45,13 +45,11 @@ def command_line_interface():
 
     if running_in_github_ci:
         print(f"Running in GitHub-CI. Setting timeout to {timeout_in_seconds / 60} minutes.")
-
         # in case we run in the github-CI, we set a timeout
         def handler(signum, frame):
             print("Process timed out")
             report_error("I ran out of time.")
             sys.exit(1)
-
         signal.signal(signal.SIGALRM, handler)
         signal.alarm(timeout_in_seconds)  # Set the timeout to 3 minutes
 
