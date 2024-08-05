@@ -176,7 +176,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, check_if_file_exists
     from ._utilities import remove_outer_markdown, split_content_and_summary
 
-    try:
+    if check_if_file_exists(repository, branch_name, filename):
         file_content = get_repository_file_content(repository, branch_name, file_path)
         print(filename, "will be overwritten")
         file_content_instruction = remove_indentation(remove_indentation(f"""Modify the file "{filename}" to solve the issue #{issue}:
@@ -184,7 +184,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         {file_content}
         </END_FILE>
         """))
-    except:
+    else:
         print(filename, "will be created")
         file_content_instruction = remove_indentation(remove_indentation(f"""Create the file "{filename}" to solve the issue #{issue}.
         """))
