@@ -11,34 +11,27 @@ def remove_indentation(text):
 
 
 def remove_outer_markdown(text):
-    code = text \
-        .replace("```python", "```") \
-        .replace("```Python", "```") \
-        .replace("```nextflow", "```") \
-        .replace("```java", "```") \
-        .replace("```javascript", "```") \
-        .replace("```macro", "```") \
-        .replace("```groovy", "```") \
-        .replace("```jython", "```") \
-        .replace("```md", "```") \
-        .replace("```markdown", "```") \
-        .replace("```txt", "```") \
-        .replace("```csv", "```") \
-        .replace("```yml", "```") \
-        .replace("```yaml", "```") \
-        .replace("```json", "```") \
-        .replace("```py", "```")
 
-    parts = code.split("```")
-    if len(parts) == 1:
-        return parts[0]
-    else:
-        code = ""
-        for t, c in zip(parts[::2], parts[1::2]):
-            code = code + c
-        code = code.strip("\n")
+    text = text.strip("\n")
 
-    return code
+    possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy", "```jython", "```md", "```markdown",
+                           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
+
+    possible_endings = ["```", "</FILE>"]
+
+    for beginning in possible_beginnings:
+        if text.startswith(beginning):
+            text = text[len(beginning):]
+            break
+
+    for ending in possible_endings:
+        if text.endswith(ending):
+            text = text[:-len(ending)]
+            break
+
+    text = text.strip("\n")
+
+    return text
 
 @lru_cache(maxsize=1)
 def get_llm_name():
@@ -94,7 +87,6 @@ def catch_error(func):
             print(f"Error in {name}: {str(e)}")
             report_error(f"Error in {name}: {str(e)}")
             raise e
-
     return worker_function
 
 
