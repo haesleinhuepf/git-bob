@@ -46,12 +46,19 @@ def get_llm_name():
     return os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
 
 
+class ErrorReporting:
+    status = True
+
+
 def report_error(message):
     import sys
     import os
     from ._ai_github_utilities import setup_ai_remark
     from ._github_utilities import add_comment_to_issue
     from ._logger import Log
+
+    if not ErrorReporting.status:
+        return
 
     log = "\n".join(Log().get())
 

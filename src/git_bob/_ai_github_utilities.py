@@ -244,7 +244,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     Log().log(f"-> solve_github_issue({repository}, {issue})")
 
     from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, get_diff_of_branches
-    from ._utilities import remove_outer_markdown, split_content_and_summary
+    from ._utilities import remove_outer_markdown, split_content_and_summary, ErrorReporting
     import json
 
     ai_remark = setup_ai_remark()
@@ -278,6 +278,8 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
 
     print("Created branch", branch_name)
 
+    ErrorReporting.status = False
+
     errors = []
     commit_messages = []
     for filename in filenames:
@@ -289,6 +291,8 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
             commit_messages.append(message)
         except Exception as e:
             errors.append(f"Error processing {filename}" + str(e))
+
+    ErrorReporting.status = True
 
     error_messages = ""
     if len(errors) > 0:
