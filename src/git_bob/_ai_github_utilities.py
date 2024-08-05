@@ -221,7 +221,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     print("Summary", commit_message)
 
     write_file_in_new_branch(repository, branch_name, filename, new_content, commit_message)
-
+j
     return commit_message
 
 
@@ -270,6 +270,8 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     You can also consider files which do not exist yet. 
     Respond ONLY the filenames as JSON list.
     """)))
+
+    print("JSON relevant filenames:", relevant_files
 
     filenames = json.loads(relevant_files)
 
