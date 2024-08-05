@@ -1,14 +1,15 @@
 # Playground
 
-This folder is a playground to test git-bob on a repository. 
+## Folders Structure
 
-This file contains a tpyo. Let's see what is going to happen with it.
+In this playground, we create various files and folders as part of our coding exercises.
 
-May it stay here forever? Or does an AI find it and fix it?
+### Test Folder
 
-Time will tell.
+- A new folder named `test_folder` was created.
+- Inside `test_folder`, a file named `test.md` has been added.
+- The `test.md` file contains 10 programmer jokes written in markdown format.
 
-Best, 
-Robert
+### Contributing
 
-
+Feel free to add more folders and files for different exercises.
