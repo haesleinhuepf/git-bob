@@ -1,15 +1,27 @@
-class Log():
-    _instance = None
+import logging
+import sys
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(Log, cls).__new__(cls)
-            cls._instance._log = []
-        return cls._instance
+def setup_logger(name, level=logging.INFO):
+    """
+    Set up and configure a logger.
 
-    def log(self, message):
-        print(message)
-        self._log.append(message)
+    Parameters
+    ----------
+    name : str
+        Name of the logger.
+    level : int, optional
+        Logging level, by default logging.INFO.
 
-    def get(self):
-        return self._log
+    Returns
+    -------
+    logging.Logger
+        Configured logger instance.
+    """
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(level)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
