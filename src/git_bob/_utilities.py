@@ -5,108 +5,54 @@ from functools import wraps
 from toolz import curry
 
 def remove_indentation(text):
-    text = text.replace("\n    ", "\n")
+    """
+    Remove indentation from the given text.
 
+    Parameters
+    ----------
+    text : str
+        The text from which indentation needs to be removed.
+
+    Returns
+    -------
+    str
+        Text without indentation.
+    """
+    text = text.replace("\n    ", "\n")
     return text.strip()
 
-
 def remove_outer_markdown(text):
+    """
+    Remove outer markdown from the given text.
+
+    Parameters
+    ----------
+    text : str
+        The text from which outer markdown needs to be removed.
+
+    Returns
+    -------
+    str
+        Text without outer markdown.
+    """
     code = text \
-        .replace("```python", "```") \
-        .replace("```Python", "```") \
-        .replace("```nextflow", "```") \
-        .replace("```java", "```") \
-        .replace("```javascript", "```") \
-        .replace("```macro", "```") \
-        .replace("```groovy", "```") \
-        .replace("```jython", "```") \
-        .replace("```md", "```") \
-        .replace("```markdown", "```") \
-        .replace("```txt", "```") \
-        .replace("```csv", "```") \
-        .replace("```yml", "```") \
-        .replace("```yaml", "```") \
-        .replace("```json", "```") \
-        .replace("```py", "```")
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("") \
+        .replace("")
 
-    parts = code.split("```")
-    if len(parts) == 1:
-        return parts[0]
-    else:
-        code = ""
-        for t, c in zip(parts[::2], parts[1::2]):
-            code = code + c
-        code = code.strip("\n")
-
-    return code
-
-@lru_cache(maxsize=1)
-def get_llm_name():
-    import os
-    return os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
-
-
-class ErrorReporting:
-    status = True
-
-
-def report_error(message):
-    import sys
-    import os
-    from ._ai_github_utilities import setup_ai_remark
-    from ._github_utilities import add_comment_to_issue
-    from ._logger import Log
-
-    if not ErrorReporting.status:
-        return
-
-    log = "\n".join(Log().get())
-
-    repository = sys.argv[2] if len(sys.argv) > 2 else None
-    issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
-    run_id = os.environ.get("GITHUB_RUN_ID")
-    ai_remark = setup_ai_remark()
-
-    complete_error_message = remove_indentation(f"""
-    {ai_remark}
-    
-    I'm sorry, I encountered an error while processing your request. Here is the error message:
-    
-    {message}
-    
-    This is how far I came:
-    ```
+    parts = code.split("
     {log}
-    ```
     
-    [More Details...](https://github.com/{repository}/actions/runs/{run_id})
-    """)
-    add_comment_to_issue(repository, issue, complete_error_message)
-
-@curry
-def catch_error(func):
-    @wraps(func)
-    def worker_function(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            name = func.__name__
-            print(f"Error in {name}: {str(e)}")
-            report_error(f"Error in {name}: {str(e)}")
-            raise e
-
-    return worker_function
-
-
-def split_content_and_summary(text):
-    """Assuming a text consists of a task solution (code, text) and a summary in the last line, it splits the text into the content and the summary."""
-    temp = text.split("\n")
-    summary = temp[-1]
-    remaining_content = temp[:-1]
-    if len(summary) < 5:
-        summary = temp[-2]
-        remaining_content = temp[:-2]
-
-    new_content = remove_outer_markdown("\n".join(remaining_content))
-
-    return new_content, summary
