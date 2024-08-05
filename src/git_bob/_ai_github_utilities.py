@@ -271,7 +271,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     Respond ONLY the filenames as JSON list.
     """)))
 
-    print("JSON relevant filenames:", relevant_files
+    print("JSON relevant filenames:", relevant_files)
 
     filenames = json.loads(relevant_files)
 
