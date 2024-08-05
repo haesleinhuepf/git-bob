@@ -5,17 +5,42 @@ from functools import wraps
 from toolz import curry
 
 def remove_indentation(text):
+    """
+    Remove indentation from the given text.
+
+    Parameters
+    ----------
+    text : str
+        The input text with indentation.
+
+    Returns
+    -------
+    str
+        The text with indentation removed and stripped of leading/trailing whitespace.
+    """
     text = text.replace("\n    ", "\n")
 
     return text.strip()
 
 
 def remove_outer_markdown(text):
+    """
+    Remove outer markdown syntax from the given text.
 
+    Parameters
+    ----------
+    text : str
+        The input text with potential markdown syntax.
+
+    Returns
+    -------
+    str
+        The text with outer markdown syntax removed and stripped of leading/trailing newlines.
+    """
     text = text.strip("\n")
 
     possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy", "```jython", "```md", "```markdown",
-                           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
+                   "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
 
     possible_endings = ["```", "</FILE>"]
 
@@ -35,6 +60,14 @@ def remove_outer_markdown(text):
 
 @lru_cache(maxsize=1)
 def get_llm_name():
+    """
+    Get the name of the LLM from the environment variable.
+
+    Returns
+    -------
+    str
+        The name of the LLM, defaulting to 'gpt-4o-2024-05-13' if not set.
+    """
     import os
     return os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
 
@@ -44,6 +77,14 @@ class ErrorReporting:
 
 
 def report_error(message):
+    """
+    Report an error by adding a comment to the GitHub issue.
+
+    Parameters
+    ----------
+    message : str
+        The error message to be reported.
+    """
     import sys
     import os
     from ._ai_github_utilities import setup_ai_remark
@@ -62,22 +103,35 @@ def report_error(message):
 
     complete_error_message = remove_indentation(f"""
     {ai_remark}
-    
+
     I'm sorry, I encountered an error while processing your request. Here is the error message:
-    
+
     {message}
-    
+
     This is how far I came:
     ```
     {log}
     ```
-    
+
     [More Details...](https://github.com/{repository}/actions/runs/{run_id})
     """)
     add_comment_to_issue(repository, issue, complete_error_message)
 
 @curry
 def catch_error(func):
+    """
+    Decorator to catch and report errors in functions.
+
+    Parameters
+    ----------
+    func : callable
+        The function to be decorated.
+
+    Returns
+    -------
+    callable
+        The decorated function that catches and reports errors.
+    """
     @wraps(func)
     def worker_function(*args, **kwargs):
         try:
@@ -91,7 +145,26 @@ def catch_error(func):
 
 
 def split_content_and_summary(text):
-    """Assuming a text consists of a task solution (code, text) and a summary in the last line, it splits the text into the content and the summary."""
+    """
+    Split the given text into content and summary.
+
+    Parameters
+    ----------
+    text : str
+        The input text containing content and summary.
+
+    Returns
+    -------
+    tuple
+        A tuple containing two elements:
+        - str: The content with outer markdown removed.
+        - str: The summary.
+
+    Notes
+    -----
+    Assumes the summary is in the last line of the text, unless it's too short,
+    in which case it takes the second to last line as the summary.
+    """
     temp = text.split("\n")
     summary = temp[-1]
     remaining_content = temp[:-1]
@@ -102,4 +175,3 @@ def split_content_and_summary(text):
     new_content = remove_outer_markdown("\n".join(remaining_content))
 
     return new_content, summary
-
