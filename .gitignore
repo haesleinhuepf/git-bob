@@ -1,7 +1,2 @@
-
-.ipynb_checkpoints
-Untitled*
-.idea
-*__pycache__*
-*egg-info*
-deploy.bat
+# Ignore the playground directory
+playground/
