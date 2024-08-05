@@ -102,3 +102,9 @@ def split_content_and_summary(text):
     new_content = remove_outer_markdown("\n".join(remaining_content))
 
     return new_content, summary
+
+
+def split_after_token(text, token):
+    if token not in token:
+        return text
+    return text.split(token)[1]

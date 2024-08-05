@@ -254,7 +254,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     Log().log(f"-> solve_github_issue({repository}, {issue})")
 
     from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, get_diff_of_branches
-    from ._utilities import remove_outer_markdown, split_content_and_summary, ErrorReporting
+    from ._utilities import remove_outer_markdown, split_content_and_summary, ErrorReporting, split_after_token
     import json
 
     ai_remark = setup_ai_remark()
@@ -263,7 +263,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
 
     all_files = "* " + "\n* ".join(list_repository_files(repository))
 
-    relevant_files = remove_outer_markdown(prompt_function(remove_indentation(f"""
+    relevant_files = remove_outer_markdown(split_after_token(prompt_function(remove_indentation(f"""
     {SYSTEM_PROMPT}
     Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files are relevant to solve the issue.
     
@@ -278,8 +278,9 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     ## Your task
     Which of these files might be relevant for issue #{issue} ? 
     You can also consider files which do not exist yet. 
-    Respond ONLY the filenames as JSON list.
-    """)))
+    
+    Respond with "JSONLIST:" and afterwards the filenames as JSON list.
+    """), "JSONLIST:")))
 
     print("JSON relevant filenames:", relevant_files)
 
