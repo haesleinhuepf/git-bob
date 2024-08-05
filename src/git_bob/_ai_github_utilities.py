@@ -280,7 +280,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     You can also consider files which do not exist yet. 
     
     Respond with "JSONLIST:" and afterwards the filenames as JSON list.
-    """), "JSONLIST:")))
+    """)), "JSONLIST:"))
 
     print("JSON relevant filenames:", relevant_files)
 
