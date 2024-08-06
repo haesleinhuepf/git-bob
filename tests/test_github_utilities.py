@@ -52,3 +52,30 @@ def test_check_if_file_exists():
     assert check_if_file_exists("haesleinhuepf/git-bob", "main", "readme.md")
     assert not check_if_file_exists("haesleinhuepf/git-bob", "main", "readme2.md")
 
+def test_create_or_modify_file():
+    import json
+    from git_bob._github_utilities import create_or_modify_file
+
+    # Mock notebook content
+    notebook_content = {
+        "cells": [
+            {
+                "cell_type": "code",
+                "execution_count": 1,
+                "outputs": [{"output_type": "stream", "text": "Hello World"}]
+            }
+        ]
+    }
+
+    # Convert to JSON string
+    file_content = json.dumps(notebook_content)
+
+    # Call the function (assuming it returns the modified content)
+    modified_content = create_or_modify_file("haesleinhuepf/git-bob", "test.ipynb", file_content)
+
+    # Parse the modified content
+    modified_notebook = json.loads(modified_content)
+
+    # Check if output and execution count are removed
+    assert modified_notebook["cells"][0]["execution_count"] is None
+    assert "outputs" not in modified_notebook["cells"][0] or modified_notebook["cells"][0]["outputs"] == []
