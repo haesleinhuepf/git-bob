@@ -36,7 +36,6 @@ def test_list_repository_files():
     assert "src/git_bob/__init__.py" in files
     assert "playground/python_basics.ipynb" in files
 
-
 def test_get_repository_file_contents():
     from git_bob._github_utilities import get_repository_file_contents
     content = get_repository_file_contents("haesleinhuepf/git-bob", ["readme.md"])
@@ -46,9 +45,33 @@ def test_get_repository_file_contents():
     assert content["readme.md"].startswith("# git-bob")
     assert "## Acknowledgements" in content["readme.md"]
 
-
 def test_check_if_file_exists():
     from git_bob._github_utilities import check_if_file_exists
     assert check_if_file_exists("haesleinhuepf/git-bob", "main", "readme.md")
     assert not check_if_file_exists("haesleinhuepf/git-bob", "main", "readme2.md")
 
+def test_create_or_modify_file():
+    from git_bob._github_utilities import create_or_modify_file
+    import json
+
+    # Mock file content for a Jupyter notebook
+    notebook_content = {
+        "cells": [
+            {
+                "cell_type": "code",
+                "execution_count": 1,
+                "outputs": [{"output_type": "stream", "text": "Hello, World!"}]
+            }
+        ]
+    }
+    file_content = json.dumps(notebook_content)
+
+    # Call the function (assuming it returns the modified content)
+    modified_content = create_or_modify_file("haesleinhuepf/git-bob", "test.ipynb", file_content, "Test commit")
+
+    # Parse the modified content
+    modified_notebook = json.loads(modified_content)
+
+    # Check if outputs and execution_count are removed
+    assert modified_notebook['cells'][0]['outputs'] == []
+    assert modified_notebook['cells'][0]['execution_count'] is None
