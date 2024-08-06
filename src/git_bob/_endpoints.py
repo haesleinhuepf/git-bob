@@ -23,9 +23,10 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
     client = Anthropic()
 
     message = client.messages.create(
-        max_tokens=4096,
+        max_tokens=8192 if model == "claude-3-5-20240620" else 4096,
         messages=message,
         model=model,
+        extra_headers={"anthropic-beta": "max-tokens-3-5-sonnet-2024-07-15"} if model == "claude-3-5-20240620" else None,
     )
 
     # extract answer
@@ -63,4 +64,3 @@ def prompt_gemini(request, model="gemini-1.5-flash-001"):
     client = genai.GenerativeModel(model)
     result = client.generate_content(request)
     return result.text
-
