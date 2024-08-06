@@ -51,4 +51,3 @@ def test_check_if_file_exists():
     from git_bob._github_utilities import check_if_file_exists
     assert check_if_file_exists("haesleinhuepf/git-bob", "main", "readme.md")
     assert not check_if_file_exists("haesleinhuepf/git-bob", "main", "readme2.md")
-
