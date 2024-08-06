@@ -3,6 +3,7 @@
 
 from ._utilities import remove_indentation, catch_error
 from ._logger import Log
+import json
 
 SYSTEM_PROMPT = """You are an extremely skilled python developer. Your name is git-bob. 
 You can solve programming tasks and review code.
@@ -117,7 +118,7 @@ def review_pull_request(repository, issue, prompt_function):
     ## Your task
 
     Review this pull-request and contribute to the discussion. 
-    
+
     Do NOT explain your response or anything else. 
     Just respond to the discussion.
     """))
@@ -153,7 +154,7 @@ def summarize_github_issue(repository, issue, prompt_function):
     summary = prompt_function(remove_indentation(f"""
     Summarize the most important details of this issue #{issue} in the repository {repository}. 
     In case filenames, variables and code-snippetes are mentioned, keep them in the summary, they are very important.
-    
+
     ## Issue to summarize:
     {issue_conversation}
     """))
@@ -187,14 +188,21 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     if check_if_file_exists(repository, branch_name, filename):
         file_content = get_file_in_repository(repository, branch_name, filename).decoded_content.decode()
         print(filename, "will be overwritten")
+        if filename.endswith('.ipynb'):
+            notebook = json.loads(file_content)
+            for cell in notebook['cells']:
+                if cell['cell_type'] == 'code':
+                    cell['outputs'] = []
+                    cell['execution_count'] = None
+            file_content = json.dumps(notebook, indent=1)
         file_content_instruction = remove_indentation(remove_indentation(f"""Modify the file "{filename}" to solve the issue #{issue}.
         Keep your modifications absolutely minimal.
-        
+
         That's the file "{filename}" content you will find in the file:
         ```
         {file_content}
         ```
-        
+
         ## Your task
         Modify content of the file "{filename}" to solve the issue above.
         Keep your modifications absolutely minimal.
@@ -202,7 +210,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     else:
         print(filename, "will be created")
         file_content_instruction = remove_indentation(remove_indentation(f"""Create the file "{filename}" to solve the issue #{issue}.
-        
+
         ## Your task
         Generate content for the file "{filename}" to solve the issue above.
         Keep it short.
@@ -211,16 +219,16 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     response = prompt_function(remove_indentation(f"""
     {SYSTEM_PROMPT}
     Given a github issue summary (#{issue}) and optionally file content (filename {filename}), modify the file content or create the file content to solve the issue.
-    
+
     ## Issue {issue} Summary
-    
+
     {issue_summary}
-    
+
     ## File {filename} content
-    
+
     {file_content_instruction}
-    
-    
+
+
     Respond ONLY the content of the file and afterwards a single line summarizing the changes you made (without mentioning the issue).
     """))
 
@@ -265,15 +273,15 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
 
     relevant_files = remove_outer_markdown(prompt_function(remove_indentation(f"""
     Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files are relevant to solve the issue.
-    
+
     ## Files in the repository
-    
+
     {all_files}
-    
+
     ## Github Issue #{issue} Summary
-    
+
     {issue_summary}
-    
+
     ## Your task
     Which of these files are relevant for issue #{issue} ? Keep the list short.
     You can also consider files which do not exist yet. 
@@ -323,21 +331,21 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     {SYSTEM_PROMPT}
     Given a list of commit messages and a git diff, summarize the changes you made in the files.
     You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
-    
+
     ## Issue Summary
-    
+
     {issue_summary}
-    
+
     ## Commit messages
     You committed these changes to these files
-    
+
     {commit_messages_prompt}
-        
+
     ## Git diffs
     The following changes were made in the files:
-    
+
     {diffs_prompt}
-        
+
     ## Your task
     Summarize the changes above to a one paragraph line Github pull-request message. 
     Afterwards, summarize the summary in a single line, which will become the title of the pull-request.
