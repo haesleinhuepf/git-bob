@@ -51,6 +51,19 @@ It will then try to solve the issue and send a pull-request.
 git-bob solve
 ```
 
+## Recommended Workflow
+
+Here's the recommended workflow for using git-bob:
+
+1. Create an issue describing the problem or task.
+2. Comment on the issue with `git-bob solve` to trigger git-bob.
+3. Wait for git-bob to create a pull request (PR) addressing the issue.
+4. Review the PR and comment on the issue if changes are needed.
+5. Wait for git-bob to create a second PR with the requested changes.
+6. Repeat steps 4-5 as necessary until the issue is resolved satisfactorily.
+
+For an example of this workflow in action, see [issue #128](https://github.com/haesleinhuepf/git-bob/issues/128).
+
 ### Use-case examples
 
 #### Solving github issues
