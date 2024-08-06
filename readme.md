@@ -96,7 +96,7 @@ git-bob <action> <organization>/<repository> <issue-number>
 Available actions:
 * `review-pull-request`
 * `comment-on-issue`
-* `solve-issue` (only works with OpenAI/gpt-4-omni at the moment)
+* `solve-issue`
 
 ## Limitations
 `git-bob` is a research project and has limitations. It serves as basis for discussion and further development. Once LLMs become better, `git-bob` will become better as well.
@@ -112,7 +112,7 @@ At the moment, these limitations can be observed:
   If others send a pull-request, a repository member must allow the action to run manually.
 * `git-bob` is incompatible with locally running open-source/-weight LLMs. 
   This might make sense when being executed locally only. In the Github-CI this might be impossible.
-* Recently tested `claude-3-5-sonnet-20240620` and `gpt-4o-2024-05-13` models produce useful results. The model `gemini-1.5-flash-001` is technically supported, too, but its results were not very useful.
+* Recently tested `claude-3-5-sonnet-20240620` and `gpt-4o-2024-05-13` models produce useful results. The model `gemini-1.5-flash-001` is technically supported too, but its results were not very useful.
 
 ## Similar projects
 
