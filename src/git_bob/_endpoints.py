@@ -33,7 +33,7 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
     return message.content[0].text
 
 
-def prompt_chatgpt(message: str, model="gpt-4o-2024-05-13"):
+def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06"):
     """A prompt helper function that sends a message to openAI
     and returns only the text response.
     """
