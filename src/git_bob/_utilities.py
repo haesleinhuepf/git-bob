@@ -51,7 +51,7 @@ def get_llm_name():
         The name of the LLM.
     """
     import os
-    return os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
+    return os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-08-06")
 
 
 class ErrorReporting:
