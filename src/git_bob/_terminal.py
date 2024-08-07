@@ -73,8 +73,14 @@ def command_line_interface():
         if not check_access_and_ask_for_approval(user, repository, issue):
             sys.exit(1)
 
-    # add reaction to issue to show that we're working on it
-    add_reaction_to_last_comment_in_issue(repository, issue, "+1")
+    # add reaction to issue to show that we're working on it; if this fails, we do not fail due to the error, because it's not critical
+    ErrorReporting.status = False
+    try:
+        add_reaction_to_last_comment_in_issue(repository, issue, "+1")
+    except:
+        print("Error: Could not add reaction to issue.")
+        pass
+    ErrorReporting.status = True
 
 
     # execute the task

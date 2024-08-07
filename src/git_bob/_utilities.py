@@ -97,7 +97,11 @@ This is how far I came:
 
 [More Details...](https://github.com/{repository}/actions/runs/{run_id})
 """
+    before = ErrorReporting.status
+    ErrorReporting.status = False
     add_comment_to_issue(repository, issue, complete_error_message)
+    ErrorReporting.status = before
+
 
 @curry
 def catch_error(func):
