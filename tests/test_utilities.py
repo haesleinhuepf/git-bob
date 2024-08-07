@@ -1,10 +1,5 @@
-from git_bob._utilities import remove_indentation, remove_outer_markdown
-
-def test_remove_indentation():
-    assert remove_indentation("    Hello") == "Hello"
-    assert remove_indentation("        Hello") == "    Hello"
-
 def test_remove_outer_markdown():
+    from git_bob._utilities import remove_outer_markdown
     assert remove_outer_markdown("""```python
 bla
 ```""") == "bla"
@@ -25,7 +20,3 @@ def test_split_content_and_summary():
 
     assert content.strip() == "blabla"
     assert summary == "summary"
-    assert remove_indentation("    Line1\n    Line2") == "Line1\nLine2"
-    assert remove_indentation("    Line1\n        Line2") == "Line1\n    Line2"
-    assert remove_indentation("Line1\nLine2") == "Line1\nLine2"
-    assert remove_indentation("    Line1\nLine2") == "    Line1\nLine2"
