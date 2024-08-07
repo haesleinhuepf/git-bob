@@ -18,11 +18,10 @@ def remove_indentation(text):
     str
         The text with indentation removed and stripped.
     """
-    text = text.replace("\n    ", "\n")
-    if text.startswith("    "):
-        text = text[4:]
+    lines = text.split('\n')
+    if all(line.startswith('    ') for line in lines if line):
+        text = '\n'.join(line[4:] if line.startswith('    ') else line for line in lines)
     return text
-
 
 def remove_outer_markdown(text):
     """
@@ -41,7 +40,7 @@ def remove_outer_markdown(text):
     text = text.strip("\n")
 
     possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy", "```jython", "```md", "```markdown",
-           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
+        "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
 
     possible_endings = ["```", "</FILE>"]
 
@@ -72,10 +71,8 @@ def get_llm_name():
     import os
     return os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-05-13")
 
-
 class ErrorReporting:
     status = False
-
 
 def report_error(message):
     """
@@ -103,19 +100,19 @@ def report_error(message):
     ai_remark = setup_ai_remark()
 
     complete_error_message = remove_indentation(f"""
-    {ai_remark}
+{ai_remark}
 
-    I'm sorry, I encountered an error while processing your request. Here is the error message:
+I'm sorry, I encountered an error while processing your request. Here is the error message:
 
-    {message}
+{message}
 
-    This is how far I came:
-    ```
-    {log}
-    ```
+This is how far I came:
+```
+{log}
+```
 
-    [More Details...](https://github.com/{repository}/actions/runs/{run_id})
-    """)
+[More Details...](https://github.com/{repository}/actions/runs/{run_id})
+""")
     add_comment_to_issue(repository, issue, complete_error_message)
 
 @curry
@@ -146,7 +143,6 @@ def catch_error(func):
         else:
             return func(*args, **kwargs)
     return worker_function
-
 
 def split_content_and_summary(text):
     """
