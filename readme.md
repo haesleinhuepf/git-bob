@@ -36,7 +36,7 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
   * [OpenAI (gpt)](https://openai.com/blog/openai-api)
   * [Anthropic (claude)](https://www.anthropic.com/api)
   <!-- * [Google AI](https://ai.google.dev/gemini-api/docs/api-key)-->
-* configure Github actions to run the workflow on issues and pull-requests. Also give write-access to the action runner.
+* configure Github actions to run the workflow on issues and pull-requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
 
 To trigger git-bob, you need to comment on an issue or pull-request with the following command:
 

@@ -56,6 +56,10 @@ Enter the key name `OPENAI_API_KEY` and paste the key into the value field.
 
 ![img_4.png](images/install/img_4.png)
 
+In the menu on the right, under Actions / General, give read and write permissions to the Workflows using the `GITHUB_TOKEN` and allow github actions to create and merge pull-requests.
+
+![img.png](images/install/img4a.png)
+
 ## Step 3 (optional):
 
 Go back to the OpenAI API website and set a limit for the API key. With this you can make sure that the usage does not spend to much money:
