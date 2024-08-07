@@ -62,11 +62,9 @@ Here's the recommended workflow for using git-bob:
 5. Wait for git-bob to create a second PR with the requested changes.
 6. Repeat steps 4-5 as necessary until the issue is resolved satisfactorily.
 
-For an example of this workflow in action, see [issue #128](https://github.com/haesleinhuepf/git-bob/issues/128).
+## Use-case examples
 
-### Use-case examples
-
-#### Solving github issues
+### Solving github issues
 
 `git-bob` can fix typos ([issue](https://github.com/haesleinhuepf/git-bob/issues/16), [pull-request](https://github.com/haesleinhuepf/git-bob/pull/17)):
 
@@ -76,12 +74,12 @@ For an example of this workflow in action, see [issue #128](https://github.com/h
 
 <a href="docs/images/demo_comment_code.png"><img src="docs/images/demo_comment_code.png" width="400"></a>
 
-#### Review Pull-Requests
+### Review Pull-Requests
 `git-bob` can review pull-requests and provide feedback ([pull-request](https://github.com/haesleinhuepf/git-bob/pull/11)):
 
 <a href="docs/images/demo_review_pull_request.png"><img src="docs/images/demo_review_pull_request.png" width="400"></a>
 
-#### General prompting
+### General prompting
 `git-bob` can also be exploited to answer questions ([issue](https://github.com/haesleinhuepf/git-bob/issues/20)).
 
 <a href="docs/images/demo_question.png"><img src="docs/images/demo_question.png" width="400"></a>
