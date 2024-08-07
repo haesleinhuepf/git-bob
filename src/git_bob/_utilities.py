@@ -4,25 +4,6 @@ from functools import lru_cache
 from functools import wraps
 from toolz import curry
 
-def remove_indentation(text):
-    """
-    Remove indentation from the given text.
-
-    Parameters
-    ----------
-    text : str
-        The input text with indentation.
-
-    Returns
-    -------
-    str
-        The text with indentation removed and stripped.
-    """
-    text = text.replace("\n    ", "\n")
-    if text.startswith("    "):
-        text = text[4:]
-    return text
-
 
 def remove_outer_markdown(text):
     """
@@ -102,20 +83,20 @@ def report_error(message):
     run_id = os.environ.get("GITHUB_RUN_ID")
     ai_remark = setup_ai_remark()
 
-    complete_error_message = remove_indentation(f"""
-    {ai_remark}
+    complete_error_message = f"""
+{ai_remark}
 
-    I'm sorry, I encountered an error while processing your request. Here is the error message:
+I'm sorry, I encountered an error while processing your request. Here is the error message:
 
-    {message}
+{message}
 
-    This is how far I came:
-    ```
-    {log}
-    ```
+This is how far I came:
+```
+{log}
+```
 
-    [More Details...](https://github.com/{repository}/actions/runs/{run_id})
-    """)
+[More Details...](https://github.com/{repository}/actions/runs/{run_id})
+"""
     add_comment_to_issue(repository, issue, complete_error_message)
 
 @curry

@@ -183,7 +183,6 @@ def get_github_issue_details(repository: str, issue: int) -> str:
     str
         A string containing detailed information about the issue.
     """
-    from ._utilities import remove_indentation
     Log().log(f"-> get_github_issue_details({repository}, {issue})")
 
     repo = get_github_repository(repository)
@@ -192,17 +191,19 @@ def get_github_issue_details(repository: str, issue: int) -> str:
     issue = repo.get_issue(number=issue)
 
     # Format issue details
-    content = remove_indentation(f"""Issue #{issue.number}: {issue.title}
-    State: {issue.state}
-    Created at: {issue.created_at}
-    Updated at: {issue.updated_at}
-    Closed at: {issue.closed_at}
-    Author: {issue.user.login}
-    Assignees: {', '.join([assignee.login for assignee in issue.assignees])}
-    Labels: {', '.join([label.name for label in issue.labels])}
-    Comments: {issue.comments}
-    Body:
-    {issue.body}""")
+    content = f"""
+Issue #{issue.number}: {issue.title}
+State: {issue.state}
+Created at: {issue.created_at}
+Updated at: {issue.updated_at}
+Closed at: {issue.closed_at}
+Author: {issue.user.login}
+Assignees: {', '.join([assignee.login for assignee in issue.assignees])}
+Labels: {', '.join([label.name for label in issue.labels])}
+Comments: {issue.comments}
+Body:
+{issue.body}
+"""
 
     # Add comments if any
     if issue.comments > 0:
@@ -473,7 +474,6 @@ def check_access_and_ask_for_approval(user, repository, issue):
     # Check if the user is a repository member
     Log().log(f"-> check_access_and_ask_for_approval({user}, {repository}, {issue})")
 
-    from ._utilities import remove_indentation
     from ._ai_github_utilities import setup_ai_remark
 
     repo = get_github_repository(repository)
@@ -483,16 +483,17 @@ def check_access_and_ask_for_approval(user, repository, issue):
     if user not in members:
         print("User does not have access rights.")
         member_names = ", ".join(["@" + str(m) for m in members])
-        add_comment_to_issue(repository, issue, remove_indentation(remove_indentation(f"""{remark}
+        add_comment_to_issue(repository, issue,f"""
+{remark}
 
-        Hi @{user}, 
+Hi @{user}, 
 
-        thanks for reaching out! Unfortunately, I'm not allowed to respond to you directly. 
-        I need approval from a repository member: {member_names}
+thanks for reaching out! Unfortunately, I'm not allowed to respond to you directly. 
+I need approval from a repository member: {member_names}
 
-        Best,
-        git-bob
-        """)))
+Best,
+git-bob
+""")
         return False
     return True
 
