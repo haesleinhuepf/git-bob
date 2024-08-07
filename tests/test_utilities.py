@@ -25,3 +25,7 @@ def test_split_content_and_summary():
 
     assert content.strip() == "blabla"
     assert summary == "summary"
+    assert remove_indentation("    Line1\n    Line2") == "Line1\nLine2"
+    assert remove_indentation("    Line1\n        Line2") == "Line1\n    Line2"
+    assert remove_indentation("Line1\nLine2") == "Line1\nLine2"
+    assert remove_indentation("    Line1\nLine2") == "    Line1\nLine2"

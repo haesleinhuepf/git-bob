@@ -18,9 +18,9 @@ def remove_indentation(text):
     str
         The text with indentation removed and stripped.
     """
-    text = text.replace("\n    ", "\n")
-    if text.startswith("    "):
-        text = text[4:]
+    lines = text.split('\n')
+    if all(line.startswith('    ') for line in lines if line):
+        text = '\n'.join(line[4:] for line in lines)
     return text
 
 
