@@ -616,3 +616,25 @@ def get_diff_of_branches(repository, compare_branch, base_branch="main"):
         else:
             output.append("No diff available (possibly a binary file)")
     return "\n".join(output)
+
+@catch_error
+def ensure_changes_to_create_pr(repository, branch_name):
+    """
+    Ensures there are changes between the given branch and the main branch to proceed with PR creation.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    branch_name : str
+        The branch name to check differences against the main branch.
+
+    Returns
+    -------
+    bool
+        True if there are changes, False otherwise.
+    """
+    Log().log(f"-> ensure_changes_to_create_pr({repository}, {branch_name})")
+
+    diff = get_diff_of_branches(repository, branch_name, base_branch="main")
+    return bool(diff.strip())
