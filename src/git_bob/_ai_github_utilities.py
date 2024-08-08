@@ -325,7 +325,7 @@ Respond with the filenames as JSON list.
     commit_messages = []
     for filename in filenames:
         if filename.startswith(".github/workflows"):
-            errors.append(f"Error processing {filename}: Modifying workflow files is not allowed."")
+            errors.append(f"Error processing {filename}: Modifying workflow files is not allowed.")
             # skip github workflows
             continue
         try:
