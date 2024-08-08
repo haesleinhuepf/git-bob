@@ -11,12 +11,10 @@ def command_line_interface():
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue
     from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini
     from ._github_utilities import check_access_and_ask_for_approval, add_reaction_to_last_comment_in_issue
-    from ._utilities import get_llm_name, report_error, ErrorReporting
+    from ._utilities import get_llm_name, quick_first_response
     from ._logger import Log
 
     print("Hello")
-
-    ErrorReporting.status = True
 
     # read environment variables
     timeout_in_seconds = os.environ.get("TIMEOUT_IN_SECONDS", 300) # 5 minutes
@@ -73,15 +71,7 @@ def command_line_interface():
         if not check_access_and_ask_for_approval(user, repository, issue):
             sys.exit(1)
 
-    # add reaction to issue to show that we're working on it; if this fails, we do not fail due to the error, because it's not critical
-    ErrorReporting.status = False
-    try:
-        add_reaction_to_last_comment_in_issue(repository, issue, "+1")
-    except:
-        print("Error: Could not add reaction to issue.")
-        pass
-    ErrorReporting.status = True
-
+    quick_first_response()
 
     # execute the task
     if task == "review-pull-request":
