@@ -194,6 +194,15 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
                 if cell['cell_type'] == 'code':
                     cell['outputs'] = []
                     cell['execution_count'] = None
+            # Adding an exercise cell for students to implement what they have learned
+            notebook['cells'].append({
+                "cell_type": "markdown",
+                "metadata": {},
+                "source": [
+                    "## Exercise\n",
+                    "Implement the concepts you have learned in the notebook."
+                ]
+            })
             file_content = json.dumps(notebook, indent=1)
         file_content_instruction = f"""
 Modify the file "{filename}" to solve the issue #{issue}.
