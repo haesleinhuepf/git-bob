@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - "\d+\.\d+\.\d+" # Push events to matching, i.e. v1.0, v20.15.10
+      - "*.*.*" # Push events to matching, i.e. v1.0.1, v20.15.10
 
 jobs:
   validate-version:
