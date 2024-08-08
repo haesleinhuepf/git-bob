@@ -58,9 +58,9 @@ class ErrorReporting:
     status = False
 
 
-def report_error(message):
+def quick_first_response():
     """
-    Report an error by adding a comment to the GitHub issue.
+    Response to a comment to the GitHub issue just mentioning that we're on it.
 
     Parameters
     ----------
@@ -70,67 +70,22 @@ def report_error(message):
     import sys
     import os
     from ._ai_github_utilities import setup_ai_remark
-    from ._github_utilities import add_comment_to_issue
-    from ._logger import Log
-
-    if not ErrorReporting.status:
-        return
-
-    log = "\n".join(Log().get())
+    from ._github_utilities import add_comment_to_issue, add_reaction_to_last_comment_in_issue
 
     repository = sys.argv[2] if len(sys.argv) > 2 else None
     issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
     run_id = os.environ.get("GITHUB_RUN_ID")
     ai_remark = setup_ai_remark()
 
-    complete_error_message = f"""
+    # add reaction to issue
+    add_reaction_to_last_comment_in_issue(repository, issue, "+1")
+
+    message = f"""
 {ai_remark}
 
-I'm sorry, I encountered an error while processing your request. Here is the error message:
-
-{message}
-
-This is how far I came:
-```
-{log}
-```
-
-[More Details...](https://github.com/{repository}/actions/runs/{run_id})
+I'm on it! [Read Details...](https://github.com/{repository}/actions/runs/{run_id})
 """
-    before = ErrorReporting.status
-    ErrorReporting.status = False
-    add_comment_to_issue(repository, issue, complete_error_message)
-    ErrorReporting.status = before
-
-
-@curry
-def catch_error(func):
-    """
-    Decorator to catch and report errors in functions.
-
-    Parameters
-    ----------
-    func : callable
-        The function to be decorated.
-
-    Returns
-    -------
-    callable
-        The decorated function.
-    """
-    @wraps(func)
-    def worker_function(*args, **kwargs):
-        if ErrorReporting.status:
-            try:
-                return func(*args, **kwargs)
-            except Exception as e:
-                name = func.__name__
-                print(f"Error in {name}: {str(e)}")
-                report_error(f"Error in {name}: {str(e)}")
-                raise e
-        else:
-            return func(*args, **kwargs)
-    return worker_function
+    add_comment_to_issue(repository, issue, message)
 
 
 def split_content_and_summary(text):
