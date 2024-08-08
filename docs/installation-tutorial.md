@@ -16,7 +16,7 @@ pip install -e .
 by this one:
 
 ```
-pip install git-bob==0.1.0
+pip install git-bob==0.2.2
 ```
 
 You can see the full [git commit here](https://github.com/haesleinhuepf/stackview/commit/a5542352b2f2dd7e2cfbff32280ae8cec0015458).
