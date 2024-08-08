@@ -118,3 +118,22 @@ def split_content_and_summary(text):
     new_content = remove_outer_markdown("\n".join(remaining_content))
 
     return new_content.strip(), summary.strip()
+
+
+def erase_outputs_of_code_cells(file_content):
+    """
+    Erase outputs of code cells in a Jupyter notebook.
+
+    Parameters
+    ----------
+    notebook : str
+        The notebook content as a string.
+    """
+    import json
+    notebook = json.loads(file_content)
+    for cell in notebook.get('cells', []):
+        if cell.get('cell_type') == 'code':
+            cell['outputs'] = []
+            cell['execution_count'] = None
+    file_content = json.dumps(notebook, indent=1)
+    return file_content

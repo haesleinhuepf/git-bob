@@ -174,10 +174,12 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         The name of the branch to create or modify the file in.
     issue_summary : str
         The summary of the issue to solve.
+    prompt_function : function
+        The function to generate the file modification content.
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
     from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, check_if_file_exists, get_file_in_repository
-    from ._utilities import remove_outer_markdown, split_content_and_summary
+    from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells
 
     original_ipynb_file_content = None
 
@@ -187,12 +189,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         if filename.endswith('.ipynb'):
             print("Removing outputs from ipynb file")
             original_ipynb_file_content = file_content
-            notebook = json.loads(file_content)
-            for cell in notebook['cells']:
-                if cell['cell_type'] == 'code':
-                    cell['outputs'] = []
-                    cell['execution_count'] = None
-            file_content = json.dumps(notebook, indent=1)
+            file_content = erase_outputs_of_code_cells(file_content)
         file_content_instruction = f"""
 Modify the file "{filename}" to solve the issue #{issue}.
 Keep your modifications absolutely minimal.
@@ -253,8 +250,11 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
             else: # if code is different, any future results may be different, too
                 print("codes no longer match")
                 break
-
         new_content = json.dumps(new_notebook, indent=1)
+
+    elif filename.endswith('.ipynb'):
+        print("Erasing outputs in generated ipynb file")
+        new_content = erase_outputs_of_code_cells(new_content)
     print("New file content", new_content)
     print("Summary", commit_message)
 
