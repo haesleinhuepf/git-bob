@@ -10,14 +10,14 @@ def test_get_conversation_on_issue():
     from git_bob._github_utilities import get_conversation_on_issue
     conversation = get_conversation_on_issue("haesleinhuepf/git-bob", 20)
 
-    assert "What is the captial of France?" in conversation
+    assert "What is the capital of France?" in conversation
     assert "France" in conversation
 
 def test_get_most_recent_comment_on_issue():
     from git_bob._github_utilities import get_most_recent_comment_on_issue
     user, comment = get_most_recent_comment_on_issue("haesleinhuepf/git-bob", 20)
 
-    assert "What is the captial of France?" not in comment
+    assert "What is the capital of France?" not in comment
     assert "France" in comment
 
 def test_list_issues():
