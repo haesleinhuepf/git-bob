@@ -136,6 +136,7 @@ There are similar projects out there
 * [OpenDevin](https://github.com/OpenDevin/OpenDevin)
 * [Devika](https://github.com/stitionai/devika)
 * [GPT-Codemaster](https://github.com/dex3r/GPT-Codemaster)
+* [Github Copilot Workspace](https://githubnext.com/projects/copilot-workspace)
 
 ## Contributing
 
