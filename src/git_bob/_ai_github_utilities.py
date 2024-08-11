@@ -41,24 +41,57 @@ def comment_on_issue(repository, issue, prompt_function):
         The function to generate the comment.
     """
     Log().log(f"-> comment_on_issue({repository}, {issue})")
-    from ._github_utilities import get_conversation_on_issue, add_comment_to_issue
+    from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, list_repository_files, get_repository_file_contents
+    from ._utilities import text_to_json, modify_discussion
 
     ai_remark = setup_ai_remark()
 
-    discussion = get_conversation_on_issue(repository, issue)
+    discussion = modify_discussion(get_conversation_on_issue(repository, issue))
     print("Discussion:", discussion)
+
+    all_files = "* " + "\n* ".join(list_repository_files(repository))
+
+    relevant_files = prompt_function(f"""
+{SYSTEM_PROMPT}
+Decide what to do to respond to a github issue. The entire issue discussion is given and a list of all files in the repository.
+
+## Discussion of the issue #{issue}
+
+{discussion}
+
+## All files in the repository
+
+{all_files}
+
+## Your task
+Which of these files are necessary to read for solving the issue #{issue} ? Keep the list short.
+Returning an empty list is also a valid answer.
+Respond with the filenames as JSON list.
+""")
+    filenames = text_to_json(relevant_files)
+
+    file_content_dict = get_repository_file_contents(repository, filenames)
+
+    temp = []
+    for k, v in file_content_dict.items():
+        temp = temp + [f"### File {k} content\n\n```\n{v}\n```\n"]
+    relevant_files_contents = "\n".join(temp)
 
     comment = prompt_function(f"""
 {SYSTEM_PROMPT}
-Respond to a github issue. Its entire discussion is given.
+Respond to a github issue. Its entire discussion is given and additionally, content of some relevant files.
 
 ## Discussion
 
 {discussion}
 
+## Relevant files
+
+{relevant_files_contents}
+
 ## Your task
 
-Respond to the discussion above. 
+Respond to the discussion above.
 Do NOT explain your response or anything else. 
 Just respond to the discussion.
 """)
@@ -87,10 +120,11 @@ def review_pull_request(repository, issue, prompt_function):
     """
     Log().log(f"-> review_pull_request({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, get_diff_of_pull_request
+    from ._utilities import modify_discussion
 
     ai_remark = setup_ai_remark()
 
-    discussion = get_conversation_on_issue(repository, issue)
+    discussion = modify_discussion(get_conversation_on_issue(repository, issue))
     print("Discussion:", discussion)
 
     file_changes = get_diff_of_pull_request(repository, issue)
@@ -280,41 +314,32 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
 
     Log().log(f"-> solve_github_issue({repository}, {issue})")
 
-    from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, get_diff_of_branches
-    from ._utilities import remove_outer_markdown, split_content_and_summary
-    import json
+    from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, get_diff_of_branches, get_conversation_on_issue
+    from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion
 
-    ai_remark = setup_ai_remark()
-
-    issue_summary = summarize_github_issue(repository, issue, prompt_function)
+    discussion = modify_discussion(get_conversation_on_issue(repository, issue))
+    print("Discussion:", discussion)
 
     all_files = "* " + "\n* ".join(list_repository_files(repository))
 
     relevant_files = remove_outer_markdown(prompt_function(f"""
 Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files are relevant to solve the issue.
 
-## Files in the repository
+## Github Issue #{issue} Discussion
+
+{discussion}
+
+## All files in the repository
 
 {all_files}
 
-## Github Issue #{issue} Summary
-
-{issue_summary}
-
 ## Your task
-Which of these files are relevant for issue #{issue} ? Keep the list short.
+Decide which of these files need to be modified to solve #{issue} ? Keep the list short.
 You can also consider files which do not exist yet. 
 Respond with the filenames as JSON list.
 """))
 
-    if "[" in relevant_files:
-        relevant_files = "[" +  relevant_files.split("[")[1]
-    if "]" in relevant_files:
-        relevant_files = relevant_files.split("]")[0] + "]"
-
-    print("JSON relevant filenames:", relevant_files)
-
-    filenames = json.loads(relevant_files)
+    filenames = text_to_json(relevant_files)
 
     # create a new branch
     branch_name = create_branch(repository)
@@ -329,7 +354,7 @@ Respond with the filenames as JSON list.
             # skip github workflows
             continue
         try:
-            message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, issue_summary, prompt_function)
+            message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion, prompt_function)
             commit_messages.append(message)
         except Exception as e:
             errors.append(f"Error processing {filename}: " + str(e))
@@ -337,6 +362,8 @@ Respond with the filenames as JSON list.
     error_messages = ""
     if len(errors) > 0:
         error_messages = "## Error messages\n\nDuring solving this issue, the following errors occurred:\n\n* " + "\n* ".join(errors) + "\n"
+
+    print(error_messages)
 
     # get a diff of all changes
     diffs_prompt = get_diff_of_branches(repository, branch_name)
@@ -348,9 +375,9 @@ Respond with the filenames as JSON list.
 Given a list of commit messages and a git diff, summarize the changes you made in the files.
 You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
 
-## Issue Summary
+## Github Issue #{issue} Discussion
 
-{issue_summary}
+{discussion}
 
 ## Commit messages
 You committed these changes to these files
