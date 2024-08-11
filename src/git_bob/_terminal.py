@@ -58,7 +58,9 @@ def command_line_interface():
     # handle aliases
     text = text.replace("git-bob respond", "git-bob comment")
     text = text.replace("git-bob review", "git-bob comment")
-    
+    text = text.replace("git-bob think about", "git-bob comment")
+    text = text.replace("git-bob implement", "git-bob solve")
+
     if running_in_github_ci:
         if not ("git-bob comment" in text or "git-bob solve" in text):
             print("They didn't speak to me. I show myself out.")
@@ -79,6 +81,8 @@ def command_line_interface():
         solve_github_issue(repository, issue, llm_name, prompt)
     elif task == "comment-on-issue" and ("git-bob comment" in text or not running_in_github_ci):
         comment_on_issue(repository, issue, prompt)
+    else:
+        raise NotImplementedError("Unknown task. I show myself out.")
 
     print("Done. Summary:")
     print("* " + "\n* ".join(Log().get()))

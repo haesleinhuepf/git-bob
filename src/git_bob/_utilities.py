@@ -80,13 +80,6 @@ def quick_first_response():
     # add reaction to issue
     add_reaction_to_last_comment_in_issue(repository, issue, "+1")
 
-    message = f"""
-{ai_remark}
-
-I'm on it! [Read Details...](https://github.com/{repository}/actions/runs/{run_id})
-"""
-    add_comment_to_issue(repository, issue, message)
-
 
 def split_content_and_summary(text):
     """
@@ -137,3 +130,23 @@ def erase_outputs_of_code_cells(file_content):
             cell['execution_count'] = None
     file_content = json.dumps(notebook, indent=1)
     return file_content
+
+
+def text_to_json(text):
+    """Converts a string, e.g. a response from an LLM, to a valid JSON object."""
+    import json
+    if "[" in text:
+        text = "[" +  text.split("[")[1]
+    if "]" in text:
+        text = text.split("]")[0] + "]"
+
+    print("JSON?:", text)
+
+    return json.loads(text)
+
+
+def modify_discussion(discussion):
+    import re
+    discussion = discussion.replace("\n#", "\n###")
+    return re.sub(r'<sup>.*?</sup>', '', discussion)
+

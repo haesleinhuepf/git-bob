@@ -56,11 +56,13 @@ git-bob solve
 Here's the recommended workflow for using git-bob:
 
 1. Create an issue describing the problem or task.
-2. Comment on the issue with `git-bob solve` to trigger git-bob.
-3. Wait for git-bob to create a pull request (PR) addressing the issue.
-4. Review the PR and comment on the issue if changes are needed.
-5. Wait for git-bob to create a second PR with the requested changes.
-6. Repeat steps 4-5 as necessary until the issue is resolved satisfactorily.
+2. Comment on the issue with `git-bob comment` to trigger git-bob making a plan.
+3. Respond to git-bob with any clarifications or additional information it requests.
+4. Comment on the issue with `git-bob solve` to trigger git-bob.
+5. Wait for git-bob to create a pull request (PR) addressing the issue.
+6. Review the PR and comment on the issue if changes are needed.
+7. Wait for git-bob to create a second PR with the requested changes.
+8. Repeat steps 3-5 as necessary until the issue is resolved satisfactorily.
 
 ## Use-case examples
 
