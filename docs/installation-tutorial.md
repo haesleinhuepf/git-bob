@@ -3,9 +3,9 @@
 In this tutorial, we will install `git-bob` in the `stackview` repository to demonstrate all steps necessary for this.
 Afterwards, `git-bob` can use AI to help developing `stackview`.
 
-## Step 1: github workflows.
+## Step 1: GitHub Workflows.
 
-The first step is to copy over the github workflows from the `git-bob` repository to the `stackview` repository.
+The first step is to copy over the GitHub workflows from the `git-bob` repository to the `stackview` repository.
 It is recommended to do this change on a git-branch. We can then test this, before we submit the changes.
 We only adapt one thing, we replace this line:
 
@@ -23,9 +23,9 @@ You can see the full [git commit here](https://github.com/haesleinhuepf/stackvie
 
 ## Step 2: Creating an OpenAI API Key
 
-We navigate to the [openai API website](https://openai.com/index/openai-api/) and log in.
+We navigate to the [OpenAI API website](https://openai.com/index/openai-api/) and log in.
 
-You find the [API Key page](https://platform.openai.com/api-keys) by clicking on `Dashbord` and `API Keys`.
+You find the [API Key page](https://platform.openai.com/api-keys) by clicking on `Dashboard` and `API Keys`.
 
 ![img.png](images/install/img.png)
 
@@ -37,7 +37,7 @@ Copy the key from this text field:
 
 ![img_2.png](images/install/img_2.png)
 
-And navigate to the repository on github 
+And navigate to the repository on GitHub 
 
 ```
 https://github.com/<GITHUB ORGANIZATION>/<REPOSITORY>/settings/secrets/actions
@@ -56,13 +56,13 @@ Enter the key name `OPENAI_API_KEY` and paste the key into the value field.
 
 ![img_4.png](images/install/img_4.png)
 
-In the menu on the right, under Actions / General, give read and write permissions to the Workflows using the `GITHUB_TOKEN` and allow github actions to create and merge pull-requests.
+In the menu on the right, under Actions / General, give read and write permissions to the workflows using the `GITHUB_TOKEN` and allow GitHub actions to create and merge pull-requests.
 
 ![img.png](images/install/img4a.png)
 
 ## Step 3 (optional):
 
-Go back to the OpenAI API website and set a limit for the API key. With this you can make sure that the usage does not spend to much money:
+Go back to the OpenAI API website and set a limit for the API key. With this you can make sure that the usage does not spend too much money:
 
 ![img_5.png](images/install/img_5.png)
 
@@ -70,7 +70,7 @@ Go back to the OpenAI API website and set a limit for the API key. With this you
 
 ## Step 4: Testing the installation
 
-Next, we navigate to the github repository and submit our changes as pull-request.
+Next, we navigate to the GitHub repository and submit our changes as pull-request.
 
 ![img_7.png](images/install/img_7.png)
 
@@ -78,7 +78,7 @@ In this pull-request, enter `git-bob comment` and it will review the pull-reques
 
 ![img_8.png](images/install/img_8.png)
 
-Wait a second and this box should appear indicating that the git-bob github action is running:
+Wait a second and this box should appear indicating that the git-bob GitHub action is running:
 
 ![img_9.png](images/install/img_9.png)
 
