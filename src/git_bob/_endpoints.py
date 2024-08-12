@@ -55,6 +55,34 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06"):
     return response.choices[0].message.content
 
 
+def prompt_blablador(message: str, model="blablador-alias-large"):
+    """A prompt helper function that sends a message to blablador
+    and returns only the text response.
+    """
+    # convert message in the right format if necessary
+    import os
+    import openai
+
+    if isinstance(message, str):
+        message = [{"role": "user", "content": message}]
+
+    if model.strip("blablador-"):
+        model = model.replace("blablador-", "")
+
+    # setup connection to the LLM
+    client = openai.OpenAI(base_url="https://helmholtz-blablador.fz-juelich.de:8000/v1", api_key=os.environ['BLABLADOR_API_KEY'])
+
+    # submit prompt
+    print("using model: ", model)
+    response = client.chat.completions.create(
+        model=model,
+        messages=message,
+    )
+
+    # extract answer
+    return response.choices[0].message.content
+
+
 def prompt_gemini(request, model="gemini-1.5-flash-001"):
     """Send a prompt to Google Gemini and return the response"""
     from google import generativeai as genai

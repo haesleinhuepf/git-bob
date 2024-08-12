@@ -4,7 +4,7 @@ git-bob uses AI to solve Github-issues and review pull-requests. It runs inside 
 
 ![demo_fix_typos.png](docs/images/banner.png)
 
-Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api) or [OpenAI's chatGPT](https://openai.com/blog/openai-api) <!--or [Google's Gemini](https://blog.google/technology/ai/google-gemini-ai/)--> to understand the text and 
+Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api), [OpenAI's chatGPT](https://openai.com/blog/openai-api) or [Helmholtz' blablador](https://helmholtz-blablador.fz-juelich.de/) <!--or [Google's Gemini](https://blog.google/technology/ai/google-gemini-ai/)--> to understand the text and 
 [pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull-requests.
 
 ## Disclaimer
@@ -31,8 +31,9 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
   * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These were tested:
 * `claude-3-5-sonnet-20240620`
 * `gpt-4o-2024-08-06` (recommended if you work with large files, < 16k tokens)
+* `blablador-alias-large`
 <!--* `gemini-1.5-flash-001`-->
-* configure a Github secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` <!--or `GOOGLE_API_KEY`--> with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
+* configure a Github secret called `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` or `BLABLADOR_API_KEY` <!--or `GOOGLE_API_KEY`--> with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
   * [OpenAI (gpt)](https://openai.com/blog/openai-api)
   * [Anthropic (claude)](https://www.anthropic.com/api)
   <!-- * [Google AI](https://ai.google.dev/gemini-api/docs/api-key)-->
