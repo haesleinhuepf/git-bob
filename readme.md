@@ -137,6 +137,7 @@ There are similar projects out there
 * [Devika](https://github.com/stitionai/devika)
 * [GPT-Codemaster](https://github.com/dex3r/GPT-Codemaster)
 * [Github Copilot Workspace](https://githubnext.com/projects/copilot-workspace)
+* [agentless](https://github.com/OpenAutoCoder/Agentless)
 
 ## Contributing
 
