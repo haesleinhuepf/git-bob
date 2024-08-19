@@ -327,7 +327,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
     from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, \
         write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, \
         get_diff_of_branches, get_conversation_on_issue, rename_file_in_repository, delete_file_from_repository, \
-        copy_file_in_repository  # added copy_file_in_repository
+        copy_file_in_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion
 
     discussion = modify_discussion(get_conversation_on_issue(repository, issue))
@@ -352,7 +352,7 @@ Response format:
 - For modifications: {{'action': 'modify', 'filename': '...'}}
 - For creations: {{'action': 'create', 'filename': '...'}}
 - For renames: {{'action': 'rename', 'old_filename': '...', 'new_filename': '...'}}
-- For copies: {{'action': 'rename', 'old_filename': '...', 'new_filename': '...'}}
+- For copies: {{'action': 'copy', 'old_filename': '...', 'new_filename': '...'}}
 - For deletions: {{'action': 'delete', 'filename': '...'}}
 Respond with the actions as JSON list.
 """)
