@@ -6,3 +6,6 @@ def faculty(number):
 
 for i in range(10):
     print("The faculty of", i, "is", faculty(i))
+
+import shutil
+shutil.copyfile('playground/test.py', 'playground/test4.py')
