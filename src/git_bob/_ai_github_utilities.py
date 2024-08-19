@@ -347,11 +347,12 @@ Given a list of files in the repository {repository} and a github issues descrip
 {all_files}
 
 ## Your task
-Decide which of these files need to be modified, created, renamed or deleted to solve #{issue} ? Keep the list short.
+Decide which of these files need to be modified, created, renamed, copied or deleted to solve #{issue} ? Keep the list short.
 Response format:
 - For modifications: {{'action': 'modify', 'filename': '...'}}
 - For creations: {{'action': 'create', 'filename': '...'}}
 - For renames: {{'action': 'rename', 'old_filename': '...', 'new_filename': '...'}}
+- For copies: {{'action': 'rename', 'old_filename': '...', 'new_filename': '...'}}
 - For deletions: {{'action': 'delete', 'filename': '...'}}
 Respond with the actions as JSON list.
 """)
@@ -390,11 +391,11 @@ Respond with the actions as JSON list.
                 filename = instruction['filename']
                 delete_file_from_repository(repository, branch_name, filename)
                 commit_messages.append(f"Deleted {filename}.")
-            elif action == 'copy':  # handling the copy action
+            elif action == 'copy':
                 old_filename = instruction['old_filename']
                 new_filename = instruction['new_filename']
                 copy_file_in_repository(repository, branch_name, old_filename, new_filename)
-                commit_messages.append(f"Copied {src_filename} to {dest_filename}.")
+                commit_messages.append(f"Copied {old_filename} to {new_filename}.")
         except Exception as e:
             errors.append(f"Error processing {instruction}: " + str(e))
 
