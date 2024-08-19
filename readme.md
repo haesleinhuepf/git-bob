@@ -117,7 +117,7 @@ Available actions:
 At the moment, these limitations can be observed:
 * `git-bob` was tested for Python projects only (yet).
 * It sometimes halucinates, especially in code reviews. E.g. it [claimed](https://github.com/haesleinhuepf/git-bob/pull/70) to have tested code, which is certainly not true.
-* It cannot solve issues where changing long files is required, as the output of the LLMs is limited to 4096 tokens.
+* It cannot solve issues where changing long files is required, as the output of the LLMs is limited by a maximum number of tokens (e.g. 16k for `gpt-4o-2024-08-06`).
 * It cannot solve issues where running and testing the code is required. 
 * When changing multiple files, it may introduce conflicts between the files, as it does not know about the content of the other files.
 * It has only limited logic to control who is allowed to trigger it. 
@@ -125,7 +125,7 @@ At the moment, these limitations can be observed:
   If others send a pull-request, a repository member must allow the action to run manually.
 * `git-bob` is incompatible with locally running open-source/-weight LLMs. 
   This might make sense when being executed locally only. In the Github-CI this might be impossible.
-* Recently tested `claude-3-5-sonnet-20240620` and `gpt-4o-2024-05-13` models produce useful results. The model `gemini-1.5-flash-001` is technically supported too, but its results were not very useful.
+* Recently tested `claude-3-5-sonnet-20240620` and `gpt-4o-2024-08-06` models produce useful results. The model `gemini-1.5-flash-001` is technically supported too, but its results were not very useful.
 
 ## Similar projects
 
