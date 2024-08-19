@@ -391,9 +391,9 @@ Respond with the actions as JSON list.
                 delete_file_from_repository(repository, branch_name, filename)
                 commit_messages.append(f"Deleted {filename}.")
             elif action == 'copy':  # handling the copy action
-                src_filename = instruction['src_filename']
-                dest_filename = instruction['dest_filename']
-                copy_file_in_repository(repository, branch_name, src_filename, dest_filename)
+                old_filename = instruction['old_filename']
+                new_filename = instruction['new_filename']
+                copy_file_in_repository(repository, branch_name, old_filename, new_filename)
                 commit_messages.append(f"Copied {src_filename} to {dest_filename}.")
         except Exception as e:
             errors.append(f"Error processing {instruction}: " + str(e))
