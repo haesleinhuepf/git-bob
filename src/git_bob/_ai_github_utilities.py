@@ -12,6 +12,7 @@ Do not claim anything that you don't know.
 In case you are asked to review code, you focus on the quality of the code. 
 """
 
+
 def setup_ai_remark():
     """
     Set up the AI remark for comments.
@@ -41,7 +42,8 @@ def comment_on_issue(repository, issue, prompt_function):
         The function to generate the comment.
     """
     Log().log(f"-> comment_on_issue({repository}, {issue})")
-    from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, list_repository_files, get_repository_file_contents
+    from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, list_repository_files, \
+        get_repository_file_contents
     from ._utilities import text_to_json, modify_discussion
 
     ai_remark = setup_ai_remark()
@@ -212,7 +214,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         The function to generate the file modification content.
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
-    from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, check_if_file_exists, get_file_in_repository
+    from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, \
+        check_if_file_exists, get_file_in_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells
 
     original_ipynb_file_content = None
@@ -239,8 +242,14 @@ Keep your modifications absolutely minimal.
 """
     else:
         print(filename, "will be created")
+        format_specific_instructions = ""
+        if filename.endswith('.py'):
+            format_specific_instructions = " When writing new functions, use numpy-style docstrings."
+        elif filename.endswith('.ipynb'):
+            format_specific_instructions = " In the new notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell."
+
         file_content_instruction = f"""
-Create the file "{filename}" to solve the issue #{issue}.
+Create the file "{filename}" to solve the issue #{issue}.{format_specific_instructions}
 
 ## Your task
 Generate content for the file "{filename}" to solve the issue above.
@@ -281,7 +290,7 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
                 if "outputs" in o_cell.keys():
                     n_cell['outputs'] = o_cell['outputs']
                     n_cell['execution_count'] = o_cell['execution_count']
-            else: # if code is different, any future results may be different, too
+            else:  # if code is different, any future results may be different, too
                 print("codes no longer match")
                 break
         new_content = json.dumps(new_notebook, indent=1)
@@ -314,7 +323,9 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
 
     Log().log(f"-> solve_github_issue({repository}, {issue})")
 
-    from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, get_diff_of_branches, get_conversation_on_issue
+    from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, \
+        write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, \
+        get_diff_of_branches, get_conversation_on_issue, rename_file_in_repository, delete_file_from_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion
 
     discussion = modify_discussion(get_conversation_on_issue(repository, issue))
@@ -322,8 +333,8 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
 
     all_files = "* " + "\n* ".join(list_repository_files(repository))
 
-    relevant_files = remove_outer_markdown(prompt_function(f"""
-Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files are relevant to solve the issue.
+    modifications = prompt_function(f"""
+Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files need to be modified, renamed or deleted to solve the issue.
 
 ## Github Issue #{issue} Discussion
 
@@ -334,12 +345,16 @@ Given a list of files in the repository {repository} and a github issues descrip
 {all_files}
 
 ## Your task
-Decide which of these files need to be modified to solve #{issue} ? Keep the list short.
-You can also consider files which do not exist yet. 
-Respond with the filenames as JSON list.
-"""))
+Decide which of these files need to be modified, created, renamed or deleted to solve #{issue} ? Keep the list short.
+Response format:
+- For modifications: {{'action': 'modify', 'filename': '...'}}
+- For creations: {{'action': 'create', 'filename': '...'}}
+- For renames: {{'action': 'rename', 'old_filename': '...', 'new_filename': '...'}}
+- For deletions: {{'action': 'delete', 'filename': '...'}}
+Respond with the actions as JSON list.
+""")
 
-    filenames = text_to_json(relevant_files)
+    instructions = text_to_json(modifications)
 
     # create a new branch
     branch_name = create_branch(repository)
@@ -348,20 +363,38 @@ Respond with the filenames as JSON list.
 
     errors = []
     commit_messages = []
-    for filename in filenames:
-        if filename.startswith(".github/workflows"):
-            errors.append(f"Error processing {filename}: Modifying workflow files is not allowed.")
-            # skip github workflows
-            continue
+    for instruction in instructions:
+        action = instruction.get('action')
+
+        for filename_key in ["filename", "new_filename", "old_filename"]:
+            if filename_key in instruction.keys():
+                filename = instruction[filename_key]
+                if filename.startswith(".github/workflows"):
+                    errors.append(f"Error processing {filename}: Modifying workflow files is not allowed.")
+                    continue
+
         try:
-            message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion, prompt_function)
-            commit_messages.append(message)
+            if action == 'modify' or action == 'create':
+                filename = instruction['filename']
+                message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
+                                                                 prompt_function)
+                commit_messages.append(message)
+            elif action == 'rename':
+                old_filename = instruction['old_filename']
+                new_filename = instruction['new_filename']
+                rename_file_in_repository(repository, branch_name, old_filename, new_filename)
+                commit_messages.append(f"Renamed {old_filename} to {new_filename}.")
+            elif action == 'delete':
+                filename = instruction['filename']
+                delete_file_from_repository(repository, branch_name, filename)
+                commit_messages.append(f"Deleted {filename}.")
         except Exception as e:
-            errors.append(f"Error processing {filename}: " + str(e))
+            errors.append(f"Error processing {instruction}: " + str(e))
 
     error_messages = ""
     if len(errors) > 0:
-        error_messages = "## Error messages\n\nDuring solving this issue, the following errors occurred:\n\n* " + "\n* ".join(errors) + "\n"
+        error_messages = "## Error messages\n\nDuring solving this issue, the following errors occurred:\n\n* " + "\n* ".join(
+            errors) + "\n"
 
     print(error_messages)
 
@@ -399,4 +432,5 @@ Do not add headnline or any other formatting. Just respond with the paragraphe a
 
     pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
 
-    send_pull_request(repository, branch_name, pull_request_title, pull_request_description + "\n\ncloses #" + str(issue))
+    send_pull_request(repository, branch_name, pull_request_title,
+                      pull_request_description + "\n\ncloses #" + str(issue))
