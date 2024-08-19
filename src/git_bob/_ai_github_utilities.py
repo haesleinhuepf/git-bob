@@ -326,7 +326,8 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
 
     from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, \
         write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, \
-        get_diff_of_branches, get_conversation_on_issue, rename_file_in_repository, delete_file_from_repository
+        get_diff_of_branches, get_conversation_on_issue, rename_file_in_repository, delete_file_from_repository, \
+        copy_file_in_repository  # added copy_file_in_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion
 
     discussion = modify_discussion(get_conversation_on_issue(repository, issue))
@@ -389,6 +390,11 @@ Respond with the actions as JSON list.
                 filename = instruction['filename']
                 delete_file_from_repository(repository, branch_name, filename)
                 commit_messages.append(f"Deleted {filename}.")
+            elif action == 'copy':  # handling the copy action
+                src_filename = instruction['src_filename']
+                dest_filename = instruction['dest_filename']
+                copy_file_in_repository(repository, branch_name, src_filename, dest_filename)
+                commit_messages.append(f"Copied {src_filename} to {dest_filename}.")
         except Exception as e:
             errors.append(f"Error processing {instruction}: " + str(e))
 
