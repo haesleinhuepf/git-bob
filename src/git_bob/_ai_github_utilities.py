@@ -239,6 +239,7 @@ That's the file "{filename}" content you will find in the file:
 ## Your task
 Modify content of the file "{filename}" to solve the issue above.
 Keep your modifications absolutely minimal.
+Return the entire new file content, do not shorten it.
 """
     else:
         print(filename, "will be created")
@@ -246,7 +247,7 @@ Keep your modifications absolutely minimal.
         if filename.endswith('.py'):
             format_specific_instructions = " When writing new functions, use numpy-style docstrings."
         elif filename.endswith('.ipynb'):
-            format_specific_instructions = " In the new notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell."
+            format_specific_instructions = " In the new notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. By the end of the notebook add an Exercise markdown cell with a short exercise allowing the reader to recapitulate on what they just learned."
         file_content_instruction = f"""
 Create the file "{filename}" to solve the issue #{issue}.{format_specific_instructions}
 
