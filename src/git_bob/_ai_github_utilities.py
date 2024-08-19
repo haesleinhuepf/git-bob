@@ -94,6 +94,7 @@ Respond to a github issue. Its entire discussion is given and additionally, cont
 ## Your task
 
 Respond to the discussion above.
+In case code-changes are discussed, make a proposal of how new code could look like.
 Do NOT explain your response or anything else. 
 Just respond to the discussion.
 """)
