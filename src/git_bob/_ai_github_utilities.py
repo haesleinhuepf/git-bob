@@ -247,7 +247,6 @@ Keep your modifications absolutely minimal.
             format_specific_instructions = " When writing new functions, use numpy-style docstrings."
         elif filename.endswith('.ipynb'):
             format_specific_instructions = " In the new notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell."
-
         file_content_instruction = f"""
 Create the file "{filename}" to solve the issue #{issue}.{format_specific_instructions}
 
