@@ -1,3 +1,18 @@
+def test_create_or_modify_file_with_py_format():
+    from git_bob._ai_github_utilities import create_or_modify_file
+    # The function should handle Python file instructions properly
+    instructions = create_or_modify_file("example.py")
+    assert "numpy-style docstrings" in instructions
+
+
+def test_create_or_modify_file_with_ipynb_format():
+    from git_bob._ai_github_utilities import create_or_modify_file
+    # The function should handle Jupyter notebook file instructions properly
+    instructions = create_or_modify_file("example.ipynb")
+    assert "short code snippets" in instructions
+    assert "explanatory markdown cells" in instructions
+
+
 def test_get_github_repository():
     from git_bob._github_utilities import get_github_repository
     assert get_github_repository("haesleinhuepf/git-bob").name == "git-bob"
