@@ -4,3 +4,8 @@ def sum_of_squares(numbers):
 
 def print_sum_of_squares(numbers):
     print(f"Sum of squares of {numbers} is {sum_of_squares(numbers)}")
+
+
+def print_list_contents(lst):
+    for item in lst:
+        print(item)
