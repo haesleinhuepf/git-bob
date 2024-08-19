@@ -678,3 +678,35 @@ def delete_file_from_repository(repository, branch_name, file_path, commit_messa
 
     file = get_file_in_repository(repository, branch_name, file_path)
     repo.delete_file(file.path, commit_message, file.sha, branch=branch_name)
+
+def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_path, commit_message="Copy file"):
+    """
+    Copy a file in the specified GitHub repository on a given branch.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    branch_name : str
+        The name of the branch to copy the file in.
+    src_file_path : str
+        The source file path.
+    dest_file_path : str
+        The destination file path.
+    commit_message : str, optional
+        The commit message for the copy. Default is "Copy file".
+
+    Returns
+    -------
+    bool
+        True if the file was copied successfully, False otherwise.
+    """
+    Log().log(f"-> copy_file_in_repository({repository}, {branch_name}, {src_file_path}, {dest_file_path})")
+
+    # Authenticate with GitHub
+    repo = get_github_repository(repository)
+
+    file = get_file_in_repository(repository, branch_name, src_file_path)
+
+    # Create a new file with the old content at the new path
+    repo.create_file(dest_file_path, commit_message, file.decoded_content.decode(), branch=branch_name)
