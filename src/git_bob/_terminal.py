@@ -77,7 +77,7 @@ def command_line_interface():
     # execute the task
     if task == "review-pull-request":
         review_pull_request(repository, issue, prompt)
-    elif (not running_in_github_ci and task == "solve-issue") or (task == "comment-on-issue" and "git-bob solve" in text):
+    elif (not running_in_github_ci and task == "solve-issue") or (running_in_github_ci and task == "comment-on-issue" and "git-bob solve" in text):
         solve_github_issue(repository, issue, llm_name, prompt)
     elif task == "comment-on-issue" and ("git-bob comment" in text or not running_in_github_ci):
         comment_on_issue(repository, issue, prompt)
