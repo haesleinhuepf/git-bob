@@ -239,8 +239,14 @@ Keep your modifications absolutely minimal.
 """
     else:
         print(filename, "will be created")
+        format_specific_instructions = ""
+        if filename.endswith('.py'):
+            format_specific_instructions = " Instruct to use numpy-style docstrings in functions."
+        elif filename.endswith('.ipynb'):
+            format_specific_instructions = " Instruct that the notebook should have short code snippets in code cells and no long code blocks. Also, ask for explanatory markdown cells in front of every code cell."
+        
         file_content_instruction = f"""
-Create the file "{filename}" to solve the issue #{issue}.
+Create the file "{filename}" to solve the issue #{issue}.{format_specific_instructions}
 
 ## Your task
 Generate content for the file "{filename}" to solve the issue above.
