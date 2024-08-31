@@ -193,7 +193,7 @@ def modify_discussion(discussion):
         elif url_type == 'file':
             parts = url.split('/')
             repo = parts[3] + '/' + parts[4]
-            branch_name = parts[-3]
+            branch_name = parts[6]
             file_path = '/'.join(parts[7:])
             file_contents = get_file_in_repository (repo, branch_name, file_path).decoded_content.decode()
             if url.endswith('.ipynb'):
