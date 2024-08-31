@@ -44,3 +44,10 @@ def test_create_or_modify_file_ipynb():
     modified_notebook = json.loads(modified_content)
     assert modified_notebook["cells"][0]["outputs"] == []
     assert modified_notebook["cells"][0]["execution_count"] is None
+
+def test_modify_discussion():
+    from git_bob._utilities import modify_discussion
+    discussion = "Check this issue https://github.com/user/repo/issues/1 and this PR https://github.com/user/repo/pull/2"
+    modified_discussion = modify_discussion(discussion)
+    assert "issue" in modified_discussion
+    assert "pull_request" in modified_discussion
