@@ -411,6 +411,7 @@ def get_file_in_repository(repository, branch_name, file_path):
     github.ContentFile.ContentFile
         The content file object of the specified file.
     """
+    print(f"-> get_file_in_repository({repository}, {branch_name}, {file_path})")
     print("loading file content...", file_path)
     repo = get_github_repository(repository)
     return repo.get_contents(file_path, ref=branch_name)
@@ -710,3 +711,4 @@ def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_pa
 
     # Create a new file with the old content at the new path
     repo.create_file(dest_file_path, commit_message, file.decoded_content.decode(), branch=branch_name)
+

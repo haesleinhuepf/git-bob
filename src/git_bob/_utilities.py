@@ -145,8 +145,67 @@ def text_to_json(text):
     return json.loads(text)
 
 
+def is_github_url(url):
+    """
+    Check if the given URL is a GitHub URL and determine its type.
+    """
+    if not str(url).startswith('https://github.com'):
+        return None
+    if '/issues/' in url:
+        return 'issue'
+    elif '/pull/' in url:
+        return 'pull_request'
+    elif 'blob/' in url:
+        return 'file'
+    return None
+
+
 def modify_discussion(discussion):
     import re
-    discussion = discussion.replace("\n#", "\n###")
-    return re.sub(r'<sup>.*?</sup>', '', discussion)
+    from ._github_utilities import get_conversation_on_issue, get_diff_of_pull_request, get_file_in_repository
 
+    # Regex to find URLs in the discussion
+    url_pattern = r'(https?://[^\s]+)'
+    urls = re.findall(url_pattern, discussion)
+
+    # Placeholder for additional content extracted from URLs
+    additional_content = {}
+
+    # Process each URL based on its type
+    for url in urls:
+        url_type = is_github_url(url)
+
+        if "### File {url} content" in discussion:
+            continue
+
+        if url_type == 'issue':
+            parts = url.split('/')
+            repo = parts[3] + '/' + parts[4]
+            issue_number = int(parts[-1])
+            additional_content[url] = get_conversation_on_issue(repo, issue_number)
+        elif url_type == 'pull_request':
+            parts = url.split('/')
+            repo = parts[3] + '/' + parts[4]
+            pr_number = int(parts[-1])
+            # Get both the diff and discussion on pull request
+            additional_content[url] = (get_conversation_on_issue(repo, pr_number) +
+                                       get_diff_of_pull_request(repo, pr_number))
+        elif url_type == 'file':
+            parts = url.split('/')
+            repo = parts[3] + '/' + parts[4]
+            branch_name = parts[6]
+            file_path = '/'.join(parts[7:])
+            file_contents = get_file_in_repository (repo, branch_name, file_path).decoded_content.decode()
+            if url.endswith('.ipynb'):
+                file_contents = erase_outputs_of_code_cells(file_contents)
+            additional_content[url] = file_contents
+
+    # Modify the existing discussion content
+    discussion = discussion.replace("\n#", "\n###")
+    discussion = re.sub(r'<sup>.*?</sup>', '', discussion)
+
+    # Append the additional content to the discussion before returning
+    temp = []
+    for k, v in additional_content.items():
+        temp = temp + [f"### File {k} content\n\n```\n{v}\n```\n"]
+    return discussion + "\n\n" + "\n".join(temp)
