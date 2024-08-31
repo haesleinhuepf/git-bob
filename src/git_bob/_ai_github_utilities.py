@@ -443,3 +443,68 @@ Do not add headnline or any other formatting. Just respond with the paragraphe a
 
     send_pull_request(repository, branch_name, pull_request_title,
                       pull_request_description + "\n\ncloses #" + str(issue))
+
+
+def split_issue_in_sub_issues(repository, issue, sub_tasks):
+    """
+    Split a main issue into sub-issues for each sub-task.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The main issue number.
+    sub_tasks : list of dict
+        A list containing dictionaries with 'title' and 'body' keys for sub-tasks.
+
+    Returns
+    -------
+    list of int
+        A list of created sub-issue numbers.
+    """
+    Log().log(f"-> split_issue_in_sub_issues({repository}, {issue}, {sub_tasks})")
+    from ._github_utilities import create_issue, add_comment_to_issue
+    sub_issue_numbers = []
+
+    for sub_task in sub_tasks:
+        issue_number = create_issue(repository, sub_task["title"], sub_task["body"])
+        sub_issue_numbers.append(issue_number)
+    
+    # Create a comment on the main issue with the list of sub-issues
+    sub_issue_links = "\n".join([f"- #{num}" for num in sub_issue_numbers])
+    comment_text = f"Sub-issues have been created:\n{sub_issue_links}"
+
+    add_comment_to_issue(repository, issue, comment_text)
+
+    return sub_issue_numbers
+
+def extract_sub_tasks(discussion):
+    """
+    Extract sub-tasks from the discussion.
+
+    Parameters
+    ----------
+    discussion : str
+        The entire discussion of the issue.
+
+    Returns
+    -------
+    list of dict
+        A list containing dictionaries with 'title' and 'body' for each sub-task.
+    """
+    from ._utilities import text_to_json
+    # Implement the prompt to parse the discussion
+    sub_tasks_json = prompt_function(f"""
+{SYSTEM_PROMPT}
+You need to extract sub-tasks from a given discussion.
+Return a JSON list with each sub-task containing a 'title' and 'body'.
+
+#### Discussion
+{discussion}
+
+#### Your task
+Extract and return sub-tasks as a JSON list with 'title' and 'body' for each.
+""")
+
+    return text_to_json(sub_tasks_json)
