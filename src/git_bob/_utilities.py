@@ -147,6 +147,53 @@ def text_to_json(text):
 
 def modify_discussion(discussion):
     import re
-    discussion = discussion.replace("\n#", "\n###")
-    return re.sub(r'<sup>.*?</sup>', '', discussion)
+    from ._github_utilities import get_conversation_on_issue, get_diff_of_pull_request, get_repository_file_contents
 
+    # Regex to find URLs in the discussion
+    url_pattern = r'(https?://[^\s]+)'
+    urls = re.findall(url_pattern, discussion)
+
+    # Function to check if URL is a GitHub issue, pull request or file path
+    def is_github_url(url):
+        if 'github.com' not in url:
+            return None
+        if '/issues/' in url:
+            return 'issue'
+        elif '/pull/' in url:
+            return 'pull_request'
+        elif 'blob/' in url:
+            return 'file'
+        return None
+
+    # Placeholder for additional content extracted from URLs
+    additional_content = ""
+
+    # Process each URL based on its type
+    for url in urls:
+        url_type = is_github_url(url)
+        if url_type == 'issue':
+            parts = url.split('/')
+            repo = parts[3] + '/' + parts[4]
+            issue_number = int(parts[-1])
+            additional_content += get_conversation_on_issue(repo, issue_number)
+        elif url_type == 'pull_request':
+            parts = url.split('/')
+            repo = parts[3] + '/' + parts[4]
+            pr_number = int(parts[-1])
+            # Get both the diff and discussion on pull request
+            additional_content += get_conversation_on_issue(repo, pr_number)
+            additional_content += get_diff_of_pull_request(repo, pr_number)
+        elif url_type == 'file':
+            parts = url.split('/')
+            repo = parts[3] + '/' + parts[4]
+            branch_name = parts[-3]
+            file_path = '/'.join(parts[7:])
+            file_contents = get_repository_file_contents(repo, [file_path])
+            additional_content += file_contents.get(file_path, '')
+
+    # Modify the existing discussion content
+    discussion = discussion.replace("\n#", "\n###")
+    discussion = re.sub(r'<sup>.*?</sup>', '', discussion)
+
+    # Append the additional content to the discussion before returning
+    return discussion + "\n\n" + additional_content
