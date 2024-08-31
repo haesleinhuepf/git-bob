@@ -476,10 +476,8 @@ extract relevant information for one of the sub-tasks.
 
 ## Your task
 Extract relevant information for the sub-task "{title}".
-Write the information in a short paragraph. Assume this paragraph will be the body of a new issue.
-Hence, all necessary information should be included.
-Also add a paragraph with a first proposal of how to solve the sub-task.
-Do not explain your response or anything else. Just respond the two paragraphs about the sub-task and its potential solution.
+Write the information down and make a proposal of how to solve the sub-task.
+Do not explain your response or anything else. Just respond the relevant information for the sub-task and a potential solution.
 """)
         body = body.replace("git-bob", "git=bob") # prevent endless loops
 
