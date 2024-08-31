@@ -128,9 +128,39 @@ def erase_outputs_of_code_cells(file_content):
         if cell.get('cell_type') == 'code':
             cell['outputs'] = []
             cell['execution_count'] = None
+        cell['id'] = None
+
+    notebook["metadata"] = {}
+
     file_content = json.dumps(notebook, indent=1)
     return file_content
 
+
+def restore_outputs_of_code_cells(new_content, original_ipynb_file_content):
+    """
+    Restore outputs of code cells in a Jupyter notebook from another notebook.
+    """
+    import json
+    print("Recovering outputs in ipynb file")
+    original_notebook = json.loads(original_ipynb_file_content)
+    new_notebook = json.loads(new_content)
+
+    original_code_cells = [cell for cell in original_notebook['cells'] if cell['cell_type'] == 'code']
+    new_code_cells = [cell for cell in new_notebook['cells'] if cell['cell_type'] == 'code']
+
+    for o_cell, n_cell in zip(original_code_cells, new_code_cells):
+        if "\n".join(o_cell['source']).strip() == "\n".join(n_cell['source']).strip():
+            print("Original cell content", o_cell)
+            print("New cell content", n_cell)
+            if "outputs" in o_cell.keys():
+                n_cell['outputs'] = o_cell['outputs']
+                n_cell['execution_count'] = o_cell['execution_count']
+        else:  # if code is different, any future results may be different, too
+            print("codes no longer match")
+            break
+
+    new_notebook["metadata"] = original_notebook["metadata"]
+    return json.dumps(new_notebook, indent=1)
 
 def text_to_json(text):
     """Converts a string, e.g. a response from an LLM, to a valid JSON object."""
@@ -208,4 +238,5 @@ def modify_discussion(discussion):
     temp = []
     for k, v in additional_content.items():
         temp = temp + [f"### File {k} content\n\n```\n{v}\n```\n"]
+
     return discussion + "\n\n" + "\n".join(temp)
