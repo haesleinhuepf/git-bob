@@ -47,7 +47,14 @@ def test_create_or_modify_file_ipynb():
 
 def test_modify_discussion():
     from git_bob._utilities import modify_discussion
-    discussion = "Check this issue https://github.com/user/repo/issues/1 and this PR https://github.com/user/repo/pull/2"
+    discussion = """
+    Check this issue hhttps://github.com/haesleinhuepf/git-bob/pull/1 ,
+    this PR https://github.com/haesleinhuepf/git-bob/pull/3 ,
+    this file https://github.com/haesleinhuepf/bia-bob/blob/main/setup.cfg and
+    this website https://haesleinhuepf.github.io/ 
+    """
     modified_discussion = modify_discussion(discussion)
-    assert "issue" in modified_discussion
-    assert "pull_request" in modified_discussion
+    assert "Hi, this is a test!" in modified_discussion
+    assert "I have a question. What" in modified_discussion
+    assert "Bug Tracker = https://github.com/haesleinhuepf/bia-bob/issues" in modified_discussion
+    assert "Dr. rer. medic. Robert Haase" not in modified_discussion
