@@ -149,7 +149,7 @@ def is_github_url(url):
     """
     Check if the given URL is a GitHub URL and determine its type.
     """
-    if 'github.com' not in url:
+    if not str(url).startswith('https://github.com'):
         return None
     if '/issues/' in url:
         return 'issue'
