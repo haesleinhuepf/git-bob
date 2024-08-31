@@ -411,6 +411,7 @@ def get_file_in_repository(repository, branch_name, file_path):
     github.ContentFile.ContentFile
         The content file object of the specified file.
     """
+    print(f"-> get_file_in_repository({repository}, {branch_name}, {file_path})")
     print("loading file content...", file_path)
     repo = get_github_repository(repository)
     return repo.get_contents(file_path, ref=branch_name)
@@ -711,39 +712,3 @@ def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_pa
     # Create a new file with the old content at the new path
     repo.create_file(dest_file_path, commit_message, file.decoded_content.decode(), branch=branch_name)
 
-
-def get_pull_request_conversation(repository, pull_request):
-    """
-    Retrieve the entire conversation (title, body, and comments) of a specific GitHub pull request.
-
-    Parameters
-    ----------
-    repository : str
-        The full name of the GitHub repository (e.g., "username/repo-name").
-    pull_request : int
-        The pull request number to retrieve the conversation for.
-
-    Returns
-    -------
-    str
-        The conversation string containing the pull request title, body, and comments.
-    """
-    Log().log(f"-> get_pull_request_conversation({repository}, {pull_request})")
-
-    repo = get_github_repository(repository)
-
-    # Get the pull request by number
-    pr_obj = repo.get_pull(pull_request)
-
-    # Get the conversation as a string
-    conversation = f"Pull Request Title: {pr_obj.title}\n\n"
-    conversation += f"Pull Request Body:\n{pr_obj.body}\n\n"
-
-    # Get all comments on the pull request
-    comments = pr_obj.get_comments()
-
-    # Append each comment to the conversation string
-    for comment in comments:
-        conversation += f"Comment by {comment.user.login}:\n{comment.body}\n\n"
-
-    return conversation
