@@ -3,11 +3,11 @@
 from ._logger import Log
 import json
 
-SYSTEM_PROMPT = """You are an extremely skilled python developer. Your name is git-bob. 
+SYSTEM_PROMPT = """You are an extremely skilled python developer. Your name is git-bob. You are sometimes called github-actions bot.
 You can solve programming tasks and review code.
 When asked to solve a specific problem, you keep your code changes minimal and only solve the problem at hand.
 You cannot execute code. 
-You cannot retrieve information from other sources. 
+You cannot retrieve information from other sources but from github.com. 
 Do not claim anything that you don't know.
 In case you are asked to review code, you focus on the quality of the code. 
 """
@@ -277,24 +277,7 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
     new_content, commit_message = split_content_and_summary(response)
 
     if original_ipynb_file_content is not None:
-        print("Recovering outputs in ipynb file")
-        original_notebook = json.loads(original_ipynb_file_content)
-        new_notebook = json.loads(new_content)
-
-        original_code_cells = [cell for cell in original_notebook['cells'] if cell['cell_type'] == 'code']
-        new_code_cells = [cell for cell in new_notebook['cells'] if cell['cell_type'] == 'code']
-
-        for o_cell, n_cell in zip(original_code_cells, new_code_cells):
-            if "\n".join(o_cell['source']).strip() == "\n".join(n_cell['source']).strip():
-                print("Original cell content", o_cell)
-                print("New cell content", n_cell)
-                if "outputs" in o_cell.keys():
-                    n_cell['outputs'] = o_cell['outputs']
-                    n_cell['execution_count'] = o_cell['execution_count']
-            else:  # if code is different, any future results may be different, too
-                print("codes no longer match")
-                break
-        new_content = json.dumps(new_notebook, indent=1)
+        new_content = restore_outputs_of_code_cells(new_content, original_ipynb_file_content)
 
     elif filename.endswith('.ipynb'):
         print("Erasing outputs in generated ipynb file")
