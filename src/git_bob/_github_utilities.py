@@ -712,3 +712,30 @@ def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_pa
     # Create a new file with the old content at the new path
     repo.create_file(dest_file_path, commit_message, file.decoded_content.decode(), branch=branch_name)
 
+
+def create_issue(repository, title, body):
+    """
+    Create a new GitHub issue.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    title : str
+        The title of the GitHub issue.
+    body : str
+        The detailed description of the GitHub issue.
+
+    Returns
+    -------
+    int
+        The number of the created issue.
+    """
+    Log().log(f"-> create_issue({repository}, {title})")
+    repo = get_github_repository(repository)
+
+    # Create a new issue
+    issue_obj = repo.create_issue(title=title, body=body)
+
+    print(f"Issue created: #{issue_obj.number}")
+    return issue_obj.number

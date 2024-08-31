@@ -8,7 +8,7 @@ def command_line_interface():
     import signal
 
     from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
-    from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue
+    from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues
     from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini
     from ._github_utilities import check_access_and_ask_for_approval, add_reaction_to_last_comment_in_issue
     from ._utilities import get_llm_name, quick_first_response
@@ -79,6 +79,9 @@ def command_line_interface():
         review_pull_request(repository, issue, prompt)
     elif (not running_in_github_ci and task == "solve-issue") or (running_in_github_ci and task == "comment-on-issue" and "git-bob solve" in text):
         solve_github_issue(repository, issue, llm_name, prompt)
+    elif (task == "comment-on-issue" or task == "split-issue") and (
+            "git-bob split" in text or not running_in_github_ci):
+        split_issue_in_sub_issues(repository, issue, prompt)
     elif task == "comment-on-issue" and ("git-bob comment" in text or not running_in_github_ci):
         comment_on_issue(repository, issue, prompt)
     else:
