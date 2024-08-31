@@ -44,7 +44,13 @@ To trigger git-bob, you need to comment on an issue or pull-request with the fol
 git-bob comment
 ```
 
-When using openai/gpt-4-omni, you can also use the following command to trigger git-bob.
+If the issue is complex and should be split into sub-issues, you can use the following command:
+
+```
+git-bob split
+```
+
+You can also use the following command to trigger git-bob solving an issue.
 It will then try to solve the issue and send a pull-request.
 
 ```
@@ -56,9 +62,9 @@ git-bob solve
 Here's the recommended workflow for using git-bob:
 
 1. Create an issue describing the problem or task.
-2. Comment on the issue with `git-bob comment` to trigger git-bob making a plan.
+2. Comment on the issue with `git-bob comment`, or `git-bob think about this` (an alias for `comment`) to trigger git-bob making a plan.
 3. Respond to git-bob with any clarifications or additional information it requests.
-4. Comment on the issue with `git-bob solve` to trigger git-bob.
+4. Comment on the issue with `git-bob solve` or `git-bob implement this` (an alias for `solve`) to trigger git-bob.
 5. Wait for git-bob to create a pull request (PR) addressing the issue.
 6. Review the PR and comment on the issue if changes are needed.
 7. Wait for git-bob to create a second PR with the requested changes.
@@ -81,14 +87,15 @@ Here's the recommended workflow for using git-bob:
 
 <a href="docs/images/demo_review_pull_request.png"><img src="docs/images/demo_review_pull_request.png" width="400"></a>
 
+### Splitting Issues
+
+To split a main issue into sub-issues, ask `git-bob split this issue`.
+
 ### General prompting
 `git-bob` can also be exploited to answer questions ([issue](https://github.com/haesleinhuepf/git-bob/issues/20)).
 
 <a href="docs/images/demo_question.png"><img src="docs/images/demo_question.png" width="400"></a>
 
-## Splitting Issues
-
-To split a main issue into sub-issues, use the `split-issue` mode. The function will extract sub-tasks from the issue discussion and convert each into its own GitHub issue, organizing and managing tasks more effectively.
 
 ## Installation as command-line tool
 
@@ -113,6 +120,7 @@ Available actions:
 * `review-pull-request`
 * `comment-on-issue`
 * `solve-issue`
+* `split-issue`
 
 ## Limitations
 `git-bob` is a research project and has limitations. It serves as basis for discussion and further development. Once LLMs become better, `git-bob` will become better as well.
