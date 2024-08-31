@@ -86,6 +86,9 @@ Here's the recommended workflow for using git-bob:
 
 <a href="docs/images/demo_question.png"><img src="docs/images/demo_question.png" width="400"></a>
 
+## Splitting Issues
+
+To split a main issue into sub-issues, use the `split-issue` mode. The function will extract sub-tasks from the issue discussion and convert each into its own GitHub issue, organizing and managing tasks more effectively.
 
 ## Installation as command-line tool
 
@@ -143,7 +146,6 @@ There are similar projects out there
 
 Feedback and contributions are welcome! Just open an issue and let's discuss before you send a pull-request. 
 A [human](https://haesleinhuepf.github.io) will respond and comment on your ideas!
-
 
 ## Acknowledgements
 
