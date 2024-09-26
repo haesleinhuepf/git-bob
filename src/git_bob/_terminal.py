@@ -9,7 +9,7 @@ def command_line_interface():
 
     from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues
-    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini
+    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure
     from ._github_utilities import check_access_and_ask_for_approval, add_reaction_to_last_comment_in_issue
     from ._utilities import get_llm_name, quick_first_response
     from ._logger import Log
@@ -19,7 +19,9 @@ def command_line_interface():
     # read environment variables
     timeout_in_seconds = os.environ.get("TIMEOUT_IN_SECONDS", 300) # 5 minutes
     llm_name = get_llm_name()
-    if "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
+    if "github_models:" in llm_name and os.environ.get("GH_MODELS_API_KEY") is not None:
+        prompt = prompt_azure
+    elif "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
         prompt = prompt_claude
     elif "gpt" in llm_name and os.environ.get("OPENAI_API_KEY") is not None:
         prompt = prompt_chatgpt
