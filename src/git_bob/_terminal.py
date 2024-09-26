@@ -25,7 +25,7 @@ def command_line_interface():
         prompt = prompt_chatgpt
     elif "gemini" in llm_name and os.environ.get("GOOGLE_API_KEY") is not None:
         prompt = prompt_gemini
-    elif "github_models:" in llm_name and os.environ.get("GITHUB_TOKEN") is not None:
+    elif "github_models:" in llm_name and os.environ.get("GH_MODELS_API_KEY") is not None:
         prompt = prompt_azure
     else:
         raise NotImplementedError("Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs.")
