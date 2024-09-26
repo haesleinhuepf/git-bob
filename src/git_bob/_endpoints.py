@@ -64,3 +64,36 @@ def prompt_gemini(request, model="gemini-1.5-flash-001"):
     client = genai.GenerativeModel(model)
     result = client.generate_content(request)
     return result.text
+
+
+def prompt_azure(message: str, model="gpt-4o"):
+    """A prompt helper function that sends a message to Azure's OpenAI Service
+    and returns only the text response.
+    """
+    import os
+    from openai import OpenAI
+
+    # convert message in the right format if necessary
+    if isinstance(message, str):
+        message = [{"role": "user", "content": message}]
+
+    # setup connection to the LLM
+    token = os.environ["GITHUB_TOKEN"]
+    endpoint = "https://models.inference.ai.azure.com"
+
+    client = OpenAI(
+        base_url=endpoint,
+        api_key=token,
+    )
+
+    # submit prompt
+    response = client.chat.completions.create(
+        model=model,
+        messages=message,
+        temperature=1.0,
+        top_p=1.0,
+        max_tokens=1000
+    )
+
+    # extract answer
+    return response.choices[0].message.content
