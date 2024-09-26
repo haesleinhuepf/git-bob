@@ -78,7 +78,7 @@ def prompt_azure(message: str, model="gpt-4o"):
         message = [{"role": "user", "content": message}]
 
     # setup connection to the LLM
-    token = os.environ["GITHUB_TOKEN"]
+    token = os.environ["GITHUB_MODELS_API_KEY"]
     endpoint = "https://models.inference.ai.azure.com"
 
     client = OpenAI(
