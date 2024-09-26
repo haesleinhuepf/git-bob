@@ -31,10 +31,12 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
   * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These were tested:
 * `claude-3-5-sonnet-20240620`
 * `gpt-4o-2024-08-06` (recommended if you work with large files, < 16k tokens)
+* `github_models:gpt-4o`
 <!--* `gemini-1.5-flash-001`-->
-* configure a Github secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` <!--or `GOOGLE_API_KEY`--> with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
+* configure a Github secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` or `GH_MODELS_API_KEY` <!--or `GOOGLE_API_KEY`--> with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
   * [OpenAI (gpt)](https://openai.com/blog/openai-api)
   * [Anthropic (claude)](https://www.anthropic.com/api)
+  * [Github Models Marketplace](https://github.com/marketplace/models)
   <!-- * [Google AI](https://ai.google.dev/gemini-api/docs/api-key)-->
 * configure Github actions to run the workflow on issues and pull-requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
 
@@ -101,7 +103,7 @@ To split a main issue into sub-issues, ask `git-bob split this issue`.
 
 You can also install git-bob locally and run it from the terminal. 
 In this case, create a [Github token](https://github.com/settings/tokens) and store it in an environment variable named `GITHUB_API_KEY`. 
-Also create an environment variable `GIT_BOB_LLM_NAME` with the name of the LLM you want to use, e.g. "gpt-4o-2024-05-13" or "claude-3-5-sonnet-20240620".
+Also create an environment variable `GIT_BOB_LLM_NAME` with the name of the LLM you want to use, e.g. "gpt-4o-2024-05-13" or "claude-3-5-sonnet-20240620" or "github_models:gpt-4o".
 Then you can install git-bob using pip:
 
 ```bash
