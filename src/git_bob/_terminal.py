@@ -19,14 +19,14 @@ def command_line_interface():
     # read environment variables
     timeout_in_seconds = os.environ.get("TIMEOUT_IN_SECONDS", 300) # 5 minutes
     llm_name = get_llm_name()
-    if "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
+    if "github_models:" in llm_name and os.environ.get("GH_MODELS_API_KEY") is not None:
+        prompt = prompt_azure
+    wlif "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
         prompt = prompt_claude
     elif "gpt" in llm_name and os.environ.get("OPENAI_API_KEY") is not None:
         prompt = prompt_chatgpt
     elif "gemini" in llm_name and os.environ.get("GOOGLE_API_KEY") is not None:
         prompt = prompt_gemini
-    elif "github_models:" in llm_name and os.environ.get("GH_MODELS_API_KEY") is not None:
-        prompt = prompt_azure
     else:
         raise NotImplementedError("Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs.")
 
