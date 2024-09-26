@@ -73,6 +73,9 @@ def prompt_azure(message: str, model="gpt-4o"):
     import os
     from openai import OpenAI
 
+    model = model.replace("github_models:", "")
+
+
     # convert message in the right format if necessary
     if isinstance(message, str):
         message = [{"role": "user", "content": message}]
