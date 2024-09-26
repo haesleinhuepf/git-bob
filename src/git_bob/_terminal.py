@@ -21,7 +21,7 @@ def command_line_interface():
     llm_name = get_llm_name()
     if "github_models:" in llm_name and os.environ.get("GH_MODELS_API_KEY") is not None:
         prompt = prompt_azure
-    wlif "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
+    elif "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
         prompt = prompt_claude
     elif "gpt" in llm_name and os.environ.get("OPENAI_API_KEY") is not None:
         prompt = prompt_chatgpt
