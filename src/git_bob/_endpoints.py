@@ -71,32 +71,53 @@ def prompt_azure(message: str, model="gpt-4o"):
     and returns only the text response.
     """
     import os
-    from openai import OpenAI
 
-    model = model.replace("github_models:", "")
-
-
-    # convert message in the right format if necessary
-    if isinstance(message, str):
-        message = [{"role": "user", "content": message}]
-
-    # setup connection to the LLM
     token = os.environ["GH_MODELS_API_KEY"]
     endpoint = "https://models.inference.ai.azure.com"
 
-    client = OpenAI(
-        base_url=endpoint,
-        api_key=token,
-    )
+    if "gpt" not in model:
+        from azure.ai.inference import ChatCompletionsClient
+        from azure.ai.inference.models import SystemMessage, UserMessage
+        from azure.core.credentials import AzureKeyCredential
 
-    # submit prompt
-    response = client.chat.completions.create(
-        model=model,
-        messages=message,
-        temperature=1.0,
-        top_p=1.0,
-        max_tokens=1000
-    )
+        client = ChatCompletionsClient(
+            endpoint=endpoint,
+            credential=AzureKeyCredential(token),
+        )
 
-    # extract answer
+        if isinstance(message, str):
+            message = [UserMessage(content=message)]
+
+        response = client.complete(
+            messages=[
+                SystemMessage(content="You are a helpful assistant."),
+                *message,
+            ],
+            temperature=1.0,
+            top_p=1.0,
+            max_tokens=1000,
+            model=model
+        )
+
+    else:
+        from openai import OpenAI
+
+        model = model.replace("github_models:", "")
+
+        if isinstance(message, str):
+            message = [{"role": "user", "content": message}]
+
+        client = OpenAI(
+            base_url=endpoint,
+            api_key=token,
+        )
+
+        response = client.chat.completions.create(
+            model=model,
+            messages=message,
+            temperature=1.0,
+            top_p=1.0,
+            max_tokens=1000
+        )
+
     return response.choices[0].message.content
