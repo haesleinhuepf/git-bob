@@ -3,3 +3,4 @@ openai
 google-generativeai
 pygithub
 toolz
+azure-ai-inference
