@@ -32,7 +32,7 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
 * `claude-3-5-sonnet-20240620`
 * `gpt-4o-2024-08-06` (recommended if you work with large files, < 16k tokens)
 * `github_models:gpt-4o`
-* `github_models:meta-llama-3.1-405b-instruct` <!-- Add this line -->
+* `github_models:meta-llama-3.1-405b-instruct`
 <!--* `gemini-1.5-flash-001`-->
 * configure a Github secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` or `GH_MODELS_API_KEY` <!--or `GOOGLE_API_KEY`--> with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
   * [OpenAI (gpt)](https://openai.com/blog/openai-api)
