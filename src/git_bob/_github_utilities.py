@@ -417,7 +417,7 @@ def get_file_in_repository(repository, branch_name, file_path):
     return repo.get_contents(file_path, ref=branch_name)
 
 
-def send_pull_request(repository, branch_name, title, description):
+def send_pull_request(repository, source_branch, target_branch, title, description):
     """
     Create a pull request from a defined branch into the main branch.
 
@@ -425,8 +425,10 @@ def send_pull_request(repository, branch_name, title, description):
     ----------
     repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
-    branch_name : str
-        The name of the branch that should be merged into main.
+    source_branch : str
+        The name of the branch that should be merged into target_branch.
+    target_branch : str
+        The name of the branch that the source_branch should be merged into.
     title : str
         A one-liner explaining what was changed in the branch.
     description : str
@@ -439,7 +441,7 @@ def send_pull_request(repository, branch_name, title, description):
     str
         The URL to the pull-request that was just created.
     """
-    Log().log(f"-> send_pull_request({repository}, {branch_name}, ...)")
+    Log().log(f"-> send_pull_request({repository}, {source_branch}, {target_branch}, ...)")
 
     from ._ai_github_utilities import setup_ai_remark
 
@@ -448,7 +450,7 @@ def send_pull_request(repository, branch_name, title, description):
 
     # Create a pull request
     remark = setup_ai_remark() + "\n\n"
-    pr = repo.create_pull(title=title, body=remark + description, head=branch_name, base="main")
+    pr = repo.create_pull(title=title, body=remark + description, head=source_branch, base=target_branch)
 
     return f"Pull request created: {pr.html_url}"
 

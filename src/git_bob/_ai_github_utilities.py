@@ -290,7 +290,7 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
     return commit_message
 
 
-def solve_github_issue(repository, issue, llm_model, prompt_function):
+def solve_github_issue(repository, issue, llm_model, prompt_function, base_branch=None):
     """
     Attempt to solve a GitHub issue by modifying a single file and sending a pull-request.
 
@@ -302,6 +302,10 @@ def solve_github_issue(repository, issue, llm_model, prompt_function):
         The issue number to solve.
     llm_model : str
         The language model to use for generating the solution.
+    prompt_function: function
+        The function to use for generating prompts.
+    base_branch : str
+        The name of the base branch to create the new branch from.
     """
     # modified from: https://github.com/ScaDS/generative-ai-notebooks/blob/main/docs/64_github_interaction/solving_github_issues.ipynb
 
@@ -343,7 +347,7 @@ Respond with the actions as JSON list.
     instructions = text_to_json(modifications)
 
     # create a new branch
-    branch_name = create_branch(repository)
+    branch_name = create_branch(repository, parent_branch=base_branch)
 
     print("Created branch", branch_name)
 
@@ -390,7 +394,7 @@ Respond with the actions as JSON list.
     print(error_messages)
 
     # get a diff of all changes
-    diffs_prompt = get_diff_of_branches(repository, branch_name)
+    diffs_prompt = get_diff_of_branches(repository, branch_name, base_branch=base_branch)
 
     # summarize the changes
     commit_messages_prompt = "* " + "\n* ".join(commit_messages)
@@ -423,8 +427,11 @@ Do not add headline or any other formatting. Just respond with the paragraphe an
 
     pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
 
-    send_pull_request(repository, branch_name, pull_request_title,
-                      pull_request_description + "\n\ncloses #" + str(issue))
+    send_pull_request(repository,
+                      source_branch=branch_name,
+                      target_branch=base_branch,
+                      title=pull_request_title,
+                      description=pull_request_description + "\n\ncloses #" + str(issue))
 
 
 def split_issue_in_sub_issues(repository, issue, prompt_function):

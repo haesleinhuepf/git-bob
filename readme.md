@@ -54,6 +54,7 @@ git-bob split
 
 You can also use the following command to trigger git-bob solving an issue.
 It will then try to solve the issue and send a pull-request.
+This action can also be used to modify code in pull-requests.
 
 ```
 git-bob solve
