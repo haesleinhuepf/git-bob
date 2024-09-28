@@ -211,12 +211,19 @@ def modify_discussion(discussion):
         if url_type == 'issue':
             parts = url.split('/')
             repo = parts[3] + '/' + parts[4]
-            issue_number = int(parts[-1])
+            try:
+                issue_number = int(parts[-1])
+            except:
+                continue
             additional_content[url] = get_conversation_on_issue(repo, issue_number)
         elif url_type == 'pull_request':
             parts = url.split('/')
             repo = parts[3] + '/' + parts[4]
-            pr_number = int(parts[-1])
+            try:
+                pr_number = int(parts[-1])
+            except:
+                continue
+                
             # Get both the diff and discussion on pull request
             additional_content[url] = (get_conversation_on_issue(repo, pr_number) +
                                        get_diff_of_pull_request(repo, pr_number))
