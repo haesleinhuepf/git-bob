@@ -54,6 +54,7 @@ git-bob split
 
 You can also use the following command to trigger git-bob solving an issue.
 It will then try to solve the issue and send a pull-request.
+This action can also be used to modify code in pull-requests.
 
 ```
 git-bob solve
@@ -68,8 +69,8 @@ Here's the recommended workflow for using git-bob:
 3. Respond to git-bob with any clarifications or additional information it requests.
 4. Comment on the issue with `git-bob solve` or `git-bob implement this` (an alias for `solve`) to trigger git-bob.
 5. Wait for git-bob to create a pull request (PR) addressing the issue.
-6. Review the PR and comment on the issue if changes are needed.
-7. Wait for git-bob to create a second PR with the requested changes.
+6. Review the PR and comment on the PR or on the original issue if changes are needed.
+7. Wait for git-bob to create another PR with the requested changes. Depending on if you commented on the PR or on the issue, the starting point for the new modification will be different.
 8. Repeat steps 3-5 as necessary until the issue is resolved satisfactorily.
 
 ## Use-case examples

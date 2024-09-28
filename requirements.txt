@@ -4,3 +4,5 @@ google-generativeai
 pygithub
 toolz
 azure-ai-inference
+nbconvert
+nbformat

@@ -1,4 +1,5 @@
-
+dist/*
+build/*
 .ipynb_checkpoints
 Untitled*
 .idea
