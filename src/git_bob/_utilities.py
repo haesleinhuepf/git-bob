@@ -129,7 +129,7 @@ def erase_outputs_of_code_cells(file_content):
         if cell.get('cell_type') == 'code':
             cell['outputs'] = []
             cell['execution_count'] = None
-        cell['id'] = None
+        #cell['id'] = None
 
     notebook["metadata"] = {}
 
