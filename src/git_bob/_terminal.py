@@ -59,6 +59,7 @@ def command_line_interface():
     user, text = get_most_recent_comment_on_issue(repository, issue)
 
     # handle aliases
+    text = text.replace("gitbob", "gib-bob") # typing - on the phone is hard
     text = text.replace("git-bob respond", "git-bob comment")
     text = text.replace("git-bob review", "git-bob comment")
     text = text.replace("git-bob think about", "git-bob comment")
