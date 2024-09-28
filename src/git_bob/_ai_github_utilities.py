@@ -1,5 +1,7 @@
 # This module contains utility functions for interacting with GitHub issues and pull requests using AI.
 # It includes functions for setting up AI remarks, commenting on issues, reviewing pull requests, and solving issues.
+import warnings
+
 from ._logger import Log
 import json
 
@@ -217,7 +219,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
     from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, \
         check_if_file_exists, get_file_in_repository
-    from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells
+    from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells, \
+        restore_outputs_of_code_cells, execute_notebook
 
     original_ipynb_file_content = None
 
@@ -277,11 +280,19 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
     new_content, commit_message = split_content_and_summary(response)
 
     if original_ipynb_file_content is not None:
-        new_content = restore_outputs_of_code_cells(new_content, original_ipynb_file_content)
+        try:
+            new_content = restore_outputs_of_code_cells(new_content, original_ipynb_file_content)
+        except ValueError as e:
+            warnings.warn(f"Could not restore outputs of code cells in {filename}: {e}")
+            print("Executing the notebook")
+            new_content = execute_notebook(new_content)
 
     elif filename.endswith('.ipynb'):
         print("Erasing outputs in generated ipynb file")
         new_content = erase_outputs_of_code_cells(new_content)
+        print("Executing the notebook")
+        new_content = execute_notebook(new_content)
+
     print("New file content", new_content)
     print("Summary", commit_message)
 

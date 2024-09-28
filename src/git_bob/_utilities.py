@@ -1,5 +1,6 @@
 # This module provides utility functions for text processing, including functions to remove indentation and outer markdown from text.
 import sys
+import warnings
 from functools import lru_cache
 from functools import wraps
 from toolz import curry
@@ -156,8 +157,7 @@ def restore_outputs_of_code_cells(new_content, original_ipynb_file_content):
                 n_cell['outputs'] = o_cell['outputs']
                 n_cell['execution_count'] = o_cell['execution_count']
         else:  # if code is different, any future results may be different, too
-            print("codes no longer match")
-            break
+            raise ValueError("Code cells are different. Cannot restore outputs.")
 
     new_notebook["metadata"] = original_notebook["metadata"]
     return json.dumps(new_notebook, indent=1)
@@ -240,3 +240,39 @@ def modify_discussion(discussion):
         temp = temp + [f"### File {k} content\n\n```\n{v}\n```\n"]
 
     return discussion + "\n\n" + "\n".join(temp)
+
+
+def execute_notebook(notebook_content, timeout=600, kernel_name='python3'):
+    """
+    Execute a Jupyter notebook and return whether an error occurred.
+
+    Args:
+        notebook_content (str): Content of the notebook file as string in json format.
+        timeout (int): Timeout in seconds for each cell (default 600).
+        kernel_name (str): The kernel to use for execution (default 'python3').
+
+    Returns:
+        bool: True if execution was successful, False if an error occurred.
+        Exception (optional): The error that occurred during execution, if any.
+    """
+    import nbformat
+    from nbconvert.preprocessors import ExecutePreprocessor
+    try:
+        # Load the notebook
+        notebook = nbformat.reads(notebook_content, as_version=4)
+
+        # Initialize the processor to execute the notebook
+        ep = ExecutePreprocessor(timeout=timeout, kernel_name=kernel_name)
+
+        # Execute the notebook
+        ep.preprocess(notebook, {'metadata': {'path': './'}})
+
+        # Save executed notebook
+        notebook_content = nbformat.writes(notebook)
+
+        # If we reach here, execution was successful
+        return notebook_content
+    except Exception as e:
+        # If an error occurs during execution, warn and return the notebook as it was
+        warnings.warn(f"Error during notebook execution: {e}")
+        return notebook_content
