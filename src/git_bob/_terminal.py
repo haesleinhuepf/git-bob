@@ -10,9 +10,10 @@ def command_line_interface():
     from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues
     from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure
-    from ._github_utilities import check_access_and_ask_for_approval, add_reaction_to_last_comment_in_issue
+    from ._github_utilities import check_access_and_ask_for_approval, get_github_repository
     from ._utilities import get_llm_name, quick_first_response
     from ._logger import Log
+    from github.GithubException import UnknownObjectException
 
     print("Hello")
 
@@ -76,11 +77,24 @@ def command_line_interface():
 
     quick_first_response()
 
+    repo = get_github_repository(repository)
+    try:
+        pull_request = repo.get_pull(issue)
+        print("Issue is a a PR")
+
+        # Extract source (head) and target (base) branches
+        base_branch = pull_request.head.ref
+        #target_branch = pull_request.base.ref
+    except UnknownObjectException:
+        print("Issue is a not a PR")
+        base_branch = repo.default_branch
+
     # execute the task
     if task == "review-pull-request":
         review_pull_request(repository, issue, prompt)
-    elif (not running_in_github_ci and task == "solve-issue") or (running_in_github_ci and task == "comment-on-issue" and "git-bob solve" in text):
-        solve_github_issue(repository, issue, llm_name, prompt)
+    elif ((not running_in_github_ci and task == "solve-issue") or
+          (running_in_github_ci and task == "comment-on-issue" and "git-bob solve" in text)):
+        solve_github_issue(repository, issue, llm_name, prompt, base_branch=base_branch)
     elif (task == "comment-on-issue" or task == "split-issue") and (
             "git-bob split" in text or not running_in_github_ci):
         split_issue_in_sub_issues(repository, issue, prompt)
