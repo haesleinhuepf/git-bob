@@ -252,8 +252,8 @@ def execute_notebook(notebook_content, timeout=600, kernel_name='python3'):
         kernel_name (str): The kernel to use for execution (default 'python3').
 
     Returns:
-        bool: True if execution was successful, False if an error occurred.
-        Exception (optional): The error that occurred during execution, if any.
+        str: content of the executed notebook.
+
     """
     import nbformat
     from nbconvert.preprocessors import ExecutePreprocessor
