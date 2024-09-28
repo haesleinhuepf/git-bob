@@ -74,6 +74,7 @@ def prompt_azure(message: str, model="gpt-4o"):
 
     token = os.environ["GH_MODELS_API_KEY"]
     endpoint = "https://models.inference.ai.azure.com"
+    model = model.replace("github_models:", "")
 
     if "gpt" not in model:
         from azure.ai.inference import ChatCompletionsClient
@@ -89,20 +90,15 @@ def prompt_azure(message: str, model="gpt-4o"):
             message = [UserMessage(content=message)]
 
         response = client.complete(
-            messages=[
-                SystemMessage(content="You are a helpful assistant."),
-                *message,
-            ],
+            messages=message,
             temperature=1.0,
             top_p=1.0,
-            max_tokens=1000,
+            max_tokens=4096,
             model=model
         )
 
     else:
         from openai import OpenAI
-
-        model = model.replace("github_models:", "")
 
         if isinstance(message, str):
             message = [{"role": "user", "content": message}]
@@ -117,7 +113,7 @@ def prompt_azure(message: str, model="gpt-4o"):
             messages=message,
             temperature=1.0,
             top_p=1.0,
-            max_tokens=1000
+            max_tokens=4096
         )
 
     return response.choices[0].message.content
