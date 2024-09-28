@@ -682,6 +682,47 @@ def delete_file_from_repository(repository, branch_name, file_path, commit_messa
     file = get_file_in_repository(repository, branch_name, file_path)
     repo.delete_file(file.path, commit_message, file.sha, branch=branch_name)
 
+
+def execute_notebook_in_repository(repository, branch_name, file_path, commit_message="Executed notebook"):
+    """
+    Execute a Jupyter notebook in the specified GitHub repository on a given branch.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    branch_name : str
+        The name of the branch to execute the notebook in.
+    file_path : str
+        The path of the notebook file to execute.
+    commit_message : str, optional
+        The commit message for the execution. Default is "Executed notebook".
+
+    Returns
+    -------
+    bool
+        True if the notebook was executed successfully, False otherwise.
+    """
+    Log().log(f"-> execute_notebook_in_repository({repository}, {branch_name}, {file_path})")
+    from ._utilities import execute_notebook
+
+    if not file_path.endswith(".ipynb"):
+        raise ValueError("The file must be a Jupyter notebook (*.ipynb). It cannot be executed otherwise.")
+
+    # Authenticate with GitHub
+    repo = get_github_repository(repository)
+
+    # Get the notebook file
+    file = get_file_in_repository(repository, branch_name, file_path)
+    notebook_content = file.decoded_content.decode()
+
+    # Execute the notebook
+    new_notebook_content = execute_notebook(notebook_content)
+
+    # Commit the changes
+    repo.update_file(file_path, commit_message, new_notebook_content, file.sha, branch=branch_name)
+
+
 def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_path, commit_message="Copy file"):
     """
     Copy a file in the specified GitHub repository on a given branch.

@@ -3,3 +3,5 @@ openai
 google-generativeai
 pygithub
 toolz
+nbconvert
+nbformat

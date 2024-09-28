@@ -1,5 +1,7 @@
 # This module contains utility functions for interacting with GitHub issues and pull requests using AI.
 # It includes functions for setting up AI remarks, commenting on issues, reviewing pull requests, and solving issues.
+import warnings
+
 from ._logger import Log
 import json
 
@@ -217,7 +219,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
     from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, \
         check_if_file_exists, get_file_in_repository
-    from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells
+    from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells, \
+        restore_outputs_of_code_cells, execute_notebook
 
     original_ipynb_file_content = None
 
@@ -277,11 +280,19 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
     new_content, commit_message = split_content_and_summary(response)
 
     if original_ipynb_file_content is not None:
-        new_content = restore_outputs_of_code_cells(new_content, original_ipynb_file_content)
+        try:
+            new_content = restore_outputs_of_code_cells(new_content, original_ipynb_file_content)
+        except ValueError as e:
+            warnings.warn(f"Could not restore outputs of code cells in {filename}: {e}")
+            print("Executing the notebook")
+            new_content = execute_notebook(new_content)
 
     elif filename.endswith('.ipynb'):
         print("Erasing outputs in generated ipynb file")
         new_content = erase_outputs_of_code_cells(new_content)
+        print("Executing the notebook")
+        new_content = execute_notebook(new_content)
+
     print("New file content", new_content)
     print("Summary", commit_message)
 
@@ -314,7 +325,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, \
         write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, \
         get_diff_of_branches, get_conversation_on_issue, rename_file_in_repository, delete_file_from_repository, \
-        copy_file_in_repository
+        copy_file_in_repository, execute_notebook_in_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion
 
     discussion = modify_discussion(get_conversation_on_issue(repository, issue))
@@ -334,12 +345,13 @@ Given a list of files in the repository {repository} and a github issues descrip
 {all_files}
 
 ## Your task
-Decide which of these files need to be modified, created, renamed, copied or deleted to solve #{issue} ? Keep the list short.
+Decide which of these files need to be modified, created, renamed, copied, executed or deleted to solve #{issue} ? Keep the list short.
 Response format:
 - For modifications: {{'action': 'modify', 'filename': '...'}}
 - For creations: {{'action': 'create', 'filename': '...'}}
 - For renames: {{'action': 'rename', 'old_filename': '...', 'new_filename': '...'}}
 - For copies: {{'action': 'copy', 'old_filename': '...', 'new_filename': '...'}}
+- For executions: {{'action': 'execute', 'filename': '...'}}
 - For deletions: {{'action': 'delete', 'filename': '...'}}
 Respond with the actions as JSON list.
 """)
@@ -364,7 +376,14 @@ Respond with the actions as JSON list.
                     continue
 
         try:
-            if action == 'modify' or action == 'create':
+            if action == 'create':
+                if check_if_file_exists(repository, branch_name, filename):
+                    errors.append(f"Error processing {filename}: File already exists.")
+                else:
+                    message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
+                                                                     prompt_function)
+                    commit_messages.append(message)
+            elif action == 'modify':
                 filename = instruction['filename']
                 message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
                                                                  prompt_function)
@@ -383,6 +402,11 @@ Respond with the actions as JSON list.
                 new_filename = instruction['new_filename']
                 copy_file_in_repository(repository, branch_name, old_filename, new_filename)
                 commit_messages.append(f"Copied {old_filename} to {new_filename}.")
+            elif action == 'execute':
+                filename = instruction['filename']
+                print("Executing", filename)
+                execute_notebook_in_repository(repository, branch_name, filename)
+                commit_messages.append(f"Executed {filename}.")
         except Exception as e:
             errors.append(f"Error processing {instruction}: " + str(e))
 
