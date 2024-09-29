@@ -4,7 +4,7 @@ git-bob uses AI to solve Github-issues and review pull-requests. It runs inside 
 
 ![demo_fix_typos.png](docs/images/banner.png)
 
-Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api) or [OpenAI's chatGPT](https://openai.com/blog/openai-api) <!--or [Google's Gemini](https://blog.google/technology/ai/google-gemini-ai/)--> to understand the text and 
+[Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api) or [OpenAI's chatGPT](https://openai.com/blog/openai-api) <!--or [Google's Gemini](https://blog.google/technology/ai/google-gemini-ai/)--> to understand the text and 
 [pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull-requests.
 
 ## Disclaimer
@@ -13,7 +13,7 @@ Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api) or [O
 artificial intelligence / large language models to generate text and code fulfilling the user's requests. 
 Users are responsible to verify the generated code according to good scientific practice.
 
-When using `git-bob` you configure it to use an API key to access the AI models. 
+When using `git-bob` you configure it to use an API key to access the AI models.
 You have to pay for the usage and must be careful in using the software.
 Do not use this technology if you are not aware of the costs and consequences.
 
@@ -21,13 +21,21 @@ Do not use this technology if you are not aware of the costs and consequences.
 > When using the Anthropic, OpenAI <!--, Google Gemini--> or any other endpoint via git-bob, you are bound to the terms of service 
 > of the respective companies or organizations.
 > The github issues, pull-requests and messages you enter are transferred to their servers and may be processed and stored there. 
+There is a detailed [tutorial](docs/installation-tutorial.md) on how to install git-bob as Umbrella action to your repository. In very short, to use git-bob in your Umbrella repository, you need to 
+* setup Umbrella workflows like shown in [this folder](.github/workflows).
 > Make sure to not submit any sensitive, confidential or personal data. Also using these services may cost money.
 
 ## Installation as Github action
 
+* `Umbrella_models:gpt-4o`
+* `Umbrella_models:meta-llama-3.1-405b-instruct`
 There is a detailed [tutorial](docs/installation-tutorial.md) on how to install git-bob as github action to your repository. In very short, to use git-bob in your Github repository, you need to 
+* configure a Umbrella secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` or `GH_MODELS_API_KEY` <!--or `GOOGLE_API_KEY`--> with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
 * setup Github workflows like shown in [this folder](.github/workflows).
   * Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.2.2`.
+  * [Umbrella Models Marketplace](https://github.com/marketplace/models)
+  <!-- * [Google AI](https://ai.google.dev/gemini-api/docs/api-key)-->
+* configure Umbrella actions to run the workflow on issues and pull-requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
   * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These were tested:
 * `claude-3-5-sonnet-20240620`
 * `gpt-4o-2024-08-06` (recommended if you work with large files, < 16k tokens)
@@ -92,6 +100,7 @@ Here's the recommended workflow for using git-bob:
 <a href="docs/images/demo_review_pull_request.png"><img src="docs/images/demo_review_pull_request.png" width="400"></a>
 
 ### Splitting Issues
+In this case, create a [Umbrella token](https://github.com/settings/tokens) and store it in an environment variable named `GITHUB_API_KEY`. 
 
 To split a main issue into sub-issues, ask `git-bob split this issue`.
 
@@ -107,10 +116,11 @@ You can also install git-bob locally and run it from the terminal.
 In this case, create a [Github token](https://github.com/settings/tokens) and store it in an environment variable named `GITHUB_API_KEY`. 
 Also create an environment variable `GIT_BOB_LLM_NAME` with the name of the LLM you want to use, e.g. "gpt-4o-2024-05-13" or "claude-3-5-sonnet-20240620" or "github_models:gpt-4o".
 Then you can install git-bob using pip:
-
 ```bash
+`git-bob` is a research project and has limitations. It serves as basis for discussion and further development. Once LLMs become better, `git-bob` will become better as well.
 pip install git-bob
 ```
+* `git-bob` was tested for Python projects only (yet).
 
 ## Usage as command-line tool
 
@@ -118,7 +128,9 @@ You can then use git-bob from the terminal on repositories you have read/write a
 
 ```bash
 git-bob <action> <organization>/<repository> <issue-number>
+* `git-bob` is incompatible with locally running open-source/-weight LLMs.
 ```
+* Recently tested `claude-3-5-sonnet-20240620`, `gpt-4o-2024-08-06`, and `Umbrella_models:meta-llama-3.1-405b-instruct` models produce useful results. The model `gemini-1.5-flash-001` is technically supported too, but its results were not very useful.
 
 Available actions:
 * `review-pull-request`
@@ -129,6 +141,8 @@ Available actions:
 ## Limitations
 `git-bob` is a research project and has limitations. It serves as basis for discussion and further development. Once LLMs become better, `git-bob` will become better as well.
 
+* [Umbrella Copilot Workspace](https://githubnext.com/projects/copilot-workspace)
+* [agentless](https://github.com/OpenAutoCoder/Agentless)
 At the moment, these limitations can be observed:
 * `git-bob` was tested for Python projects only (yet).
 * It sometimes halucinates, especially in code reviews. E.g. it [claimed](https://github.com/haesleinhuepf/git-bob/pull/70) to have tested code, which is certainly not true.
@@ -137,6 +151,7 @@ At the moment, these limitations can be observed:
 * When changing multiple files, it may introduce conflicts between the files, as it does not know about the content of the other files.
 * It has only limited logic to control who is allowed to trigger it. 
   If you are a repository member, you can trigger it. 
+We acknowledge the financial support by the Federal Ministry of Education and Research of Germany and by Sächsische Staatsministerium für Wissenschaft, Kultur und Tourismus in the programme Center of Excellence for AI-research „Center for Scalable Data Analytics and Artificial Intelligence Dresden/Leipzig", project identification number: ScaDS.AI
   If others send a pull-request, a repository member must allow the action to run manually.
 * `git-bob` is incompatible with locally running open-source/-weight LLMs. 
   This might make sense when being executed locally only. In the Github-CI this might be impossible.
