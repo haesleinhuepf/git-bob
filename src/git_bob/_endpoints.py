@@ -33,26 +33,46 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
     return message.content[0].text
 
 
-def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06"):
+def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", max_accumulated_responses=10, max_response_tokens=16384):
     """A prompt helper function that sends a message to openAI
     and returns only the text response.
     """
     # convert message in the right format if necessary
     import openai
+    import warnings
+    from ._utilities import append_result
     if isinstance(message, str):
         message = [{"role": "user", "content": message}]
-
+    original_message = message
     # setup connection to the LLM
     client = openai.OpenAI()
 
-    # submit prompt
-    response = client.chat.completions.create(
-        model=model,
-        messages=message
-    )
+    result = ""
+
+    for _ in range(0, max_accumulated_responses):
+
+        # submit prompt
+        response = client.chat.completions.create(
+            model=model,
+            messages=message,
+            max_tokens=max_response_tokens,
+        )
+
+        result = append_result(result, response.choices[0].message.content)
+        print("finish_reason", response.choices[0].finish_reason)
+        print("len", len(result))
+
+        if response.choices[0].finish_reason == "length":
+            message = original_message.copy()
+            message.append({"role": "assistant", "content": result})
+            message.append({"role": "user", "content": "Continue!"})
+
+            warnings.warn("Long output. Continuing conversation. When generation is continued, sometimes there might be small issues on connecting the last sentence of the previous response with the first sentence of the next response. Check output carefully.")
+        else:
+            break
 
     # extract answer
-    return response.choices[0].message.content
+    return result
 
 
 def prompt_gemini(request, model="gemini-1.5-flash-001"):
@@ -66,7 +86,7 @@ def prompt_gemini(request, model="gemini-1.5-flash-001"):
     return result.text
 
 
-def prompt_azure(message: str, model="gpt-4o"):
+def prompt_azure(message: str, model="gpt-4o", max_accumulated_responses=10, max_response_tokens=16384):
     """A prompt helper function that sends a message to Azure's OpenAI Service
     and returns only the text response.
     """
