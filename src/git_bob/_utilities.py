@@ -4,7 +4,7 @@ import warnings
 from functools import lru_cache
 from functools import wraps
 from toolz import curry
-
+from ._endpoints import prompt_chatgpt
 
 def remove_outer_markdown(text):
     """
@@ -187,10 +187,52 @@ def is_github_url(url):
         return 'pull_request'
     elif 'blob/' in url:
         return 'file'
+    elif url.endswith('.png') or url.endswith('.jpg') or url.endswith('.jpeg') or url.endswith('.gif') \
+            or url.endswith('.webp') or "user-attachments/assets" in url:
+        return 'image'
     return None
 
 
-def modify_discussion(discussion):
+def load_image_from_url(url):
+    import urllib
+    import io
+    from PIL import Image
+    from ._logger import Log
+    Log().log("Loading image from URL: " + url)
+
+    # Load the bytestream from the URL
+    with urllib.request.urlopen(url) as response:
+        bytestream = response.read()
+
+    # Open the image from bytestream using PIL
+    image = Image.open(io.BytesIO(bytestream))
+    return image
+
+
+def image_to_url(image):
+    """
+    Convert an image to a URL.
+    """
+    if isinstance(image, str) and (image.startswith("data:image") or image.startswith("http")):
+        return image
+
+    import base64
+    import io
+    from PIL import Image
+
+    if isinstance(image, str):
+        return image
+
+    if isinstance(image, bytes):
+        image = Image.open(io.BytesIO(image))
+
+    buffered = io.BytesIO()
+    image.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+    return f"data:image/png;base64,{img_str}"
+
+
+def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
     import re
     from ._github_utilities import get_conversation_on_issue, get_diff_of_pull_request, get_file_in_repository
 
@@ -203,6 +245,8 @@ def modify_discussion(discussion):
 
     # Process each URL based on its type
     for url in urls:
+        if url.endswith(")"): # happens with ![](url) syntax
+            url = url[:-1]
         url_type = is_github_url(url)
 
         if "### File {url} content" in discussion:
@@ -236,6 +280,10 @@ def modify_discussion(discussion):
             if url.endswith('.ipynb'):
                 file_contents = erase_outputs_of_code_cells(file_contents)
             additional_content[url] = file_contents
+        elif url_type == 'image':
+            image = load_image_from_url(url)
+            image_content = prompt_visionlm("""Please describe this image. What does it show? What structures are in the individual channels? How might the image have been taken?""", image=url)
+            additional_content[url] = image_content
 
     # Modify the existing discussion content
     discussion = discussion.replace("\n#", "\n###")
