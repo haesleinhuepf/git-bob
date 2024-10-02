@@ -5,6 +5,9 @@ from functools import lru_cache
 from functools import wraps
 from toolz import curry
 from ._endpoints import prompt_chatgpt
+import os
+
+VISION_SYSTEM_MESSAGE = os.environ.get("VISION_SYSTEM_MESSAGE", "You are a AI-based vison system. You described images professionally and clearly.")
 
 def remove_outer_markdown(text):
     """
@@ -282,7 +285,7 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
             additional_content[url] = file_contents
         elif url_type == 'image':
             image = load_image_from_url(url)
-            image_content = prompt_visionlm("""Please describe this image. What does it show? What structures are in the individual channels? How might the image have been taken?""", image=url)
+            image_content = prompt_visionlm(VISION_SYSTEM_MESSAGE + "\n\nDescribe this image.", image=url)
             additional_content[url] = image_content
 
     # Modify the existing discussion content
