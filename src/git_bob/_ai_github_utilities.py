@@ -221,11 +221,22 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         check_if_file_exists, get_file_in_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells, \
         restore_outputs_of_code_cells, execute_notebook
+    from ._utilities import apply_diff
 
     original_ipynb_file_content = None
 
+    apply_patch = False
+
     if check_if_file_exists(repository, branch_name, filename):
         file_content = get_file_in_repository(repository, branch_name, filename).decoded_content.decode()
+
+        if len(file_content) > 0: #todo set threshold to 1000 or so
+            print("Asking for a diff to patch")
+            target_format = "Return a diff of the modifications of the file, do NOT return the entire file content."
+            apply_patch = True
+        else:
+            target_format = "Return the entire new file content, do not shorten it."
+
         print(filename, "will be overwritten")
         if filename.endswith('.ipynb'):
             print("Removing outputs from ipynb file")
@@ -243,7 +254,7 @@ That's the file "{filename}" content you will find in the file:
 ## Your task
 Modify content of the file "{filename}" to solve the issue above.
 Keep your modifications absolutely minimal.
-Return the entire new file content, do not shorten it.
+{target_format}
 """
     else:
         print(filename, "will be created")
@@ -278,6 +289,10 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
     response = prompt_function(prompt)
 
     new_content, commit_message = split_content_and_summary(response)
+
+    if apply_patch:
+        print("Applying patch\n-------------------\n", new_content, "\n-------------------")
+        new_content = apply_diff(file_content, new_content)
 
     if original_ipynb_file_content is not None:
         try:
@@ -375,7 +390,8 @@ Respond with the actions as JSON list.
                     errors.append(f"Error processing {filename}: Modifying workflow files is not allowed.")
                     continue
 
-        try:
+        if True:
+        #try:
             if action == 'create':
                 if check_if_file_exists(repository, branch_name, filename):
                     errors.append(f"Error processing {filename}: File already exists.")
@@ -407,8 +423,8 @@ Respond with the actions as JSON list.
                 print("Executing", filename)
                 execute_notebook_in_repository(repository, branch_name, filename)
                 commit_messages.append(f"Executed {filename}.")
-        except Exception as e:
-            errors.append(f"Error processing {instruction}: " + str(e))
+        #except Exception as e:
+        #    errors.append(f"Error processing {instruction}: " + str(e))
 
     error_messages = ""
     if len(errors) > 0:

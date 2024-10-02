@@ -283,3 +283,31 @@ def execute_notebook(notebook_content, timeout=600, kernel_name='python3'):
         # If an error occurs during execution, warn and return the notebook as it was
         warnings.warn(f"Error during notebook execution: {e}")
         return notebook_content
+
+
+def apply_diff(original_content, diff_content):
+    import re
+    lines = original_content.splitlines()
+    hunks = diff_content.split('\n@@')
+
+    for hunk in hunks[1:]:  # Skip the first empty element
+        match = re.match(r' -(\d+),(\d+) \+(\d+),(\d+) @@', hunk)
+        if not match:
+            continue
+
+        start = int(match.group(3)) - 1  # 0-based index
+        hunk_lines = hunk[match.end():].splitlines()
+
+        for line in hunk_lines[1:]:  # Skip the context line
+            if line.startswith('-'):
+                if lines[start] == line[1:]:
+                    lines.pop(start)
+                else:
+                    print(f"Warning: Line to remove not found: {line}")
+            elif line.startswith('+'):
+                lines.insert(start, line[1:])
+                start += 1
+            else:
+                start += 1
+
+    return '\n'.join(lines)
