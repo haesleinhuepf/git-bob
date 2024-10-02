@@ -100,8 +100,14 @@ To split a main issue into sub-issues, ask `git-bob split this issue`.
 
 <a href="docs/images/demo_question.png"><img src="docs/images/demo_question.png" width="400"></a>
 
+## Installation for development
 
-## Installation as command-line tool
+```
+git clone https://github.com/haselinhuepf/git-bob.git
+cd git-bob
+```
+
+### Installation as command-line tool (for development)
 
 You can also install git-bob locally and run it from the terminal. 
 In this case, create a [Github token](https://github.com/settings/tokens) and store it in an environment variable named `GITHUB_API_KEY`. 
@@ -112,7 +118,7 @@ Then you can install git-bob using pip:
 pip install git-bob
 ```
 
-## Usage as command-line tool (for development only)
+### Usage as command-line tool (for development)
 
 You can then use git-bob from the terminal on repositories you have read/write access to. 
 It is recommended to call it from the root folder of the repository you want to interact with.
