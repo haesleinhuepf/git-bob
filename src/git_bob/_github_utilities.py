@@ -416,6 +416,17 @@ def get_file_in_repository(repository, branch_name, file_path):
         The content file object of the specified file.
     """
     print(f"-> get_file_in_repository({repository}, {branch_name}, {file_path})")
+    if file_path.endswith(")"):
+        file_path = file_path[:-1]
+    if file_path.endswith("'"):
+        file_path = file_path[:-1]
+    if file_path.endswith('"'):
+        file_path = file_path[:-1]
+
+    if file_path.endswith("?raw=true"):
+        print("fixing file path")
+        file_path = file_path[:-9]
+
     print("loading file content...", file_path)
     repo = get_github_repository(repository)
     return repo.get_contents(file_path, ref=branch_name)

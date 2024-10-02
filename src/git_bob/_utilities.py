@@ -250,6 +250,11 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
     for url in urls:
         if url.endswith(")"): # happens with ![](url) syntax
             url = url[:-1]
+        if url.endswith("'"):
+            url = url[:-1]
+        if url.endswith('"'):
+            url = url[:-1]
+            
         url_type = is_github_url(url)
 
         if "### File {url} content" in discussion:
