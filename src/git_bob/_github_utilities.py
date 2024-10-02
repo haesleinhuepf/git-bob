@@ -782,3 +782,42 @@ def create_issue(repository, title, body):
 
     print(f"Issue created: #{issue_obj.number}")
     return issue_obj.number
+
+
+def download_to_repository(repo, url, path):
+    """
+    Download a file from the given URL and store it in the specified GitHub repository path.
+
+    Parameters
+    ----------
+    repo : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    url : str
+        The URL of the file to download.
+    path : str
+        The path in the repository where the file should be stored.
+
+    Returns
+    -------
+    bool
+        True if the file was downloaded and stored successfully, False otherwise.
+    """
+    import requests
+    Log().log(f"-> download_to_repository({repo}, {url}, {path})")
+    
+    try:
+        # Send a HTTP GET request
+        response = requests.get(url)
+        
+        # Check if the request was successful
+        if response.status_code == 200:
+            repo = get_github_repository(repo)
+            repo.create_file(path, f"Download file {path}", response.content, branch="main")
+            Log().log(f"File downloaded and stored at {path}")
+            return True
+        else:
+            Log().log(f"Failed to download file from {url} with status code {response.status_code}")
+            return False
+    except Exception as e:
+        Log().log(f"An error occurred: {str(e)}")
+        return False
