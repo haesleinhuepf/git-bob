@@ -54,3 +54,6 @@ exclude = [
 
 target-version = "py39"
 fix = true
+
+[tool]
+version = "0.0.1"
