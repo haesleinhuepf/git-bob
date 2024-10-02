@@ -188,11 +188,11 @@ def is_github_url(url):
         return 'issue'
     elif '/pull/' in url:
         return 'pull_request'
+    elif url.endswith('.png') or url.endswith('.jpg') or url.endswith('.jpeg') or url.endswith('.gif') \
+            or url.endswith('.webp') or "user-attachments/assets" in url or url.endswith("?raw=true"):
+        return 'image'
     elif 'blob/' in url:
         return 'file'
-    elif url.endswith('.png') or url.endswith('.jpg') or url.endswith('.jpeg') or url.endswith('.gif') \
-            or url.endswith('.webp') or "user-attachments/assets" in url:
-        return 'image'
     return None
 
 
