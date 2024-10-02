@@ -212,9 +212,9 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
     from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, \
-        check_if_file_exists, get_file_in_repository
+        check_if_file_exists, get_file_in_repository, execute_notebook_in_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells, \
-        restore_outputs_of_code_cells, execute_notebook
+        restore_outputs_of_code_cells
 
     original_ipynb_file_content = None
 
@@ -273,24 +273,28 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
 
     new_content, commit_message = split_content_and_summary(response)
 
+    do_execute_notebok = False
+
     if original_ipynb_file_content is not None:
         try:
             new_content = restore_outputs_of_code_cells(new_content, original_ipynb_file_content)
         except ValueError as e:
             warnings.warn(f"Could not restore outputs of code cells in {filename}: {e}")
-            print("Executing the notebook")
-            new_content = execute_notebook(new_content)
+            do_execute_notebok = True
 
     elif filename.endswith('.ipynb'):
         print("Erasing outputs in generated ipynb file")
         new_content = erase_outputs_of_code_cells(new_content)
-        print("Executing the notebook")
-        new_content = execute_notebook(new_content)
+        do_execute_notebok = True
 
     print("New file content", new_content)
     print("Summary", commit_message)
 
     write_file_in_new_branch(repository, branch_name, filename, new_content + "\n", commit_message)
+
+    if do_execute_notebok:
+        print("Executing the notebook")
+        execute_notebook_in_repository(repository, branch_name, filename)
 
     return commit_message
 
@@ -319,7 +323,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, \
         write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, \
         get_diff_of_branches, get_conversation_on_issue, rename_file_in_repository, delete_file_from_repository, \
-        copy_file_in_repository, execute_notebook_in_repository
+        copy_file_in_repository, execute_notebook_in_repository, download_to_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion
 
     discussion = modify_discussion(get_conversation_on_issue(repository, issue))
@@ -339,10 +343,12 @@ Given a list of files in the repository {repository} and a github issues descrip
 {all_files}
 
 ## Your task
-Decide which of these files need to be modified, created, renamed, copied, executed or deleted to solve #{issue} ? Keep the list short.
+Decide which of these files need to be modified, created, downloaded, renamed, copied, executed or deleted to solve #{issue} ? Downloads are necessary, if there is a url in the discussion and the linked file is needed in the proposed code.
+Keep the list of actions minimarl.
 Response format:
 - For modifications: {{'action': 'modify', 'filename': '...'}}
 - For creations: {{'action': 'create', 'filename': '...'}}
+- For downloads: {{'action': 'download', 'source_url': '...', 'target_filename': '...'}}
 - For renames: {{'action': 'rename', 'old_filename': '...', 'new_filename': '...'}}
 - For copies: {{'action': 'copy', 'old_filename': '...', 'new_filename': '...'}}
 - For executions: {{'action': 'execute', 'filename': '...'}}
@@ -382,6 +388,11 @@ Respond with the actions as JSON list.
                 message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
                                                                  prompt_function)
                 commit_messages.append(message)
+            elif action == 'download':
+                source_url = instruction['source_url']
+                target_filename = instruction['target_filename']
+                download_to_repository(repository, branch_name, source_url, target_filename)
+                commit_messages.append(f"Downloaded {source_url}, saved as {target_filename}.")
             elif action == 'rename':
                 old_filename = instruction['old_filename']
                 new_filename = instruction['new_filename']

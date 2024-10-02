@@ -324,6 +324,10 @@ def write_file_in_new_branch(repository, branch_name, file_path, new_content, co
     else:
         repo.create_file(file_path, commit_message, new_content, branch=branch_name)
 
+    # save the file
+    with open(file_path, "w") as f:
+        f.write(new_content)
+
     return f"File {file_path} successfully created in repository {repository} branch {branch_name}."
 
 
@@ -653,6 +657,10 @@ def rename_file_in_repository(repository, branch_name, old_file_path, new_file_p
     # Delete the old file
     repo.delete_file(old_file_path, commit_message, file.sha, branch=branch_name)
 
+    # move file locally using shutil
+    import shutil
+    shutil.move(old_file_path, new_file_path)
+
 
 def delete_file_from_repository(repository, branch_name, file_path, commit_message="Delete file"):
     """
@@ -705,9 +713,14 @@ def execute_notebook_in_repository(repository, branch_name, file_path, commit_me
     """
     Log().log(f"-> execute_notebook_in_repository({repository}, {branch_name}, {file_path})")
     from ._utilities import execute_notebook
+    import os
 
     if not file_path.endswith(".ipynb"):
         raise ValueError("The file must be a Jupyter notebook (*.ipynb). It cannot be executed otherwise.")
+
+    current_dir = os.getcwd()
+    path_without_filename = "/".join(file_path.split("/")[:-1])
+    os.chdir(path_without_filename)
 
     # Authenticate with GitHub
     repo = get_github_repository(repository)
@@ -719,8 +732,14 @@ def execute_notebook_in_repository(repository, branch_name, file_path, commit_me
     # Execute the notebook
     new_notebook_content = execute_notebook(notebook_content)
 
+    os.chdir(current_dir)
+
     # Commit the changes
     repo.update_file(file_path, commit_message, new_notebook_content, file.sha, branch=branch_name)
+
+    # save the file
+    with open(file_path, "w") as f:
+        f.write(new_notebook_content)
 
 
 def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_path, commit_message="Copy file"):
@@ -751,9 +770,55 @@ def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_pa
     repo = get_github_repository(repository)
 
     file = get_file_in_repository(repository, branch_name, src_file_path)
+    file_content = file.decoded_content.decode()
 
     # Create a new file with the old content at the new path
-    repo.create_file(dest_file_path, commit_message, file.decoded_content.decode(), branch=branch_name)
+    repo.create_file(dest_file_path, commit_message, file_content, branch=branch_name)
+
+    # save the file
+    with open(dest_file_path, "w") as f:
+        f.write(file_content)
+
+
+def download_to_repository(repository, branch_name, source_url, target_filename):
+    """Download a file from a URL and upload it to a GitHub repository."""
+    import requests
+    import base64
+    from github import Github
+    from ._logger import Log
+    Log().log(f"-> download_to_repository({repository}, {branch_name}, {source_url}, {target_filename})")
+
+    if source_url.endswith(")"): # happens with ![]() markdown syntax
+        source_url = source_url[:-1]
+
+    # Download the image
+    response = requests.get(source_url)
+    if response.status_code == 200:
+        image_content = response.content
+    else:
+        raise Exception(f"Failed to download image. Status code: {response.status_code}")
+
+    # Upload the image to the GitHub repository using the GitHub API
+    repo = get_github_repository(repository)
+
+    commit_message = f"Downloaded {source_url}, saved as {target_filename}."
+
+    # save the file
+    with open(target_filename, "wb") as f:
+        f.write(image_content)
+
+    # Check if the file already exists
+    try:
+        contents = repo.get_contents(target_filename)
+        # If file exists, we need to update it
+        repo.update_file(contents.path, commit_messagecommit_message, image_content, contents.sha, branch=branch_name)
+        print(f"Image '{target_filename}' successfully updated.")
+    except:
+        # If file does not exist, we create a new one
+        repo.create_file(target_filename, commit_message, image_content, branch=branch_name)
+        print(f"Image '{target_filename}' successfully uploaded.")
+
+
 
 
 def create_issue(repository, title, body):
