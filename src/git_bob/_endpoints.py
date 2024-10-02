@@ -33,14 +33,24 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
     return message.content[0].text
 
 
-def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06"):
+def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None):
     """A prompt helper function that sends a message to openAI
     and returns only the text response.
     """
     # convert message in the right format if necessary
+    from ._utilities import image_to_url
     import openai
-    if isinstance(message, str):
+    if image is None:
         message = [{"role": "user", "content": message}]
+    else:
+        image_url = image_to_url(image)
+        message = [{"role": "user", "content": [{
+                    "type": "text",
+                    "text": message,
+                },{
+                    "type": "image_url",
+                    "image_url": {"url": image_url}
+                }]}]
 
     # setup connection to the LLM
     client = openai.OpenAI()
@@ -66,11 +76,12 @@ def prompt_gemini(request, model="gemini-1.5-flash-001"):
     return result.text
 
 
-def prompt_azure(message: str, model="gpt-4o"):
+def prompt_azure(message: str, model="gpt-4o", image=None):
     """A prompt helper function that sends a message to Azure's OpenAI Service
     and returns only the text response.
     """
     import os
+    from ._utilities import image_to_url
 
     token = os.environ["GH_MODELS_API_KEY"]
     endpoint = "https://models.inference.ai.azure.com"
@@ -88,6 +99,15 @@ def prompt_azure(message: str, model="gpt-4o"):
 
         if isinstance(message, str):
             message = [UserMessage(content=message)]
+        if image is not None:
+            image_url = image_to_url(image)
+            message = [UserMessage(
+                    content=[
+                        TextContentItem(text=message),
+                        ImageContentItem(image_url={"url": image_url}),
+                    ],
+                )]
+
 
         response = client.complete(
             messages=message,
@@ -100,8 +120,16 @@ def prompt_azure(message: str, model="gpt-4o"):
     else:
         from openai import OpenAI
 
-        if isinstance(message, str):
+        if image is None:
             message = [{"role": "user", "content": message}]
+        else:
+            image_url = image_to_url(image)
+            message = [{"role": "user", "content": [{
+                "type": "image_url",
+                "image_url": {
+                    "url": image_url
+                }
+            }]}]
 
         client = OpenAI(
             base_url=endpoint,

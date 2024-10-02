@@ -6,3 +6,4 @@ toolz
 azure-ai-inference
 nbconvert
 nbformat
+Pillow
