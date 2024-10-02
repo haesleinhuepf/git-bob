@@ -58,3 +58,16 @@ def test_modify_discussion():
     assert "I have a question. What" in modified_discussion
     assert "Bug Tracker = https://github.com/haesleinhuepf/bia-bob/issues" in modified_discussion
     assert "Dr. rer. medic. Robert Haase" not in modified_discussion
+
+
+def test_append_result():
+    from git_bob._utilities import append_result
+    assert append_result("""
+blabla 
+
+```java
+ddddd
+""", """```java
+eeeee
+fffff
+""") == '\nblabla \n\n```java\nddddd\n\neeeee\nfffff\n'

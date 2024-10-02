@@ -331,3 +331,27 @@ def execute_notebook(notebook_content, timeout=600, kernel_name='python3'):
         # If an error occurs during execution, warn and return the notebook as it was
         warnings.warn(f"Error during notebook execution: {e}")
         return notebook_content
+
+
+def append_result(a, b):
+    """
+    Appends two string, which might be produced by LLMs. E.g. in case the first thing contains ```python and the second
+    starts with ```python, the beginning of the second string is removed.
+    """
+    if len(a) == 0:
+        return b
+    if len(b) == 0:
+        return a
+
+    possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy",
+                           "```jython", "```md", "```markdown",
+                           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
+
+    for beginning in possible_beginnings:
+        if beginning in a and b.startswith(beginning + "\n"):
+            b = b[len(beginning):]
+            return a + b
+    return a + b
+
+
+

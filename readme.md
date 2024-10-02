@@ -130,17 +130,18 @@ Available actions:
 `git-bob` is a research project and has limitations. It serves as basis for discussion and further development. Once LLMs become better, `git-bob` will become better as well.
 
 At the moment, these limitations can be observed:
-* `git-bob` was tested for Python projects only (yet).
-* It sometimes halucinates, especially in code reviews. E.g. it [claimed](https://github.com/haesleinhuepf/git-bob/pull/70) to have tested code, which is certainly not true.
-* It cannot solve issues where changing long files is required, as the output of the LLMs is limited by a maximum number of tokens (e.g. 16k for `gpt-4o-2024-08-06`).
+* `git-bob` was tested for Python projects mostly. It seems to be able to process Java and C++ as well.
 * It cannot solve issues where running and testing the code is required. 
-* When changing multiple files, it may introduce conflicts between the files, as it does not know about the content of the other files.
+* It sometimes halucinates, especially in code reviews. E.g. it [claimed](https://github.com/haesleinhuepf/git-bob/pull/70) to have tested code, which is certainly not true.
+* It cannot solve issues where changing long files is required, as the output of the LLMs is limited by a maximum number of tokens (e.g. 16k for `gpt-4o-2024-08-06`). When using OpenAI's models it combines output of multiple requests to a maximum file length about 64k tokens. It may then miss some spaces or a line break where responses were stiched. 
+  When using github models, the maximum file length is 4k tokens. When using anthropic's claude, the maximum file length is 8k tokens.
+* When changing multiple files, it may introduce conflicts between the files, as it does not know about the changed contents of the other files.
 * It has only limited logic to control who is allowed to trigger it. 
   If you are a repository member, you can trigger it. 
   If others send a pull-request, a repository member must allow the action to run manually.
 * `git-bob` is incompatible with locally running open-source/-weight LLMs. 
   This might make sense when being executed locally only. In the Github-CI this might be impossible.
-* Recently tested `claude-3-5-sonnet-20240620`, `gpt-4o-2024-08-06`, and `github_models:meta-llama-3.1-405b-instruct` models produce useful results. The model `gemini-1.5-flash-001` is technically supported too, but its results were not very useful. 
+* Recently tested `claude-3-5-sonnet-20240620`, `gpt-4o-2024-08-06`, `github_models:gpt-4o` and `github_models:meta-llama-3.1-405b-instruct` models produce useful results. The model `gemini-1.5-flash-001` is technically supported too, but its results were not very useful. 
 
 ## Similar projects
 

@@ -18,7 +18,7 @@ def command_line_interface():
     print("Hello")
 
     # read environment variables
-    timeout_in_seconds = os.environ.get("TIMEOUT_IN_SECONDS", 300) # 5 minutes
+    timeout_in_seconds = os.environ.get("TIMEOUT_IN_SECONDS", 900) # 15 minutes
     llm_name = get_llm_name()
     if "github_models:" in llm_name and os.environ.get("GH_MODELS_API_KEY") is not None:
         prompt = prompt_azure
