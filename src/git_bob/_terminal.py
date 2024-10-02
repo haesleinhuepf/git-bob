@@ -31,6 +31,8 @@ def command_line_interface():
     else:
         raise NotImplementedError("Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs.")
 
+    from git_bob import __version__
+    Log().log("I am git-bob " + str(__version__))
     Log().log("Using language model: " + llm_name)
 
     # Print out all arguments passed to the script
@@ -96,8 +98,7 @@ def command_line_interface():
     elif ((not running_in_github_ci and task == "solve-issue") or
           (running_in_github_ci and task == "comment-on-issue" and "git-bob solve" in text)):
         solve_github_issue(repository, issue, llm_name, prompt, base_branch=base_branch)
-    elif (task == "comment-on-issue" or task == "split-issue") and (
-            "git-bob split" in text or not running_in_github_ci):
+    elif ((task == "comment-on-issue" and "git-bob split" in text) or (task == "split-issue" and not running_in_github_ci)):
         split_issue_in_sub_issues(repository, issue, prompt)
     elif task == "comment-on-issue" and ("git-bob comment" in text or not running_in_github_ci):
         comment_on_issue(repository, issue, prompt)
