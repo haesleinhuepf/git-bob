@@ -112,11 +112,14 @@ Then you can install git-bob using pip:
 pip install git-bob
 ```
 
-## Usage as command-line tool
+## Usage as command-line tool (for development only)
 
-You can then use git-bob from the terminal on repositories you have read/write access to.
+You can then use git-bob from the terminal on repositories you have read/write access to. 
+It is recommended to call it from the root folder of the repository you want to interact with.
 
 ```bash
+git-clone https://github.com/<organization>/<repository>
+cd <repository>
 git-bob <action> <organization>/<repository> <issue-number>
 ```
 
