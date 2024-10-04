@@ -292,7 +292,7 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
     return file_contents
 
 
-def write_file_in_new_branch(repository, branch_name, file_path, new_content, commit_message="Update file"):
+def write_file_in_branch(repository, branch_name, file_path, new_content, commit_message="Update file"):
     """
     Modifies or creates a specified file with new content and saves the changes in a new git branch.
     The name of the new branch is returned.

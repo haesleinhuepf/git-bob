@@ -211,7 +211,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         The function to generate the file modification content.
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
-    from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, \
+    from ._github_utilities import get_repository_file_contents, write_file_in_branch, create_branch, \
         check_if_file_exists, get_file_in_repository, execute_notebook_in_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells, \
         restore_outputs_of_code_cells, execute_notebook
@@ -227,6 +227,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
             file_content = erase_outputs_of_code_cells(file_content)
         file_content_instruction = f"""
 Modify the file "{filename}" to solve the issue #{issue}.
+If the discussion is long, some stuff might be already done. In that case, focus on what was said at the very end in the discussion.
 Keep your modifications absolutely minimal.
 
 That's the file "{filename}" content you will find in the file:
@@ -274,7 +275,10 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
 
     new_content, commit_message = split_content_and_summary(response)
 
+    print("New file content", new_content)
+
     do_execute_notebook = False
+    print("Summary", commit_message)
 
     if original_ipynb_file_content is not None:
         try:
@@ -287,9 +291,6 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
         print("Erasing outputs in generated ipynb file")
         new_content = erase_outputs_of_code_cells(new_content)
         do_execute_notebook = True
-
-    print("New file content", new_content)
-    print("Summary", commit_message)
 
     if do_execute_notebook:
         print("Executing the notebook")
@@ -306,7 +307,7 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
         finally:
             os.chdir(current_dir)
 
-    write_file_in_new_branch(repository, branch_name, filename, new_content + "\n", commit_message)
+    write_file_in_branch(repository, branch_name, filename, new_content + "\n", commit_message)
 
     return commit_message
 
@@ -333,13 +334,16 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     Log().log(f"-> solve_github_issue({repository}, {issue})")
 
     from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, \
-        write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, \
+        write_file_in_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, \
         get_diff_of_branches, get_conversation_on_issue, rename_file_in_repository, delete_file_from_repository, \
-        copy_file_in_repository, execute_notebook_in_repository, download_to_repository, add_comment_to_issue
+        copy_file_in_repository, execute_notebook_in_repository, download_to_repository, add_comment_to_issue, \
+        get_github_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion, \
         remove_ansi_escape_sequences
     from github.GithubException import GithubException
     import traceback
+
+    repo = get_github_repository(repository)
 
     discussion = modify_discussion(get_conversation_on_issue(repository, issue))
     print("Discussion:", discussion)
@@ -377,9 +381,15 @@ Respond with the actions as JSON list.
     instructions = text_to_json(modifications)
 
     # create a new branch
-    branch_name = create_branch(repository, parent_branch=base_branch)
+    if base_branch is None or base_branch == repo.get_branch(repo.default_branch).name:
+        # create a new branch
+        branch_name = create_branch(repository, parent_branch=base_branch)
+        print("Created branch", branch_name)
+    else:
+        # continue on the current branch
+        branch_name = base_branch
+        print("Continue working on branch", branch_name)
 
-    print("Created branch", branch_name)
 
     errors = []
     commit_messages = []
@@ -394,11 +404,7 @@ Respond with the actions as JSON list.
                     continue
 
         try:
-            if action == 'create':
-                message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
-                                                                 prompt_function)
-                commit_messages.append(message)
-            elif action == 'modify':
+            if action == 'create' or action == 'modify':
                 filename = instruction['filename']
                 message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
                                                                  prompt_function)
@@ -448,8 +454,15 @@ Respond with the actions as JSON list.
 
     # summarize the changes
     commit_messages_prompt = "* " + "\n* ".join(commit_messages)
-    pull_request_summary = prompt_function(f"""
-{SYSTEM_PROMPT}
+
+    from ._ai_github_utilities import setup_ai_remark
+    remark = setup_ai_remark() + "\n\n"
+
+
+    if branch_name != base_branch:
+
+        pull_request_summary = prompt_function(f"""
+        {SYSTEM_PROMPT}
 Given a list of commit messages and a git diff, summarize the changes you made in the files.
 You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
 
@@ -473,20 +486,34 @@ Afterwards, summarize the summary in a single line, which will become the title 
 Do not add headline or any other formatting. Just respond with the paragraphe and the title in a new line below.
 """)
 
-    pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
+        pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
 
-    from ._ai_github_utilities import setup_ai_remark
-    remark = setup_ai_remark() + "\n\n"
+        full_report = remark + pull_request_description + error_messages
 
-    try:
-        send_pull_request(repository,
-                      source_branch=branch_name,
-                      target_branch=base_branch,
-                      title=pull_request_title,
-                      description=f"{remark}{pull_request_description} {error_messages}\n\ncloses #{issue}")
-    except GithubException as e:
-        add_comment_to_issue(repository, issue, f"{remark}Error creating pull-request: {e}{error_messages}")
+        try:
+            send_pull_request(repository,
+                          source_branch=branch_name,
+                          target_branch=base_branch,
+                          title=pull_request_title,
+                          description=full_report + f"\n\ncloses #{issue}")
+        except GithubException as e:
+            add_comment_to_issue(repository, issue, f"{remark}Error creating pull-request: {e}{error_messages}")
+    else:
+        modification_summary = prompt_function(f"""
+                {SYSTEM_PROMPT}
+        Given a list of commit messages, summarize the changes you made.
 
+        ## Commit messages
+        You committed these changes to these files
+
+        {commit_messages_prompt}
+
+        ## Your task
+        Summarize the changes above to a one paragraph.
+        Do not add headline or any other formatting. Just respond with the paragraphe below.
+        """)
+
+        add_comment_to_issue(repository, issue, remark + modification_summary + error_messages)
 
 def split_issue_in_sub_issues(repository, issue, prompt_function):
     """
