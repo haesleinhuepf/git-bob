@@ -227,6 +227,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
             file_content = erase_outputs_of_code_cells(file_content)
         file_content_instruction = f"""
 Modify the file "{filename}" to solve the issue #{issue}.
+If the discussion is long, some stuff might be already done. In that case, focus on what was said at the very end in the discussion.
 Keep your modifications absolutely minimal.
 
 That's the file "{filename}" content you will find in the file:
@@ -274,7 +275,10 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
 
     new_content, commit_message = split_content_and_summary(response)
 
+    print("New file content", new_content)
+
     do_execute_notebook = False
+    print("Summary", commit_message)
 
     if original_ipynb_file_content is not None:
         try:
@@ -287,9 +291,6 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
         print("Erasing outputs in generated ipynb file")
         new_content = erase_outputs_of_code_cells(new_content)
         do_execute_notebook = True
-
-    print("New file content", new_content)
-    print("Summary", commit_message)
 
     if do_execute_notebook:
         print("Executing the notebook")
@@ -403,11 +404,7 @@ Respond with the actions as JSON list.
                     continue
 
         try:
-            if action == 'create':
-                message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
-                                                                 prompt_function)
-                commit_messages.append(message)
-            elif action == 'modify':
+            if action == 'create' or action == 'modify':
                 filename = instruction['filename']
                 message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
                                                                  prompt_function)
