@@ -323,8 +323,9 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, \
         write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, \
         get_diff_of_branches, get_conversation_on_issue, rename_file_in_repository, delete_file_from_repository, \
-        copy_file_in_repository, execute_notebook_in_repository, download_to_repository
+        copy_file_in_repository, execute_notebook_in_repository, download_to_repository, add_comment_to_issue
     from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion
+    from github.GithubException import GithubException
 
     discussion = modify_discussion(get_conversation_on_issue(repository, issue))
     print("Discussion:", discussion)
@@ -368,7 +369,7 @@ Respond with the actions as JSON list.
     for instruction in instructions:
         action = instruction.get('action')
 
-        for filename_key in ["filename", "new_filename", "old_filename"]:
+        for filename_key in ["filename", "new_filename", "old_filename", "target_filename"]:
             if filename_key in instruction.keys():
                 filename = instruction[filename_key]
                 if filename.startswith(".github/workflows"):
@@ -413,11 +414,11 @@ Respond with the actions as JSON list.
                 execute_notebook_in_repository(repository, branch_name, filename)
                 commit_messages.append(f"Executed {filename}.")
         except Exception as e:
-            errors.append(f"Error processing {instruction}: " + str(e))
+            errors.append(f"Error during {instruction}: " + str(e))
 
     error_messages = ""
     if len(errors) > 0:
-        error_messages = "## Error messages\n\nDuring solving this issue, the following errors occurred:\n\n* " + "\n* ".join(
+        error_messages = "\n\nDuring solving this task, the following errors occurred:\n\n* " + "\n* ".join(
             errors) + "\n"
 
     print(error_messages)
@@ -446,8 +447,6 @@ The following changes were made in the files:
 
 {diffs_prompt}
 
-{error_messages}
-
 ## Your task
 Summarize the changes above to a one paragraph line Github pull-request message. 
 Afterwards, summarize the summary in a single line, which will become the title of the pull-request.
@@ -456,11 +455,14 @@ Do not add headline or any other formatting. Just respond with the paragraphe an
 
     pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
 
-    send_pull_request(repository,
+    try:
+        send_pull_request(repository,
                       source_branch=branch_name,
                       target_branch=base_branch,
                       title=pull_request_title,
-                      description=pull_request_description + "\n\ncloses #" + str(issue))
+                      description=f"{pull_request_description} {error_messages}\n\ncloses #{issue}")
+    except GithubException as e:
+        add_comment_to_issue(repository, issue, f"Error creating pull-request: {e}{error_messages}")
 
 
 def split_issue_in_sub_issues(repository, issue, prompt_function):
