@@ -93,7 +93,7 @@ def command_line_interface():
         base_branch = repo.default_branch
 
     # execute the task
-    if task == "review-pull-request":
+    if task == "review-pull-request" and not "git-bob solve" in text:
         review_pull_request(repository, issue, prompt)
     elif ((not running_in_github_ci and task == "solve-issue") or
           (running_in_github_ci and task == "comment-on-issue" and "git-bob solve" in text)):
