@@ -44,6 +44,7 @@ def add_comment_to_issue(repository, issue, comment):
         The comment text to add to the issue.
     """
     Log().log(f"-> add_comment_to_issue({repository}, {issue}, ...)")
+
     repo = get_github_repository(repository)
 
     # Get the issue object
@@ -458,14 +459,12 @@ def send_pull_request(repository, source_branch, target_branch, title, descripti
     """
     Log().log(f"-> send_pull_request({repository}, {source_branch}, {target_branch}, ...)")
 
-    from ._ai_github_utilities import setup_ai_remark
 
     # Authenticate with GitHub
     repo = get_github_repository(repository)
 
     # Create a pull request
-    remark = setup_ai_remark() + "\n\n"
-    pr = repo.create_pull(title=title, body=remark + description, head=source_branch, base=target_branch)
+    pr = repo.create_pull(title=title, body=description, head=source_branch, base=target_branch)
 
     return f"Pull request created: {pr.html_url}"
 
@@ -730,6 +729,7 @@ def execute_notebook_in_repository(repository, branch_name, file_path, commit_me
         raise ValueError("The file must be a Jupyter notebook (*.ipynb). It cannot be executed otherwise.")
 
     current_dir = os.getcwd()
+    print("current_dir", current_dir)
     path_without_filename = "/".join(file_path.split("/")[:-1])
     os.chdir(path_without_filename)
 
@@ -741,16 +741,19 @@ def execute_notebook_in_repository(repository, branch_name, file_path, commit_me
     notebook_content = file.decoded_content.decode()
 
     # Execute the notebook
-    new_notebook_content = execute_notebook(notebook_content)
-
-    os.chdir(current_dir)
-
-    # Commit the changes
-    repo.update_file(file_path, commit_message, new_notebook_content, file.sha, branch=branch_name)
+    try:
+        new_notebook_content = execute_notebook(notebook_content)
+    except:
+        raise ValueError("Error during notebook execution.")
+    finally:
+        os.chdir(current_dir)
 
     # save the file
     with open(file_path, "w") as f:
         f.write(new_notebook_content)
+
+    # Commit the changes
+    repo.update_file(file.path, commit_message, new_notebook_content, file.sha, branch=branch_name)
 
 
 def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_path, commit_message="Copy file"):
@@ -799,6 +802,9 @@ def download_to_repository(repository, branch_name, source_url, target_filename)
     from ._logger import Log
     Log().log(f"-> download_to_repository({repository}, {branch_name}, {source_url}, {target_filename})")
 
+    if not source_url.startswith("https://github.com"):
+        raise Exception("Can only download from GitHub URLs.")
+
     if source_url.endswith(")"): # happens with ![]() markdown syntax
         source_url = source_url[:-1]
 
@@ -822,7 +828,7 @@ def download_to_repository(repository, branch_name, source_url, target_filename)
     try:
         contents = repo.get_contents(target_filename)
         # If file exists, we need to update it
-        repo.update_file(contents.path, commit_messagecommit_message, image_content, contents.sha, branch=branch_name)
+        repo.update_file(contents.path, commit_message, image_content, contents.sha, branch=branch_name)
         print(f"Image '{target_filename}' successfully updated.")
     except:
         # If file does not exist, we create a new one
