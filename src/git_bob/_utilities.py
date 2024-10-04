@@ -320,25 +320,26 @@ def execute_notebook(notebook_content, timeout=600, kernel_name='python3'):
     """
     import nbformat
     from nbconvert.preprocessors import ExecutePreprocessor
+
+    # Load the notebook
+    notebook = nbformat.reads(notebook_content, as_version=4)
+
+    # Initialize the processor to execute the notebook
+    ep = ExecutePreprocessor(timeout=timeout, kernel_name=kernel_name)
+
     try:
-        # Load the notebook
-        notebook = nbformat.reads(notebook_content, as_version=4)
-
-        # Initialize the processor to execute the notebook
-        ep = ExecutePreprocessor(timeout=timeout, kernel_name=kernel_name)
-
         # Execute the notebook
         ep.preprocess(notebook, {'metadata': {'path': './'}})
+    except:
+        pass # attempt to save the error in the notebook
+        # raise Exception("Error during notebook execution.")
 
-        # Save executed notebook
-        notebook_content = nbformat.writes(notebook)
+    # Save executed notebook
+    notebook_content = nbformat.writes(notebook)
 
-        # If we reach here, execution was successful
-        return notebook_content
-    except Exception as e:
-        # If an error occurs during execution, warn and return the notebook as it was
-        warnings.warn(f"Error during notebook execution: {e}")
-        return notebook_content
+    # If we reach here, execution was successful
+    return notebook_content
+
 
 
 def append_result(a, b):
@@ -362,4 +363,7 @@ def append_result(a, b):
     return a + b
 
 
-
+def remove_ansi_escape_sequences(text):
+    import re
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    return ansi_escape.sub('', text)
