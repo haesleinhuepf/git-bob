@@ -273,26 +273,26 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
 
     new_content, commit_message = split_content_and_summary(response)
 
-    do_execute_notebok = False
+    do_execute_notebook = False
 
     if original_ipynb_file_content is not None:
         try:
             new_content = restore_outputs_of_code_cells(new_content, original_ipynb_file_content)
         except ValueError as e:
             warnings.warn(f"Could not restore outputs of code cells in {filename}: {e}")
-            do_execute_notebok = True
+            do_execute_notebook = True
 
     elif filename.endswith('.ipynb'):
         print("Erasing outputs in generated ipynb file")
         new_content = erase_outputs_of_code_cells(new_content)
-        do_execute_notebok = True
+        do_execute_notebook = True
 
     print("New file content", new_content)
     print("Summary", commit_message)
 
     write_file_in_new_branch(repository, branch_name, filename, new_content + "\n", commit_message)
 
-    if do_execute_notebok:
+    if do_execute_notebook:
         print("Executing the notebook")
         execute_notebook_in_repository(repository, branch_name, filename)
 
