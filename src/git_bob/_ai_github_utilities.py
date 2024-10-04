@@ -214,7 +214,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     from ._github_utilities import get_repository_file_contents, write_file_in_new_branch, create_branch, \
         check_if_file_exists, get_file_in_repository, execute_notebook_in_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells, \
-        restore_outputs_of_code_cells
+        restore_outputs_of_code_cells, execute_notebook
 
     original_ipynb_file_content = None
 
@@ -269,6 +269,7 @@ Given a github issue summary (#{issue}) and optionally file content (filename {f
 
 Respond ONLY the content of the file and afterwards a single line summarizing the changes you made (without mentioning the issue).
 """
+    print("Prompting for new file content...")
     response = prompt_function(prompt)
 
     new_content, commit_message = split_content_and_summary(response)
@@ -290,11 +291,22 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
     print("New file content", new_content)
     print("Summary", commit_message)
 
-    write_file_in_new_branch(repository, branch_name, filename, new_content + "\n", commit_message)
-
     if do_execute_notebook:
         print("Executing the notebook")
-        execute_notebook_in_repository(repository, branch_name, filename)
+        current_dir = os.getcwd()
+        print("current_dir", current_dir)
+        path_without_filename = "/".join(filename.split("/")[:-1])
+        os.chdir(path_without_filename)
+
+        # Execute the notebook
+        try:
+            new_content = execute_notebook(new_content)
+        except:
+            raise ValueError("Error during notebook execution.")
+        finally:
+            os.chdir(current_dir)
+
+    write_file_in_new_branch(repository, branch_name, filename, new_content + "\n", commit_message)
 
     return commit_message
 
@@ -324,8 +336,10 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
         write_file_in_new_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, \
         get_diff_of_branches, get_conversation_on_issue, rename_file_in_repository, delete_file_from_repository, \
         copy_file_in_repository, execute_notebook_in_repository, download_to_repository, add_comment_to_issue
-    from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion
+    from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion, \
+        remove_ansi_escape_sequences
     from github.GithubException import GithubException
+    import traceback
 
     discussion = modify_discussion(get_conversation_on_issue(repository, issue))
     print("Discussion:", discussion)
@@ -344,8 +358,11 @@ Given a list of files in the repository {repository} and a github issues descrip
 {all_files}
 
 ## Your task
-Decide which of these files need to be modified, created, downloaded, renamed, copied, executed or deleted to solve #{issue} ? Downloads are necessary, if there is a url in the discussion and the linked file is needed in the proposed code.
-Keep the list of actions minimarl.
+Decide which of these files need to be modified, created, downloaded, renamed, copied, executed or deleted to solve #{issue} ? 
+Downloads are necessary, if there is a url in the discussion and the linked file is needed in the proposed code.
+Executions of notebooks are NOT necessary if you just created or modified them as execution is part of the creation or modification.
+If the user asks for executing a notebook in the very last message only, then only execute it. Do not modify the notebook then.
+Keep the list of actions minimal.
 Response format:
 - For modifications: {{'action': 'modify', 'filename': '...'}}
 - For creations: {{'action': 'create', 'filename': '...'}}
@@ -378,12 +395,9 @@ Respond with the actions as JSON list.
 
         try:
             if action == 'create':
-                if check_if_file_exists(repository, branch_name, filename):
-                    errors.append(f"Error processing {filename}: File already exists.")
-                else:
-                    message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
-                                                                     prompt_function)
-                    commit_messages.append(message)
+                message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
+                                                                 prompt_function)
+                commit_messages.append(message)
             elif action == 'modify':
                 filename = instruction['filename']
                 message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
@@ -414,7 +428,13 @@ Respond with the actions as JSON list.
                 execute_notebook_in_repository(repository, branch_name, filename)
                 commit_messages.append(f"Executed {filename}.")
         except Exception as e:
-            errors.append(f"Error during {instruction}: " + str(e))
+            traces = "    " + remove_ansi_escape_sequences(traceback.format_exc()).replace("\n", "\n    ")
+            summary = f"""<details>
+    <summary>Error during {instruction}: {e}</summary>
+    <pre>{traces}</pre>
+</details>
+            """
+            errors.append(summary)
 
     error_messages = ""
     if len(errors) > 0:
@@ -455,14 +475,17 @@ Do not add headline or any other formatting. Just respond with the paragraphe an
 
     pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
 
+    from ._ai_github_utilities import setup_ai_remark
+    remark = setup_ai_remark() + "\n\n"
+
     try:
         send_pull_request(repository,
                       source_branch=branch_name,
                       target_branch=base_branch,
                       title=pull_request_title,
-                      description=f"{pull_request_description} {error_messages}\n\ncloses #{issue}")
+                      description=f"{remark}{pull_request_description} {error_messages}\n\ncloses #{issue}")
     except GithubException as e:
-        add_comment_to_issue(repository, issue, f"Error creating pull-request: {e}{error_messages}")
+        add_comment_to_issue(repository, issue, f"{remark}Error creating pull-request: {e}{error_messages}")
 
 
 def split_issue_in_sub_issues(repository, issue, prompt_function):
