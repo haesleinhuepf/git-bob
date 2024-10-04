@@ -71,7 +71,7 @@ Here's the recommended workflow for using git-bob:
 4. Comment on the issue with `git-bob solve` or `git-bob implement this` (an alias for `solve`) to trigger git-bob.
 5. Wait for git-bob to create a pull request (PR) addressing the issue.
 6. Review the PR and comment on the PR or on the original issue if changes are needed.
-7. Wait for git-bob to create another PR with the requested changes. Depending on if you commented on the PR or on the issue, the starting point for the new modification will be different.
+7. Wait for git-bob to create new PR or modifying the existing PR with the requested changes.
 8. Repeat steps 3-5 as necessary until the issue is resolved satisfactorily.
 
 ## Use-case examples
