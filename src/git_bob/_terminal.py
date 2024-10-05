@@ -123,7 +123,7 @@ def command_line_interface():
         pull_request = repo.get_pull(issue)
         base_branch = pull_request.head.ref
         print("Issue is a a PR - switching to the branch", base_branch)
-        run_cli(f"git checkout {base_branch}", verbose=True)
+        run_cli(f"git checkout -b {base_branch} origin/{base_branch}", verbose=True)
 
         # Extract source (head) and target (base) branches
         base_branch = pull_request.head.ref
