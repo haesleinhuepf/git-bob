@@ -164,6 +164,7 @@ There are similar projects out there
 * [Github Copilot Workspace](https://githubnext.com/projects/copilot-workspace)
 * [agentless](https://github.com/OpenAutoCoder/Agentless)
 * [git-aid](https://github.com/Torantulino/git-aid)
+* [SWE-agent](https://github.com/princeton-nlp/SWE-agent)
 
 ## Contributing
 
