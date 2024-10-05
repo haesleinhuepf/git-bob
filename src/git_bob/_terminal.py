@@ -93,7 +93,7 @@ def command_line_interface():
 
     # determine task to do
     if running_in_github_ci:
-        if not ("git-bob comment" in text or "git-bob solve" in text or "git-bob split" in text):
+        if not ("git-bob comment" in text or "git-bob solve" in text or "git-bob split" in text or "git-bob deploy" in text):
             print("They didn't speak to me. I show myself out:", text)
             sys.exit(0)
         ai_remark = setup_ai_remark()
