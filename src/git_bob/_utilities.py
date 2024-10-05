@@ -44,18 +44,9 @@ def remove_outer_markdown(text):
 
     return text
 
-@lru_cache(maxsize=1)
-def get_llm_name():
-    """
-    Get the name of the LLM from environment variables.
 
-    Returns
-    -------
-    str
-        The name of the LLM.
-    """
-    import os
-    return os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-08-06")
+class Config:
+    llm_name = None
 
 
 class ErrorReporting:
