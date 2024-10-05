@@ -383,7 +383,7 @@ def run_cli(command:str, check=False, verbose=False):
 def deploy(repository, issue):
     from ._github_utilities import add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark
-    run_cli("python setup.py sdist bdist_wheel")
-    result = run_cli("twine upload dist/*")
-    add_comment_to_issue(repository, issue, setup_ai_remark + f"Deployment: {result}")
+    run_cli("python setup.py sdist bdist_wheel", verbose=True)
+    result = run_cli("twine upload dist/*", verbose=True)
+    add_comment_to_issue(repository, issue, setup_ai_remark() + f"\nDeployment: {result}")
 
