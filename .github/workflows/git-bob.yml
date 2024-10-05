@@ -1,6 +1,11 @@
-name: Review Pull Request
+name: Respond to Issue
 
 on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types:
+      - created
   pull_request:
     types: [opened, synchronize]
   pull_request_review_comment:
@@ -62,5 +67,4 @@ jobs:
           * If the image shows clearly distinct objects in its channels, these structures are listed for each channel individually.
           * You speculate how the image was acquired.
       run: |
-        git-bob review-pull-request-action ${{ github.repository }} ${{ github.event.pull_request.number }}
-
+        git-bob github-action ${{ github.repository }} ${{ github.event.pull_request.number }} ${{ github.event.issue.number }}
