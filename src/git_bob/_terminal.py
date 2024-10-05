@@ -11,7 +11,7 @@ def command_line_interface():
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues
     from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure
     from ._github_utilities import check_access_and_ask_for_approval, get_github_repository
-    from ._utilities import quick_first_response, Config
+    from ._utilities import quick_first_response, Config, deploy
     from ._logger import Log
     from github.GithubException import UnknownObjectException
 
@@ -141,6 +141,8 @@ def command_line_interface():
     elif "git-bob solve" in text:
         # could be issue or modifying code in a PR
         solve_github_issue(repository, issue, Config.llm_name, prompt, base_branch=base_branch)
+    elif "git-bob deploy" in text:
+        deploy(repository, issue)
     else:
         raise NotImplementedError(f"Unknown task. I show myself out.")
 
