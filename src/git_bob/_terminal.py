@@ -14,6 +14,7 @@ def command_line_interface():
     from ._utilities import quick_first_response, Config, deploy
     from ._logger import Log
     from github.GithubException import UnknownObjectException
+    from ._utilities import run_cli
 
 
     print("Hello")
@@ -120,7 +121,9 @@ def command_line_interface():
     repo = get_github_repository(repository)
     try:
         pull_request = repo.get_pull(issue)
-        print("Issue is a a PR")
+        base_branch = pull_request.head.ref
+        print("Issue is a a PR - switching to the branch", base_branch)
+        run_cli(f"git checkout {base_branch}", verbose=True)
 
         # Extract source (head) and target (base) branches
         base_branch = pull_request.head.ref
