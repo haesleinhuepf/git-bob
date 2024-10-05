@@ -50,12 +50,16 @@ def command_line_interface():
     issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
     user, text = get_most_recent_comment_on_issue(repository, issue)
 
+    print("text: ", text)
+    print("git-bob ask in text", "git-bob ask" in text)
+
     # handle aliases
     text = text.replace("gitbob", "git-bob")  # typing - on the phone is hard
     text = text.replace("Git-bob", "git-bob")  # typing - on the phone is hard
 
     # handle ask-llm task option
     if "git-bob ask" in text:
+        print("Dynamic LLM selection")
         llm_name = text.split("git-bob ask")[-1].strip().split(" ")[0]
         text = text.replace(f"git-bob ask {llm_name} to ", "git-bob ")
         # example:
