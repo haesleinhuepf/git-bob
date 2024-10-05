@@ -1,4 +1,4 @@
-name: Respond to Issue
+name: git-bob acting
 
 on:
   issues:
@@ -44,7 +44,7 @@ jobs:
         pip install -r requirements.txt
 
 
-    - name: Run Python
+    - name: Run git-bob
       env:
         ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
         GOOGLE_API_KEY: "${{ secrets.GOOGLE_API_KEY }}"
