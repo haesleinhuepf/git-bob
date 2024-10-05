@@ -26,7 +26,7 @@ Do not use this technology if you are not aware of the costs and consequences.
 ## Installation as Github action
 
 There is a detailed [tutorial](docs/installation-tutorial.md) on how to install git-bob as github action to your repository. In very short, to use git-bob in your Github repository, you need to 
-* setup Github workflows like shown in [this folder](.github/workflows).
+* Copy the [git-bob](.github/workflows/git-bob.yml) GitHub workflow in folder `.github/workflows/` to your repository.
   * Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.4.0`.
   * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These were tested:
 * `claude-3-5-sonnet-20240620`

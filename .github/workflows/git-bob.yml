@@ -1,6 +1,11 @@
-name: Review Pull Request
+name: git-bob acting
 
 on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types:
+      - created
   pull_request:
     types: [opened, synchronize]
   pull_request_review_comment:
@@ -39,7 +44,7 @@ jobs:
         pip install -r requirements.txt
 
 
-    - name: Run Python
+    - name: Run git-bob
       env:
         ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
         GOOGLE_API_KEY: "${{ secrets.GOOGLE_API_KEY }}"
@@ -62,5 +67,4 @@ jobs:
           * If the image shows clearly distinct objects in its channels, these structures are listed for each channel individually.
           * You speculate how the image was acquired.
       run: |
-        git-bob review-pull-request-action ${{ github.repository }} ${{ github.event.pull_request.number }}
-
+        git-bob github-action ${{ github.repository }} ${{ github.event.pull_request.number }} ${{ github.event.issue.number }}

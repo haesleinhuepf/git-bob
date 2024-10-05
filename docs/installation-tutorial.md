@@ -3,9 +3,9 @@
 In this tutorial, we will install `git-bob` in the `stackview` repository to demonstrate all steps necessary for this.
 Afterwards, `git-bob` can use AI to help developing `stackview`.
 
-## Step 1: github workflows.
+## Step 1: GitHub workflows.
 
-The first step is to copy over the github workflows from the `git-bob` repository to the `stackview` repository.
+The first step is to copy over the `git-bob.yml` GitHub workflow from the folder `.github/workflows/` in the `git-bob` repository to the same folde in the `stackview` repository.
 It is recommended to do this change on a git-branch. We can then test this, before we submit the changes.
 We only adapt one thing, we replace this line:
 
@@ -16,10 +16,8 @@ pip install -e .
 by this one:
 
 ```
-pip install git-bob==0.2.2
+pip install git-bob==0.4.0
 ```
-
-You can see the full [git commit here](https://github.com/haesleinhuepf/stackview/commit/a5542352b2f2dd7e2cfbff32280ae8cec0015458).
 
 ## Step 2: Creating an OpenAI API Key
 
