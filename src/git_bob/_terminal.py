@@ -76,7 +76,8 @@ def command_line_interface():
     elif "gemini" in Config.llm_name and os.environ.get("GOOGLE_API_KEY") is not None:
         prompt = prompt_gemini
     else:
-        raise NotImplementedError(f"Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs (setting:_{Config.llm_name[1:]}).")
+        llm_name = Config.llm_name[1:]
+        raise NotImplementedError(f"Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs (setting:_{llm_name}).")
     Log().log("Using language model: _" + Config.llm_name[1:])
 
     # aliases for comment action
