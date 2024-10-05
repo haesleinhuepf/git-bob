@@ -293,7 +293,7 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
         do_execute_notebook = True
 
     if do_execute_notebook:
-        print("Executing the notebook")
+        print("Executing the notebook", len(new_content))
         current_dir = os.getcwd()
         print("current_dir", current_dir)
         path_without_filename = "/".join(filename.split("/")[:-1])
@@ -306,6 +306,7 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
             raise ValueError("Error during notebook execution.")
         finally:
             os.chdir(current_dir)
+        print("Executed notebook", len(new_content))
 
     write_file_in_branch(repository, branch_name, filename, new_content + "\n", commit_message)
 

@@ -330,7 +330,8 @@ def execute_notebook(notebook_content, timeout=600, kernel_name='python3'):
     try:
         # Execute the notebook
         ep.preprocess(notebook, {'metadata': {'path': './'}})
-    except:
+    except Exception as e:
+        print("Error during notebook execution:", e)
         pass # attempt to save the error in the notebook
         # raise Exception("Error during notebook execution.")
 
