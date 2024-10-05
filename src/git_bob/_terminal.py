@@ -56,7 +56,7 @@ def command_line_interface():
 
     # handle ask-llm task option
     if "git-bob ask" in text:
-        llm_name = text.split("git-bob ask")[1].strip().split(" ")[0]
+        llm_name = text.split("git-bob ask")[-1].strip().split(" ")[0]
         text = text.replace(f"git-bob ask {llm_name} to ", "git-bob ")
         # example:
         # git-bob ask gpt-4o to solve this issue -> git-bob solve this issue
