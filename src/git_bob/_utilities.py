@@ -320,6 +320,15 @@ def execute_notebook(notebook_content, timeout=600, kernel_name='python3'):
     """
     import nbformat
     from nbconvert.preprocessors import ExecutePreprocessor
+    import jupyter_client
+
+    # Get the list of available kernels
+    kernels = jupyter_client.kernelspec.KernelSpecManager().get_all_specs()
+
+    # Print the names of the kernels
+    print("Available Jupyter kernels:")
+    for name, spec in kernels.items():
+        print(f"- {name}")
 
     # Load the notebook
     notebook = nbformat.reads(notebook_content, as_version=4)
