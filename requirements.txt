@@ -8,3 +8,4 @@ nbconvert
 nbformat
 Pillow
 requests
+ipykernel
