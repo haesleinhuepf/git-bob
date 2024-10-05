@@ -61,6 +61,12 @@ This action can also be used to modify code in pull-requests.
 git-bob solve
 ```
 
+If you have multiple API-Key for different LLMs configured, you can specify the LLM in the command, e.g.:
+
+```
+git-bob ask claude-3-5-sonnet-20240620 to solve this issue.
+```
+
 ## Recommended Workflow
 
 Here's the recommended workflow for using git-bob:
