@@ -4,7 +4,7 @@ git-bob uses AI to solve Github-issues and review pull-requests. It runs inside 
 
 ![demo_fix_typos.png](docs/images/banner.png)
 
-Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api) or [OpenAI's chatGPT](https://openai.com/blog/openai-api) <!--or [Google's Gemini](https://blog.google.com/technology/ai/google-gemini-ai/)--> to understand the text and 
+Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api) or [OpenAI's chatGPT](https://openai.com/blog/openai-api) or [Google's Gemini](https://blog.google/technology/ai/google-gemini-ai/) to understand the text and 
 [pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull-requests.
 
 ## Disclaimer
