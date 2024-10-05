@@ -33,7 +33,7 @@ def command_line_interface():
 
     from git_bob import __version__
     Log().log("I am git-bob " + str(__version__))
-    Log().log("Using language model: " + llm_name)
+    Log().log("Using language model: _" + llm_name[1:])
 
     # Print out all arguments passed to the script
     print("Script arguments:")
@@ -46,6 +46,7 @@ def command_line_interface():
     running_in_github_ci = task.endswith("-action")
     task = task.replace("-action", "")
 
+    # setting timeout
     if running_in_github_ci:
         print(f"Running in GitHub-CI. Setting timeout to {timeout_in_seconds / 60} minutes.")
         # in case we run in the github-CI, we set a timeout
@@ -61,12 +62,19 @@ def command_line_interface():
     user, text = get_most_recent_comment_on_issue(repository, issue)
 
     # handle aliases
-    text = text.replace("gitbob", "gib-bob") # typing - on the phone is hard
+    text = text.replace("gitbob", "git-bob")  # typing - on the phone is hard
+    text = text.replace("Git-bob", "git-bob")  # typing - on the phone is hard
+
+    # aliases for comment action
     text = text.replace("git-bob respond", "git-bob comment")
     text = text.replace("git-bob review", "git-bob comment")
     text = text.replace("git-bob think about", "git-bob comment")
-    text = text.replace("git-bob implement", "git-bob solve")
 
+    # aliases for solve action
+    text = text.replace("git-bob implement", "git-bob solve")
+    text = text.replace("git-bob apply", "git-bob solve")
+
+    # determine task to do
     if running_in_github_ci:
         if not ("git-bob comment" in text or "git-bob solve" in text or "git-bob split" in text):
             print("They didn't speak to me. I show myself out.")
@@ -77,9 +85,21 @@ def command_line_interface():
             sys.exit(0)
         if not check_access_and_ask_for_approval(user, repository, issue):
             sys.exit(1)
+    else:
+        # when running from terminal (e.g. for development), we modify the text to include the command from the terminal
+        if task == "comment-on-issue":
+            text = text + "\ngit-bob comment"
+        elif task == "solve-issue":
+            text = text + "\ngit-bob solve"
+        elif task == "split-issue":
+            text = text + "\ngit-bob split"
+        else:
+            raise NotImplementedError(f"Unknown task '{task}'. I show myself out.")
 
+    # thumbs up for quick response
     quick_first_response()
 
+    # determine if it is a PR
     repo = get_github_repository(repository)
     try:
         pull_request = repo.get_pull(issue)
@@ -90,20 +110,22 @@ def command_line_interface():
         #target_branch = pull_request.base.ref
     except UnknownObjectException:
         print("Issue is a not a PR")
+        pull_request = None
         base_branch = repo.default_branch
 
     # execute the task
-    if task == "review-pull-request" and not "git-bob solve" in text:
-        review_pull_request(repository, issue, prompt)
-    elif ((not running_in_github_ci and task == "solve-issue") or
-          (running_in_github_ci and task == "comment-on-issue" and "git-bob solve" in text)):
-        solve_github_issue(repository, issue, llm_name, prompt, base_branch=base_branch)
-    elif ((task == "comment-on-issue" and "git-bob split" in text) or (task == "split-issue" and not running_in_github_ci)):
+    if "git-bob comment" in text:
+        if pull_request is not None:
+            review_pull_request(repository, issue, prompt)
+        else:
+            comment_on_issue(repository, issue, prompt)
+    elif "git-bob split" in text:
         split_issue_in_sub_issues(repository, issue, prompt)
-    elif task == "comment-on-issue" and ("git-bob comment" in text or not running_in_github_ci):
-        comment_on_issue(repository, issue, prompt)
+    elif "git-bob solve" in text:
+        # could be issue or modifying code in a PR
+        solve_github_issue(repository, issue, llm_name, prompt, base_branch=base_branch)
     else:
-        raise NotImplementedError("Unknown task. I show myself out.")
+        raise NotImplementedError(f"Unknown task. I show myself out.")
 
     print("Done. Summary:")
     print("* " + "\n* ".join(Log().get()))
