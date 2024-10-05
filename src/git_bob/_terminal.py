@@ -20,20 +20,9 @@ def command_line_interface():
     # read environment variables
     timeout_in_seconds = os.environ.get("TIMEOUT_IN_SECONDS", 900) # 15 minutes
     llm_name = get_llm_name()
-    if "github_models:" in llm_name and os.environ.get("GH_MODELS_API_KEY") is not None:
-        prompt = prompt_azure
-    elif "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
-        prompt = prompt_claude
-    elif "gpt" in llm_name and os.environ.get("OPENAI_API_KEY") is not None:
-        prompt = prompt_chatgpt
-    elif "gemini" in llm_name and os.environ.get("GOOGLE_API_KEY") is not None:
-        prompt = prompt_gemini
-    else:
-        raise NotImplementedError("Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs.")
 
     from git_bob import __version__
     Log().log("I am git-bob " + str(__version__))
-    Log().log("Using language model: _" + llm_name[1:])
 
     # Print out all arguments passed to the script
     print("Script arguments:")
@@ -64,6 +53,25 @@ def command_line_interface():
     # handle aliases
     text = text.replace("gitbob", "git-bob")  # typing - on the phone is hard
     text = text.replace("Git-bob", "git-bob")  # typing - on the phone is hard
+
+    # handle ask-llm task option
+    if "git-bob ask" in text:
+        llm_name = text.split("git-bob ask")[1].strip().split(" ")[0]
+        text = text.replace(f"git-bob ask {llm_name} to ", "git-bob ")
+        # example:
+        # git-bob ask gpt-4o to solve this issue -> git-bob solve this issue
+
+    if "github_models:" in llm_name and os.environ.get("GH_MODELS_API_KEY") is not None:
+        prompt = prompt_azure
+    elif "claude" in llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
+        prompt = prompt_claude
+    elif "gpt" in llm_name and os.environ.get("OPENAI_API_KEY") is not None:
+        prompt = prompt_chatgpt
+    elif "gemini" in llm_name and os.environ.get("GOOGLE_API_KEY") is not None:
+        prompt = prompt_gemini
+    else:
+        raise NotImplementedError("Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs.")
+    Log().log("Using language model: _" + llm_name[1:])
 
     # aliases for comment action
     text = text.replace("git-bob respond", "git-bob comment")
