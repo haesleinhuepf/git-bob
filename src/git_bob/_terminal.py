@@ -21,6 +21,7 @@ def command_line_interface():
     # read environment variables
     timeout_in_seconds = os.environ.get("TIMEOUT_IN_SECONDS", 900) # 15 minutes
     Config.llm_name = os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-08-06")
+    Config.run_id = os.environ.get("GITHUB_RUN_ID", None)
 
     from git_bob import __version__
     Log().log("I am git-bob " + str(__version__))

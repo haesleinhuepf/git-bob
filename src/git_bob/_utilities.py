@@ -47,6 +47,7 @@ def remove_outer_markdown(text):
 
 class Config:
     llm_name = None
+    run_id = None
 
 
 class ErrorReporting:
