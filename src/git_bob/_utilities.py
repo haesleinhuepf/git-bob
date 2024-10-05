@@ -369,3 +369,21 @@ def remove_ansi_escape_sequences(text):
     import re
     ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
     return ansi_escape.sub('', text)
+
+
+def run_cli(command:str, check=False, verbose=False):
+    import subprocess
+
+    result = subprocess.run(command, shell=True, check=check, capture_output=True, text=True)
+    if verbose:
+        print("\n", result.stdout)
+        print("\n", result.stderr)
+
+
+def deploy(repository, issue):
+    from ._github_utilities import add_comment_to_issue
+    from ._ai_github_utilities import setup_ai_remark
+    run_cli("python setup.py sdist bdist_wheel")
+    result = run_cli("twine upload dist/*")
+    add_comment_to_issue(repository, issue, setup_ai_remark + f"Deployment: {result}")
+

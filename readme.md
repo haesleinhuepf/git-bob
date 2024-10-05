@@ -41,6 +41,8 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
   <!-- * [Google AI](https://ai.google.dev/gemini-api/docs/api-key)-->
 * configure Github actions to run the workflow on issues and pull-requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
 
+## Usage
+
 To trigger git-bob, you need to comment on an issue or pull-request with the following command:
 
 ```
@@ -65,6 +67,12 @@ If you have multiple API-Key for different LLMs configured, you can specify the 
 
 ```
 git-bob ask claude-3-5-sonnet-20240620 to solve this issue.
+```
+
+If you have two GitHub secrets `TWINE_USERNAME` and `TWINE_PASSWORD` configured, you can also use the following command to publish a new version of git-bob to pypi:
+
+```
+git-bob deploy
 ```
 
 ## Recommended Workflow
