@@ -4,7 +4,7 @@ git-bob uses AI to solve Github-issues and review pull-requests. It runs inside 
 
 ![demo_fix_typos.png](docs/images/banner.png)
 
-Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api) or [OpenAI's chatGPT](https://openai.com/blog/openai-api) <!--or [Google's Gemini](https://blog.google/technology/ai/google-gemini-ai/)--> to understand the text and 
+Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api) or [OpenAI's chatGPT](https://openai.com/blog/openai-api) <!--or [Google's Gemini](https://blog.google.com/technology/ai/google-gemini-ai/)--> to understand the text and 
 [pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull-requests.
 
 ## Disclaimer
@@ -34,6 +34,7 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
 * `github_models:gpt-4o`
 * `github_models:meta-llama-3.1-405b-instruct`
 <!--* `gemini-1.5-flash-001`-->
+* `gemini-1.5-pro-002`
 * configure a Github secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` or `GH_MODELS_API_KEY` <!--or `GOOGLE_API_KEY`--> with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
   * [OpenAI (gpt)](https://openai.com/blog/openai-api)
   * [Anthropic (claude)](https://www.anthropic.com/api)
@@ -157,6 +158,7 @@ At the moment, these limitations can be observed:
 * `git-bob` is incompatible with locally running open-source/-weight LLMs. 
   This might make sense when being executed locally only. In the Github-CI this might be impossible.
 * Recently tested `claude-3-5-sonnet-20240620`, `gpt-4o-2024-08-06`, `github_models:gpt-4o` and `github_models:meta-llama-3.1-405b-instruct` models produce useful results. The model `gemini-1.5-flash-001` is technically supported too, but its results were not very useful. 
+  `gemini-1.5-pro-002` is now available. It might provide better results, but we are still testing.
 
 ## Similar projects
 
