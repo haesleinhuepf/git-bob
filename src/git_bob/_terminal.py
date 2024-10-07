@@ -57,10 +57,6 @@ def command_line_interface():
     print("text: ", text)
     print(f"{agent_name} ask in text", f"{agent_name} ask" in text)
 
-    # handle aliases
-    text = text.replace("gitbob", agent_name)  # typing - on the phone is hard
-    text = text.replace("Git-bob", agent_name)  # typing - on the phone is hard
-
     # handle ask-llm task option
     if f"{agent_name} ask" in text:
         print("Dynamic LLM selection")
