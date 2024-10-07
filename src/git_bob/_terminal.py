@@ -10,7 +10,7 @@ def command_line_interface():
     from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues
     from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure
-    from ._github_utilities import check_access_and_ask_for_approval, get_github_repository
+    from ._github_utilities import check_access_and_ask_for_approval, get_github_repository, get_most_recently_commented_issue
     from ._utilities import quick_first_response, Config, deploy
     from ._logger import Log
     from github.GithubException import UnknownObjectException
@@ -52,6 +52,9 @@ def command_line_interface():
     # determine need to respond and access rights
     repository = sys.argv[2] if len(sys.argv) > 2 else None
     issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
+    if issue is None:
+        issue = get_most_recently_commented_issue(repository)
+
     user, text = get_most_recent_comment_on_issue(repository, issue)
     text = text.lower()
 

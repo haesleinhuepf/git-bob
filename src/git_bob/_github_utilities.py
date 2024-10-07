@@ -93,6 +93,32 @@ def get_conversation_on_issue(repository, issue):
     return conversation
 
 
+def get_most_recently_commented_issue(repository):
+    """
+    Return the issue number of the issue in a repository where the last comment was posted.
+    """
+    Log().log(f"-> get_most_recently_commented_issue({repository})")
+    repo = get_github_repository(repository)
+
+    most_recent_comment = None
+    issue = None
+
+    # Loop through all issues
+    for i in repo.get_issues(state="all"):
+        comments = i.get_comments()
+
+        # Loop through each comment in the issue
+        for comment in comments:
+            if most_recent_comment is None or comment.created_at > most_recent_comment.created_at:
+                most_recent_comment = comment
+                issue = i
+
+    if issue is None:
+        raise ValueError("No issue number provided")
+
+    return issue.number
+
+
 def get_most_recent_comment_on_issue(repository, issue):
     """
     Retrieve the most recent comment on a specific GitHub issue.
@@ -111,6 +137,7 @@ def get_most_recent_comment_on_issue(repository, issue):
     """
     Log().log(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
     repo = get_github_repository(repository)
+
 
     # Get the issue by number
     issue_obj = repo.get_issue(issue)
@@ -865,3 +892,5 @@ def create_issue(repository, title, body):
 
     print(f"Issue created: #{issue_obj.number}")
     return issue_obj.number
+
+
