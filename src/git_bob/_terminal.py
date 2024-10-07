@@ -53,6 +53,7 @@ def command_line_interface():
     repository = sys.argv[2] if len(sys.argv) > 2 else None
     issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
     user, text = get_most_recent_comment_on_issue(repository, issue)
+    text = text.lower()
 
     print("text: ", text)
     print(f"{agent_name} ask in text", f"{agent_name} ask" in text)
