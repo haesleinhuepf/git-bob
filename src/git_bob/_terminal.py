@@ -16,7 +16,6 @@ def command_line_interface():
     from github.GithubException import UnknownObjectException
     from ._utilities import run_cli
 
-
     print("Hello")
 
     # read environment variables
@@ -24,8 +23,10 @@ def command_line_interface():
     Config.llm_name = os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-08-06")
     Config.run_id = os.environ.get("GITHUB_RUN_ID", None)
 
+    agent_name = os.environ.get("GIT_BOB_AGENT_NAME", "git-bob")
+
     from git_bob import __version__
-    Log().log("I am git-bob " + str(__version__))
+    Log().log(f"I am {agent_name} " + str(__version__))
 
     # Print out all arguments passed to the script
     print("Script arguments:")
@@ -54,19 +55,15 @@ def command_line_interface():
     user, text = get_most_recent_comment_on_issue(repository, issue)
 
     print("text: ", text)
-    print("git-bob ask in text", "git-bob ask" in text)
-
-    # handle aliases
-    text = text.replace("gitbob", "git-bob")  # typing - on the phone is hard
-    text = text.replace("Git-bob", "git-bob")  # typing - on the phone is hard
+    print(f"{agent_name} ask in text", f"{agent_name} ask" in text)
 
     # handle ask-llm task option
-    if "git-bob ask" in text:
+    if f"{agent_name} ask" in text:
         print("Dynamic LLM selection")
-        new_llm_name = text.split("git-bob ask")[-1].strip().split(" ")[0]
+        new_llm_name = text.split(f"{agent_name} ask")[-1].strip().split(" ")[0]
         if "gemini" in new_llm_name or "github_models" in new_llm_name or "claude" in new_llm_name or "gpt" in new_llm_name:
             Config.llm_name = new_llm_name
-        text = text.replace(f"git-bob ask {new_llm_name} to ", "git-bob ")
+        text = text.replace(f"{agent_name} ask {new_llm_name} to ", f"{agent_name} ")
         # example:
         # git-bob ask gpt-4o to solve this issue -> git-bob solve this issue
 
@@ -84,17 +81,17 @@ def command_line_interface():
     Log().log("Using language model: _" + Config.llm_name[1:])
 
     # aliases for comment action
-    text = text.replace("git-bob respond", "git-bob comment")
-    text = text.replace("git-bob review", "git-bob comment")
-    text = text.replace("git-bob think about", "git-bob comment")
+    text = text.replace(f"{agent_name} respond", f"{agent_name} comment")
+    text = text.replace(f"{agent_name} review", f"{agent_name} comment")
+    text = text.replace(f"{agent_name} think about", f"{agent_name} comment")
 
     # aliases for solve action
-    text = text.replace("git-bob implement", "git-bob solve")
-    text = text.replace("git-bob apply", "git-bob solve")
+    text = text.replace(f"{agent_name} implement", f"{agent_name} solve")
+    text = text.replace(f"{agent_name} apply", f"{agent_name} solve")
 
     # determine task to do
     if running_in_github_ci:
-        if not ("git-bob comment" in text or "git-bob solve" in text or "git-bob split" in text or "git-bob deploy" in text):
+        if not (f"{agent_name} comment" in text or f"{agent_name} solve" in text or f"{agent_name} split" in text or f"{agent_name} deploy" in text):
             print("They didn't speak to me. I show myself out:", text)
             sys.exit(0)
         ai_remark = setup_ai_remark()
@@ -106,11 +103,11 @@ def command_line_interface():
     else:
         # when running from terminal (e.g. for development), we modify the text to include the command from the terminal
         if task == "comment-on-issue":
-            text = text + "\ngit-bob comment"
+            text = text + f"\n{agent_name} comment"
         elif task == "solve-issue":
-            text = text + "\ngit-bob solve"
+            text = text + f"\n{agent_name} solve"
         elif task == "split-issue":
-            text = text + "\ngit-bob split"
+            text = text + f"\n{agent_name} split"
         else:
             raise NotImplementedError(f"Unknown task '{task}'. I show myself out.")
 
@@ -135,17 +132,17 @@ def command_line_interface():
         base_branch = repo.default_branch
 
     # execute the task
-    if "git-bob comment" in text:
+    if f"{agent_name} comment" in text:
         if pull_request is not None:
             review_pull_request(repository, issue, prompt)
         else:
             comment_on_issue(repository, issue, prompt)
-    elif "git-bob split" in text:
+    elif f"{agent_name} split" in text:
         split_issue_in_sub_issues(repository, issue, prompt)
-    elif "git-bob solve" in text:
+    elif f"{agent_name} solve" in text:
         # could be issue or modifying code in a PR
         solve_github_issue(repository, issue, Config.llm_name, prompt, base_branch=base_branch)
-    elif "git-bob deploy" in text:
+    elif f"{agent_name} deploy" in text:
         deploy(repository, issue)
     else:
         raise NotImplementedError(f"Unknown task. I show myself out.")
