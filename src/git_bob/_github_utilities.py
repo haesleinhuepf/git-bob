@@ -516,24 +516,35 @@ def check_access_and_ask_for_approval(user, repository, issue):
     """
     # Check if the user is a repository member
     Log().log(f"-> check_access_and_ask_for_approval({user}, {repository}, {issue})")
+    groups = os.getenv('GIT_BOB_ACCESS_GROUPS', 'members').split(',')
 
     from ._ai_github_utilities import setup_ai_remark
+    access = False
 
     repo = get_github_repository(repository)
-    agent_name = os.getenv('AGENT_NAME', 'git-bob')
 
     members = [member.login for member in repo.get_collaborators()]
-    remark = setup_ai_remark()
-    if user not in members:
+
+    if "members" in groups:
+        if user in members:
+            access = True
+    if "bot" in groups:
+        if user == "github-actions[bot]":
+            access = True
+
+    if not access:
         print("User does not have access rights.")
-        member_names = ", ".join(["@" + str(m) for m in members])
+
+        remark = setup_ai_remark()
+        agent_name = os.getenv('AGENT_NAME', 'git-bob')
+
         add_comment_to_issue(repository, issue,f"""
 {remark}
 
 Hi @{user}, 
 
 thanks for reaching out! Unfortunately, I'm not allowed to respond to you directly. 
-I need approval from a repository member: {member_names}
+I need approval from a person who has access.
 
 Best,
 {agent_name}
