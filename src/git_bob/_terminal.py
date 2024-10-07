@@ -116,7 +116,7 @@ def command_line_interface():
             raise NotImplementedError(f"Unknown task '{task}'. I show myself out.")
 
     # thumbs up for quick response
-    quick_first_response()
+    quick_first_response(repository, issue)
 
     # determine if it is a PR
     repo = get_github_repository(repository)

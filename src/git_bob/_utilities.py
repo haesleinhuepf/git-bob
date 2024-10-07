@@ -54,7 +54,7 @@ class ErrorReporting:
     status = False
 
 
-def quick_first_response():
+def quick_first_response(repository, issue):
     """
     Response to a comment to the GitHub issue just mentioning that we're on it.
 
@@ -68,8 +68,6 @@ def quick_first_response():
     from ._ai_github_utilities import setup_ai_remark
     from ._github_utilities import add_comment_to_issue, add_reaction_to_last_comment_in_issue
 
-    repository = sys.argv[2] if len(sys.argv) > 2 else None
-    issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
     run_id = os.environ.get("GITHUB_RUN_ID")
     ai_remark = setup_ai_remark()
 
