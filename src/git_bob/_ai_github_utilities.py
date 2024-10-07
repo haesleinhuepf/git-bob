@@ -574,7 +574,7 @@ Extract relevant information for the sub-task "{title}".
 Write the information down and make a proposal of how to solve the sub-task.
 Do not explain your response or anything else. Just respond the relevant information for the sub-task and a potential solution.
 """)
-        body = body.replace("git-bob", "git=bob") # prevent endless loops
+        body = body.replace(AGENT_NAME, AGENT_NAME[:3]+ "_" + AGENT_NAME[4:]) # prevent endless loops
 
         issue_number = create_issue(repository, title, ai_remark + body)
         sub_issue_numbers.append(issue_number)

@@ -493,6 +493,7 @@ def check_access_and_ask_for_approval(user, repository, issue):
     from ._ai_github_utilities import setup_ai_remark
 
     repo = get_github_repository(repository)
+    agent_name = os.getenv('AGENT_NAME', 'git-bob')
 
     members = [member.login for member in repo.get_collaborators()]
     remark = setup_ai_remark()
@@ -508,7 +509,7 @@ thanks for reaching out! Unfortunately, I'm not allowed to respond to you direct
 I need approval from a repository member: {member_names}
 
 Best,
-git-bob
+{agent_name}
 """)
         return False
     return True
