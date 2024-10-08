@@ -1,8 +1,6 @@
 # This module provides the command line interface for interacting with GitHub issues and pull requests.
 # It supports functionalities such as reviewing pull requests, solving issues, and commenting on issues
 # using AI models like GPT and Claude. The script can be run in a GitHub CI environment with a timeout.
-from openai import base_url, api_key
-
 
 def command_line_interface():
     import os
