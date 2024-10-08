@@ -38,7 +38,7 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
   * [OpenAI (gpt)](https://openai.com/blog/openai-api)
   * [Anthropic (claude)](https://www.anthropic.com/api)
   * [Github Models Marketplace](https://github.com/marketplace/models)
-  <!-- * [Google AI](https://ai.google.dev/gemini-api/docs/api-key)-->
+  * [Google AI](https://ai.google.dev/gemini-api/docs/api-key)
 * configure Github actions to run the workflow on issues and pull-requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
 
 ## Usage
