@@ -33,7 +33,7 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
     return message.content[0].text
 
 
-def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accumulated_responses=10, max_response_tokens=16384):
+def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
     """A prompt helper function that sends a message to openAI
     and returns only the text response.
     """
@@ -56,8 +56,16 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
                 }]}]
     original_message = message
 
+    if "kisski:" in model:
+        model = model.replace("kisski:", "")
+    if "blablador:" in model:
+        model = model.replace("blablador:", "")
+
     # setup connection to the LLM
-    client = openai.OpenAI()
+    if base_url is not None and api_key is not None:
+        client = openai.OpenAI(base_url=base_url, api_key=api_key)
+    else:
+        client = openai.OpenAI()
 
     result = ""
 

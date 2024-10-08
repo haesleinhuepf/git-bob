@@ -73,6 +73,10 @@ def command_line_interface():
 
     if "github_models:" in Config.llm_name and os.environ.get("GH_MODELS_API_KEY") is not None:
         prompt = prompt_azure
+    elif "kisski:" in Config.llm_name and os.environ.get("KISSKI_API_KEY") is not None:
+        prompt = partial(prompt_chatgpt, base_url="https://chat-ai.academiccloud.de/v1", api_key=os.environ.get("KISSKI_API_KEY"))
+    elif "blablador:" in Config.llm_name and os.environ.get("BLABLADOR_API_KEY") is not None:
+        prompt = partial(prompt_chatgpt, base_url="https://helmholtz-blablador.fz-juelich.de:8000/v1", api_key=os.environ.get("BLABLADOR_API_KEY"))
     elif "claude" in Config.llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
         prompt = prompt_claude
     elif "gpt" in Config.llm_name and os.environ.get("OPENAI_API_KEY") is not None:
