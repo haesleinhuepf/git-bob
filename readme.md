@@ -34,11 +34,13 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
 * `github_models:gpt-4o`
 * `github_models:meta-llama-3.1-405b-instruct`
 * `gemini-1.5-pro-002`
-* configure a Github secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` or `GH_MODELS_API_KEY` <!--or `GOOGLE_API_KEY`--> with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
+* configure a Github secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` or `GH_MODELS_API_KEY` or `GOOGLE_API_KEY` or `KISSKI_API_KEY` or `BLABBLADOR_API_KEY` with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
   * [OpenAI (gpt)](https://openai.com/blog/openai-api)
   * [Anthropic (claude)](https://www.anthropic.com/api)
   * [Github Models Marketplace](https://github.com/marketplace/models)
   * [Google AI](https://ai.google.dev/gemini-api/docs/api-key)
+  * [KISSKI](apply for an API Key](https://services.kisski.de/services/en/service/?service=2-02-llm-service.json)
+  * [BLABLADOR](https://login.helmholtz.de/oauth2-as/oauth2-authz-web-entry)
 * configure Github actions to run the workflow on issues and pull-requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
 
 ## Usage
