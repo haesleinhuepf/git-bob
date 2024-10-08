@@ -5,8 +5,6 @@ Functions:
 - prompt_claude: Sends a message to the Claude language model and returns the text response.
 - prompt_chatgpt: Sends a message to the ChatGPT language model and returns the text response.
 """
-from openai import api_key, base_url
-
 
 def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
     """
