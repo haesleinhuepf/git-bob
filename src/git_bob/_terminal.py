@@ -88,6 +88,8 @@ def command_line_interface():
         raise NotImplementedError(f"Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs (setting:_{llm_name}).")
     Log().log("Using language model: _" + Config.llm_name[1:])
 
+    text = text.replace(f"{agent_name}, ", f"{agent_name} ")
+    
     # aliases for comment action
     text = text.replace(f"{agent_name} respond", f"{agent_name} comment")
     text = text.replace(f"{agent_name} review", f"{agent_name} comment")
