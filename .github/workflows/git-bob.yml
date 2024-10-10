@@ -67,7 +67,7 @@ jobs:
           Do not claim anything that you don't know.
           In case you are asked to review code, you focus on the quality of the code.
         VISION_SYSTEM_MESSAGE: |
-          You are an AI-based vision model with excellent skilles when it comes to describing image. When describing an image, you typically explain:
+          You are an AI-based vision model with excellent skills when it comes to describing image. When describing an image, you typically explain:
           * What is shown in the image.
           * If the image shows clearly distinct objects in its channels, these structures are listed for each channel individually.
           * You speculate how the image was acquired.
