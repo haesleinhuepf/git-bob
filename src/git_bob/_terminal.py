@@ -29,26 +29,6 @@ def command_line_interface():
     from git_bob import __version__
     Log().log(f"I am {agent_name} " + str(__version__))
 
-    prompt_handlers = {
-        "github_models:": PromptHandler(api_key=os.environ.get("GH_MODELS_API_KEY"),
-                                        prompt_function=partial(prompt_azure, model=Config.llm_name)),
-        "kisski:":        PromptHandler(api_key=os.environ.get("KISSKI_API_KEY"),
-                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name, base_url="https://chat-ai.academiccloud.de/v1", api_key=os.environ.get("KISSKI_API_KEY"))),
-        "blablador:":     PromptHandler(api_key=os.environ.get("BLABLADOR_API_KEY"),
-                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name, base_url="https://helmholtz-blablador.fz-juelich.de:8000/v1", api_key=os.environ.get("BLABLADOR_API_KEY"))),
-        "claude":         PromptHandler(api_key=os.environ.get("ANTHROPIC_API_KEY"),
-                                        prompt_function=partial(prompt_claude, model=Config.llm_name)),
-        "gpt":            PromptHandler(api_key=os.environ.get("OPENAI_API_KEY"),
-                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name)),
-        "gemini":         PromptHandler(api_key=os.environ.get("GOOGLE_API_KEY"),
-                                        prompt_function=partial(prompt_gemini, model=Config.llm_name))
-    }
-    available_handlers = {}
-    for key, value in prompt_handlers.items():
-        if value is not None:
-            available_handlers[key] = value
-    print("Available prompt handlers:", ", ".join([p.replace(":","") for p in list(available_handlers.keys())]))
-
     # Print out all arguments passed to the script
     print("Script arguments:")
     for arg in sys.argv[1:]:
@@ -93,6 +73,27 @@ def command_line_interface():
         text = text.replace(f"{agent_name} ask {new_llm_name} to ", f"{agent_name} ")
         # example:
         # git-bob ask gpt-4o to solve this issue -> git-bob solve this issue
+
+    prompt_handlers = {
+        "github_models:": PromptHandler(api_key=os.environ.get("GH_MODELS_API_KEY"),
+                                        prompt_function=partial(prompt_azure, model=Config.llm_name)),
+        "kisski:":        PromptHandler(api_key=os.environ.get("KISSKI_API_KEY"),
+                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name, base_url="https://chat-ai.academiccloud.de/v1", api_key=os.environ.get("KISSKI_API_KEY"))),
+        "blablador:":     PromptHandler(api_key=os.environ.get("BLABLADOR_API_KEY"),
+                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name, base_url="https://helmholtz-blablador.fz-juelich.de:8000/v1", api_key=os.environ.get("BLABLADOR_API_KEY"))),
+        "claude":         PromptHandler(api_key=os.environ.get("ANTHROPIC_API_KEY"),
+                                        prompt_function=partial(prompt_claude, model=Config.llm_name)),
+        "gpt":            PromptHandler(api_key=os.environ.get("OPENAI_API_KEY"),
+                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name)),
+        "gemini":         PromptHandler(api_key=os.environ.get("GOOGLE_API_KEY"),
+                                        prompt_function=partial(prompt_gemini, model=Config.llm_name))
+    }
+    available_handlers = {}
+    for key, value in prompt_handlers.items():
+        if value is not None:
+            available_handlers[key] = value
+    print("Available prompt handlers:", ", ".join([p.replace(":","") for p in list(available_handlers.keys())]))
+
 
     prompt = None
     for key, value in prompt_handlers.items():
