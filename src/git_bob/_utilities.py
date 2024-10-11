@@ -23,7 +23,7 @@ def remove_outer_markdown(text):
     str
         The text with outer markdown syntax removed and stripped.
     """
-    text = text.strip("\n")
+    text = text.strip("\n").strip(" ")
 
     possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy", "```jython", "```md", "```markdown",
            "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
@@ -390,3 +390,29 @@ def deploy(repository, issue):
     result2 = run_cli("twine upload dist/*")
     add_comment_to_issue(repository, issue, setup_ai_remark() + remove_ansi_escape_sequences(f"\n# Deployment report\n\n{result1}\n{result2}"))
 
+
+def clean_output(repository, text):
+    from ._github_utilities import get_contributors
+    # if all lines start with spaces (except 1st and last), remove those spaces in all lines
+    lines = text.split("\n")
+    while (True):
+        if all([line.startswith(" ") for line in lines[1:-1]]):
+            text = lines[0] + "\n" + "\n".join([line[1:] for line in lines[1:]]) + "\n" + lines[-1]
+            lines = text.split("\n")
+        else:
+            break
+
+    # if text starts with ```markdown, remove that
+    while text.startswith("\n") or text.startswith(" "):
+        text = text.strip("\n").strip(" ")
+    text = remove_outer_markdown(text)
+
+    # if there are strangers tagged, remove those tags
+    temp = text.split("```")
+    for i in range(0, len(temp), 2):
+        temp[i] = temp[i].replace("@", "@ ")
+    text = "```".join(temp)
+    contributors = get_contributors(repository)
+    for c in contributors:
+        text = text.replace("@ " + c, "@" + c)
+    return text
