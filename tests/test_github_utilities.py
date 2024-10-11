@@ -44,7 +44,7 @@ def test_get_repository_file_contents():
     assert len(list(content.keys())) == 1
     assert "README.md" in list(content.keys())
     assert content["README.md"].startswith("# git-bob")
-    assert "## Acknowledgements" in content["readme.md"]
+    assert "## Acknowledgements" in content["README.md"]
 
 
 def test_check_if_file_exists():
