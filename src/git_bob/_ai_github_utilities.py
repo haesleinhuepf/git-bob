@@ -621,7 +621,7 @@ def execute_code_from_discussion(repository, issue, prompt_function):
 
     # Extract Python code from the discussion
     code = prompt_function(f"""
-Extract the Python code from the following discussion. Modify the code to ensure results are saved as PNG or CSV files.
+Extract the Python code from the following discussion. Modify the code to ensure that this is a standalone runnable python code file and that results are saved as PNG or CSV files.
 Only return the modified code, nothing else.
 
 Discussion:
