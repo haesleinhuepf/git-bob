@@ -14,7 +14,6 @@ def command_line_interface():
     from ._logger import Log
     from github.GithubException import UnknownObjectException
     from ._utilities import run_cli
-    from functools import partial
 
     print("Hello")
 
@@ -172,6 +171,7 @@ class PromptHandler:
         self.prompt_function = prompt_function
 
 def init_prompt_handlers():
+    import os
     from functools import partial
     from ._utilities import Config
     from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure
