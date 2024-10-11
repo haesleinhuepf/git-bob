@@ -71,7 +71,7 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
 
     print("model", model[1:])
     print("base_url", base_url)
-    print("api_key", len(api_key))
+    print("api_key", len(api_key) if api_key is not None else 0)
 
     for _ in range(0, max_accumulated_responses):
 
