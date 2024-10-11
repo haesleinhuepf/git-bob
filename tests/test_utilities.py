@@ -1,3 +1,4 @@
+
 def test_remove_outer_markdown():
     from git_bob._utilities import remove_outer_markdown
     assert remove_outer_markdown("""```python
@@ -71,3 +72,56 @@ ddddd
 eeeee
 fffff
 """) == '\nblabla \n\n```java\nddddd\n\neeeee\nfffff\n'
+
+
+def test_clean_output1():
+    test = """
+```markdown
+git-bob comment
+
+A more descriptive name for the variable `res` could be `pull_request_response`. Here's how you could update the code:
+
+```python
+# Previous code
+res = send_pull_request(repository, branch, f"Add {filename}", "") 
+print("Done.", res)
+
+@decorator
+def function():
+    pass
+
+# Updated code
+pull_request_response = send_pull_request(repository, branch, f"Add {filename}", "") 
+print("Done.", pull_request_response)
+```
+
+Just tagging strangers: @anyoneelse and friends: @haesleinhuepf
+
+```
+    """
+    from git_bob._utilities import clean_output
+    result = clean_output("haesleinhuepf/git-bob", test)
+
+    print(result)
+
+    assert "```markdown" not in result
+    assert "@haesleinhuepf" in result # tags to friends are kept
+    assert "@decorator" in result # decorators in code are kept
+    assert "@anyoneelse" not in result # tags to strangers are removed
+
+
+
+def test_clean_output2():
+    test = """
+    blabla
+```
+    """
+    reference = test = """
+blabla
+```
+    """
+
+    from git_bob._utilities import clean_output
+    result = clean_output("haesleinhuepf/git-bob", test)
+
+    assert test == reference

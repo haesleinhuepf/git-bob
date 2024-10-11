@@ -553,6 +553,15 @@ Best,
     return True
 
 
+def get_contributors(repository):
+    """
+    Get the list of contributors to a GitHub repository.
+    """
+    repo = get_github_repository(repository)
+
+    return [member.login for member in repo.get_contributors()]
+
+
 def get_diff_of_pull_request(repository, pull_request):
     """
     Get the diff of a specific pull request in a GitHub repository.

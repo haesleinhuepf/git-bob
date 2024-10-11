@@ -51,7 +51,7 @@ def comment_on_issue(repository, issue, prompt_function):
     Log().log(f"-> comment_on_issue({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, list_repository_files, \
         get_repository_file_contents
-    from ._utilities import text_to_json, modify_discussion
+    from ._utilities import text_to_json, modify_discussion, clean_output
 
     ai_remark = setup_ai_remark()
 
@@ -105,6 +105,7 @@ In case code-changes are discussed, make a proposal of how new code could look l
 Do NOT explain your response or anything else. 
 Just respond to the discussion.
 """)
+     comment = clean_output(comment)
 
     print("comment:", comment)
 
@@ -130,7 +131,7 @@ def review_pull_request(repository, issue, prompt_function):
     """
     Log().log(f"-> review_pull_request({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, get_diff_of_pull_request
-    from ._utilities import modify_discussion
+    from ._utilities import modify_discussion, clean_output
 
     ai_remark = setup_ai_remark()
 
@@ -162,6 +163,7 @@ Review this pull-request and contribute to the discussion.
 Do NOT explain your response or anything else. 
 Just respond to the discussion.
 """)
+     comment = clean_output(comment)
 
     print("comment:", comment)
 
@@ -351,7 +353,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
         copy_file_in_repository, execute_notebook_in_repository, download_to_repository, add_comment_to_issue, \
         get_github_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion, \
-        remove_ansi_escape_sequences
+        remove_ansi_escape_sequences, clean_output
     from github.GithubException import GithubException
     import traceback
 
@@ -500,7 +502,7 @@ Do not add headline or any other formatting. Just respond with the paragraphe an
 
         pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
 
-        full_report = remark + pull_request_description + error_messages
+        full_report = remark + clean_output(pull_request_description) + error_messages
 
         try:
             send_pull_request(repository,
@@ -525,7 +527,7 @@ Do not add headline or any other formatting. Just respond with the paragraphe an
         Do not add headline or any other formatting. Just respond with the paragraphe below.
         """)
 
-        add_comment_to_issue(repository, issue, remark + modification_summary + error_messages)
+        add_comment_to_issue(repository, issue, remark + clean_output(modification_summary) + error_messages)
 
 def split_issue_in_sub_issues(repository, issue, prompt_function):
     """
