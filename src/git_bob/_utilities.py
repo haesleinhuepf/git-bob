@@ -26,7 +26,7 @@ def remove_outer_markdown(text):
     text = text.strip("\n").strip(" ")
 
     possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy", "```jython", "```md", "```markdown",
-           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
+                           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
 
     possible_endings = ["```", "</FILE>"]
 
@@ -277,7 +277,7 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
             repo = parts[3] + '/' + parts[4]
             branch_name = parts[6]
             file_path = '/'.join(parts[7:])
-            file_contents = get_file_in_repository (repo, branch_name, file_path).decoded_content.decode()
+            file_contents = get_file_in_repository(repo, branch_name, file_path).decoded_content.decode()
             if url.endswith('.ipynb'):
                 file_contents = erase_outputs_of_code_cells(file_contents)
             additional_content[url] = file_contents
@@ -316,7 +316,7 @@ def execute_notebook(notebook_content, timeout=600, kernel_name='python3'):
     import jupyter_client
 
     # Get the list of available kernels
-    kernels = jupyter_client.kernelspec.KernelSpecManager().get_all_specs()
+    kernels = jupyter_client.kernelspec.KernelSpecManager().().get_all_specs()
 
     # Print the names of the kernels
     print("Available Jupyter kernels:")
