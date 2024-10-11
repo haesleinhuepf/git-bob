@@ -45,6 +45,7 @@ def command_line_interface():
 
     # test if we're running in the github-CI
     running_in_github_ci = task.endswith("-action")
+    Config.running_in_github_ci = running_in_github_ci
     task = task.replace("-action", "")
 
     # setting timeout
@@ -62,6 +63,9 @@ def command_line_interface():
     issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
     if issue is None:
         issue = get_most_recently_commented_issue(repository)
+
+    Config.repository = repository
+    Config.issue = issue
 
     user, text = get_most_recent_comment_on_issue(repository, issue)
     text = text.lower()

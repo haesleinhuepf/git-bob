@@ -48,6 +48,9 @@ def remove_outer_markdown(text):
 class Config:
     llm_name = None
     run_id = None
+    repository = None
+    issue = None
+    running_in_github_ci = None
 
 
 class ErrorReporting:
