@@ -8,7 +8,7 @@ def command_line_interface():
     import signal
 
     from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
-    from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues
+    from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues, execute_code_from_discussion
     from ._github_utilities import check_access_and_ask_for_approval, get_github_repository, get_most_recently_commented_issue
     from ._utilities import quick_first_response, Config, deploy
     from ._logger import Log
@@ -110,7 +110,7 @@ def command_line_interface():
 
     # determine task to do
     if running_in_github_ci:
-        if not (f"{agent_name} comment" in text or f"{agent_name} solve" in text or f"{agent_name} split" in text or f"{agent_name} deploy" in text):
+        if not (f"{agent_name} comment" in text or f"{agent_name} solve" in text or f"{agent_name} split" in text or f"{agent_name} deploy" in text or f"{agent_name} execute" in text):
             print("They didn't speak to me. I show myself out:", text)
             sys.exit(0)
         ai_remark = setup_ai_remark()
@@ -151,7 +151,9 @@ def command_line_interface():
         base_branch = repo.default_branch
 
     # execute the task
-    if f"{agent_name} comment" in text:
+    if f"{agent_name} execute" in text:
+        execute_code_from_discussion(repository, issue, prompt)
+    elif f"{agent_name} comment" in text:
         if pull_request is not None:
             review_pull_request(repository, issue, prompt)
         else:
