@@ -15,6 +15,7 @@ def command_line_interface():
     from ._logger import Log
     from github.GithubException import UnknownObjectException
     from ._utilities import run_cli
+    from functools import partial
 
     print("Hello")
 
@@ -72,17 +73,17 @@ def command_line_interface():
         # git-bob ask gpt-4o to solve this issue -> git-bob solve this issue
 
     if "github_models:" in Config.llm_name and os.environ.get("GH_MODELS_API_KEY") is not None:
-        prompt = prompt_azure
+        prompt = partial(prompt_azure, model=Config.llm_name)
     elif "kisski:" in Config.llm_name and os.environ.get("KISSKI_API_KEY") is not None:
-        prompt = partial(prompt_chatgpt, base_url="https://chat-ai.academiccloud.de/v1", api_key=os.environ.get("KISSKI_API_KEY"))
+        prompt = partial(prompt_chatgpt, model=Config.llm_name, base_url="https://chat-ai.academiccloud.de/v1", api_key=os.environ.get("KISSKI_API_KEY"))
     elif "blablador:" in Config.llm_name and os.environ.get("BLABLADOR_API_KEY") is not None:
-        prompt = partial(prompt_chatgpt, base_url="https://helmholtz-blablador.fz-juelich.de:8000/v1", api_key=os.environ.get("BLABLADOR_API_KEY"))
+        prompt = partial(prompt_chatgpt, model=Config.llm_name, base_url="https://helmholtz-blablador.fz-juelich.de:8000/v1", api_key=os.environ.get("BLABLADOR_API_KEY"))
     elif "claude" in Config.llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
-        prompt = prompt_claude
+        prompt = partial(prompt_claude, model=Config.llm_name)
     elif "gpt" in Config.llm_name and os.environ.get("OPENAI_API_KEY") is not None:
-        prompt = prompt_chatgpt
+        prompt = partial(prompt_chatgpt, model=Config.llm_name)
     elif "gemini" in Config.llm_name and os.environ.get("GOOGLE_API_KEY") is not None:
-        prompt = prompt_gemini
+        prompt = partial(prompt_gemini, model=Config.llm_name)
     else:
         llm_name = Config.llm_name[1:]
         raise NotImplementedError(f"Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs (setting:_{llm_name}).")
