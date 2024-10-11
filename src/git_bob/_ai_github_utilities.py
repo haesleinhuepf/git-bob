@@ -105,7 +105,7 @@ In case code-changes are discussed, make a proposal of how new code could look l
 Do NOT explain your response or anything else. 
 Just respond to the discussion.
 """)
-     comment = clean_output(comment)
+    comment = clean_output(comment)
 
     print("comment:", comment)
 
