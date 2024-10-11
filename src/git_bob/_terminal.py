@@ -9,7 +9,6 @@ def command_line_interface():
 
     from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues
-    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure
     from ._github_utilities import check_access_and_ask_for_approval, get_github_repository, get_most_recently_commented_issue
     from ._utilities import quick_first_response, Config, deploy
     from ._logger import Log
@@ -27,6 +26,15 @@ def command_line_interface():
 
     from git_bob import __version__
     Log().log(f"I am {agent_name} " + str(__version__))
+
+
+    prompt_handlers = init_prompt_handlers()
+
+    available_handlers = {}
+    for key, value in prompt_handlers.items():
+        if value is not None:
+            available_handlers[key] = value
+    print("Available prompt handlers:", ", ".join([p.replace(":","") for p in list(available_handlers.keys())]))
 
     # Print out all arguments passed to the script
     print("Script arguments:")
@@ -65,25 +73,22 @@ def command_line_interface():
     if f"{agent_name} ask" in text:
         print("Dynamic LLM selection")
         new_llm_name = text.split(f"{agent_name} ask")[-1].strip().split(" ")[0]
-        if "gemini" in new_llm_name or "github_models" in new_llm_name or "claude" in new_llm_name or "gpt" in new_llm_name:
-            Config.llm_name = new_llm_name
+        for key in prompt_handlers:
+            if key in new_llm_name:
+                Config.llm_name = new_llm_name
+                break
         text = text.replace(f"{agent_name} ask {new_llm_name} to ", f"{agent_name} ")
         # example:
         # git-bob ask gpt-4o to solve this issue -> git-bob solve this issue
 
-    if "github_models:" in Config.llm_name and os.environ.get("GH_MODELS_API_KEY") is not None:
-        prompt = prompt_azure
-    elif "kisski:" in Config.llm_name and os.environ.get("KISSKI_API_KEY") is not None:
-        prompt = partial(prompt_chatgpt, base_url="https://chat-ai.academiccloud.de/v1", api_key=os.environ.get("KISSKI_API_KEY"))
-    elif "blablador:" in Config.llm_name and os.environ.get("BLABLADOR_API_KEY") is not None:
-        prompt = partial(prompt_chatgpt, base_url="https://helmholtz-blablador.fz-juelich.de:8000/v1", api_key=os.environ.get("BLABLADOR_API_KEY"))
-    elif "claude" in Config.llm_name and os.environ.get("ANTHROPIC_API_KEY") is not None:
-        prompt = prompt_claude
-    elif "gpt" in Config.llm_name and os.environ.get("OPENAI_API_KEY") is not None:
-        prompt = prompt_chatgpt
-    elif "gemini" in Config.llm_name and os.environ.get("GOOGLE_API_KEY") is not None:
-        prompt = prompt_gemini
-    else:
+    prompt = None
+    prompt_handlers = init_prompt_handlers() # reinitialize, because configured LLM may have changed
+    for key, value in prompt_handlers.items():
+        if key in Config.llm_name and value.api_key is not None:
+            prompt = value.prompt_function
+            break
+
+    if prompt is None:
         llm_name = Config.llm_name[1:]
         raise NotImplementedError(f"Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs (setting:_{llm_name}).")
     Log().log("Using language model: _" + Config.llm_name[1:])
@@ -159,3 +164,29 @@ def command_line_interface():
 
     print("Done. Summary:")
     print("* " + "\n* ".join(Log().get()))
+
+class PromptHandler:
+    def __init__(self, api_key, prompt_function):
+        self.api_key = api_key
+        self.prompt_function = prompt_function
+
+def init_prompt_handlers():
+    import os
+    from functools import partial
+    from ._utilities import Config
+    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure
+
+    return {
+        "github_models:": PromptHandler(api_key=os.environ.get("GH_MODELS_API_KEY"),
+                                        prompt_function=partial(prompt_azure, model=Config.llm_name)),
+        "kisski:":        PromptHandler(api_key=os.environ.get("KISSKI_API_KEY"),
+                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name, base_url="https://chat-ai.academiccloud.de/v1", api_key=os.environ.get("KISSKI_API_KEY"))),
+        "blablador:":     PromptHandler(api_key=os.environ.get("BLABLADOR_API_KEY"),
+                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name, base_url="https://helmholtz-blablador.fz-juelich.de:8000/v1", api_key=os.environ.get("BLABLADOR_API_KEY"))),
+        "claude":         PromptHandler(api_key=os.environ.get("ANTHROPIC_API_KEY"),
+                                        prompt_function=partial(prompt_claude, model=Config.llm_name)),
+        "gpt":            PromptHandler(api_key=os.environ.get("OPENAI_API_KEY"),
+                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name)),
+        "gemini":         PromptHandler(api_key=os.environ.get("GOOGLE_API_KEY"),
+                                        prompt_function=partial(prompt_gemini, model=Config.llm_name))
+    }
