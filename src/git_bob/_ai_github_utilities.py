@@ -106,7 +106,7 @@ In case code-changes are discussed, make a proposal of how new code could look l
 Do NOT explain your response or anything else. 
 Just respond to the discussion.
 """)
-    comment = clean_output(comment)
+    comment = clean_output(repository, comment)
 
     print("comment:", comment)
 
@@ -164,7 +164,7 @@ Review this pull-request and contribute to the discussion.
 Do NOT explain your response or anything else. 
 Just respond to the discussion.
 """)
-    comment = clean_output(comment)
+    comment = clean_output(repository, comment)
 
     print("comment:", comment)
 
@@ -503,7 +503,7 @@ Do not add headline or any other formatting. Just respond with the paragraphe an
 
         pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
 
-        full_report = remark + clean_output(pull_request_description) + error_messages
+        full_report = remark + clean_output(repository, pull_request_description) + error_messages
 
         try:
             send_pull_request(repository,
@@ -528,7 +528,7 @@ Do not add headline or any other formatting. Just respond with the paragraphe an
         Do not add headline or any other formatting. Just respond with the paragraphe below.
         """)
 
-        add_comment_to_issue(repository, issue, remark + clean_output(modification_summary) + error_messages)
+        add_comment_to_issue(repository, issue, remark + clean_output(repository, modification_summary) + error_messages)
 
 def split_issue_in_sub_issues(repository, issue, prompt_function):
     """
