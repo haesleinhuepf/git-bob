@@ -47,7 +47,7 @@ def command_line_interface():
     for key, value in prompt_handlers.items():
         if value is not None:
             available_handlers[key] = value
-    print("Available prompt handlers:", ", ".join([p.replace(":","") for p in list(available_handlers.key())]))
+    print("Available prompt handlers:", ", ".join([p.replace(":","") for p in list(available_handlers.keys())]))
 
     # Print out all arguments passed to the script
     print("Script arguments:")
