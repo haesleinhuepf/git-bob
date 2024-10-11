@@ -597,3 +597,59 @@ Do not explain your response or anything else. Just respond the relevant informa
     add_comment_to_issue(repository, issue, ai_remark + comment_text)
 
     return sub_issue_numbers
+
+def execute_code_from_discussion(repository, issue, prompt_function):
+    """
+    Extract and execute python code from a GitHub issue discussion.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository.
+    issue : int
+        The issue number where the discussion is.
+    prompt_function : function
+        The function to generate the code extraction and execution process.
+    """
+    from ._github_utilities import get_conversation_on_issue, add_comment_to_issue
+    from ._utilities import run_cli, image_to_url
+    import base64
+    import os
+
+    ai_remark = setup_ai_remark()
+    discussion = get_conversation_on_issue(repository, issue)
+
+    # Extract Python code from the discussion
+    code = prompt_function(f"""
+Extract the Python code from the following discussion. Modify the code to ensure results are saved as PNG or CSV files.
+Only return the modified code, nothing else.
+
+Discussion:
+{discussion}
+    """)
+
+    # Save the code to a temporary file
+    with open("temp_script.py", "w") as f:
+        f.write(code)
+
+    # Execute the code and capture the output
+    result = run_cli("python temp_script.py")
+
+    # Check for generated files
+    output_files = [f for f in os.listdir('.') if f.endswith(('.png', '.csv'))]
+
+    comment = f"{ai_remark}\n\n## Execution Result\n\n```\n{result}\n```\n\n"
+
+    # Process and add output files to the comment
+    for file in output_files:
+        if file.endswith('.png'):
+            with open(file, "rb") as image_file:
+                image_url = image_to_url(image_file.read())
+            comment += f"\n\n## Generated Image\n\n![Generated Image]({image_url})\n\n"
+        elif file.endswith('.csv'):
+            with open(file, "r") as csv_file:
+                csv_content = csv_file.read()
+            comment += f"\n\n## Generated CSV\n\n```csv\n{csv_content}\n```\n\n"
+
+    # Add the comment to the issue
+    add_comment_to_issue(repository, issue, comment)
