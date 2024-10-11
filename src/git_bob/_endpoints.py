@@ -71,6 +71,10 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
 
     result = ""
 
+    print("model", model)
+    print("base_url", base_url)
+    print("api_key", len(api_key))
+
     for _ in range(0, max_accumulated_responses):
 
         # submit prompt
