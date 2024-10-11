@@ -163,7 +163,7 @@ Review this pull-request and contribute to the discussion.
 Do NOT explain your response or anything else. 
 Just respond to the discussion.
 """)
-     comment = clean_output(comment)
+    comment = clean_output(comment)
 
     print("comment:", comment)
 
