@@ -43,6 +43,8 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
     import warnings
     from ._utilities import append_result
 
+    print("using model: _", model[1:])
+
     if image is None:
         message = [{"role": "user", "content": message}]
     else:
