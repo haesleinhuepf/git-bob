@@ -316,7 +316,7 @@ def execute_notebook(notebook_content, timeout=600, kernel_name='python3'):
     import jupyter_client
 
     # Get the list of available kernels
-    kernels = jupyter_client.kernelspec.KernelSpecManager().().get_all_specs()
+    kernels = jupyter_client.kernelspec.KernelSpecManager().get_all_specs()
 
     # Print the names of the kernels
     print("Available Jupyter kernels:")
