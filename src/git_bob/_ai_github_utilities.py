@@ -543,10 +543,6 @@ Do not add headline or any other formatting. Just respond with the paragraph and
 
         full_report = remark + clean_output(repository, pull_request_description) + error_messages
 
-        print("full_report\n-------------")
-        print(full_report)
-        print("-------------")
-
         try:
             send_pull_request(repository,
                           source_branch=branch_name,
