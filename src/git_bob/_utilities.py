@@ -426,8 +426,7 @@ def clean_output(repository, text):
     return text
 
 
-SENSIBLE_ENV_KEYS = ["GIT_BOB_AGENT_NAME",
-                    "GIT_BOB_LLM_NAME",
+SENSIBLE_ENV_KEYS = ["GIT_BOB_LLM_NAME",
                     "ANTHROPIC_API_KEY",
                     "GOOGLE_API_KEY",
                     "OPENAI_API_KEY",
