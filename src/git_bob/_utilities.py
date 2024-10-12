@@ -449,7 +449,6 @@ def save_and_clear_environment():
 
     # Clear all environment variables
     for key in list(os.environ.keys()):
-        print(f"removing {key} from env")
         if key in SENSIBLE_ENV_KEYS or \
             "password" in key.lower() or \
             "username" in key.lower() or \
