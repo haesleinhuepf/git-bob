@@ -432,15 +432,13 @@ def clean_output(repository, text):
     return text
 
 
-SENSIBLE_ENV_KEYS = ["GIT_BOB_LLM_NAME",
-                    "ANTHROPIC_API_KEY",
+SENSIBLE_ENV_KEYS = ["ANTHROPIC_API_KEY",
                     "GOOGLE_API_KEY",
                     "OPENAI_API_KEY",
                     "GH_MODELS_API_KEY",
                     "KISSKI_API_KEY",
                     "BLABLADOR_API_KEY",
                     "GITHUB_API_KEY",
-                    "GITHUB_RUN_ID",
                     "TWINE_USERNAME",
                     "TWINE_PASSWORD"]
 
