@@ -110,7 +110,7 @@ def command_line_interface():
 
     # determine task to do
     if running_in_github_ci:
-        if not (f"{agent_name} comment" in text or f"{agent_name} solve" in text or f"{agent_name} split" in text or f"{agent_name} deploy" in text):
+        if not (f"{agent_name} comment" in text or f"{agent_name} solve" in text or f"{agent_name} try" in text or f"{agent_name} split" in text or f"{agent_name} deploy" in text):
             print("They didn't speak to me. I show myself out:", text)
             sys.exit(0)
         ai_remark = setup_ai_remark()
@@ -125,6 +125,8 @@ def command_line_interface():
             text = text + f"\n{agent_name} comment"
         elif task == "solve-issue":
             text = text + f"\n{agent_name} solve"
+        elif task == "try-issue":
+            text = text + f"\n{agent_name} try"
         elif task == "split-issue":
             text = text + f"\n{agent_name} split"
         else:
@@ -158,9 +160,14 @@ def command_line_interface():
             comment_on_issue(repository, issue, prompt)
     elif f"{agent_name} split" in text:
         split_issue_in_sub_issues(repository, issue, prompt)
-    elif f"{agent_name} solve" in text:
+    elif f"{agent_name} solve" in text or f"{agent_name} try" in text:
+        if f"{agent_name} try" in text:
+            from ._github_utilities import create_branch
+            target_branch = create_branch(repository, base_branch)
+        else:
+            target_branch = base_branch
         # could be issue or modifying code in a PR
-        solve_github_issue(repository, issue, Config.llm_name, prompt, base_branch=base_branch)
+        solve_github_issue(repository, issue, Config.llm_name, prompt, base_branch=target_branch)
     elif f"{agent_name} deploy" in text:
         deploy(repository, issue)
     else:

@@ -18,7 +18,7 @@ You have to pay for the usage and must be careful in using the software.
 Do not use this technology if you are not aware of the costs and consequences.
 
 > [!CAUTION]
-> When using the Anthropic, OpenAI <!--, Google Gemini--> or any other endpoint via git-bob, you are bound to the terms of service 
+> When using the Anthropic, OpenAI, Google Gemini or any other endpoint via git-bob, you are bound to the terms of service 
 > of the respective companies or organizations.
 > The github issues, pull-requests and messages you enter are transferred to their servers and may be processed and stored there. 
 > Make sure to not submit any sensitive, confidential or personal data. Also using these services may cost money.
@@ -55,6 +55,11 @@ If the issue is complex and should be split into sub-issues, you can use the fol
 
 ```
 git-bob split
+```
+
+You can ask git-bob to implement a solution, e.g. as Jupyter notebook and run it like this:
+```
+git-bob try
 ```
 
 You can also use the following command to trigger git-bob solving an issue.

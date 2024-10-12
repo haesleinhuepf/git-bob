@@ -352,9 +352,15 @@ def write_file_in_branch(repository, branch_name, file_path, new_content, commit
     else:
         repo.create_file(file_path, commit_message, new_content, branch=branch_name)
 
+    # ensure the folder extists
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
     # save the file
-    with open(file_path, "w") as f:
-        f.write(new_content)
+    if isinstance(new_content, bytes):
+        with open(file_path, "wb") as f:
+            f.write(new_content)
+    else:
+        with open(file_path, "w") as f:
+            f.write(new_content)
 
     return f"File {file_path} successfully created in repository {repository} branch {branch_name}."
 
@@ -790,7 +796,7 @@ def execute_notebook_in_repository(repository, branch_name, file_path, commit_me
 
     # Execute the notebook
     try:
-        new_notebook_content = execute_notebook(notebook_content)
+        new_notebook_content, error_message = execute_notebook(notebook_content)
     except:
         raise ValueError("Error during notebook execution.")
     finally:
