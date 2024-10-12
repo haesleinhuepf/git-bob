@@ -125,3 +125,13 @@ blabla
     result = clean_output("haesleinhuepf/git-bob", test)
 
     assert test == reference
+
+def test_saved_environment():
+    import os
+    from git_bob._utilities import save_and_clear_environment, restore_environment
+    os.environ['TEST_KEY'] = '123'
+    saved_env = save_and_clear_environment()
+    assert os.environ.get("TEST_KEY") is None
+    restore_environment(saved_env)
+    assert saved_env.get("TEST_KEY") is not None
+

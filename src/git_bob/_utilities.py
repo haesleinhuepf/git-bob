@@ -423,3 +423,41 @@ def clean_output(repository, text):
     for c in contributors:
         text = text.replace("@ " + c, "@" + c)
     return text
+
+
+def save_and_clear_environment():
+    import os
+    # Save the current environment
+    saved_env = dict(os.environ)
+
+    # Clear all environment variables
+    for key in list(os.environ.keys()):
+        print(f"removing {key} from env")
+        if key in ["GIT_BOB_AGENT_NAME",
+                    "GIT_BOB_LLM_NAME",
+                    "ANTHROPIC_API_KEY",
+                    "GOOGLE_API_KEY",
+                    "OPENAI_API_KEY",
+                    "GH_MODELS_API_KEY",
+                    "KISSKI_API_KEY",
+                    "BLABLADOR_API_KEY",
+                    "GITHUB_API_KEY",
+                    "GITHUB_RUN_ID",
+                    "TWINE_USERNAME",
+                    "TWINE_PASSWORD"] or \
+            "password" in key.lower() or \
+            "username" in key.lower() or \
+            "key" in key.lower():
+            del os.environ[key]
+
+    return saved_env
+
+
+def restore_environment(saved_env):
+    import os
+    # Clear current environment
+    for key in list(os.environ.keys()):
+        del os.environ[key]
+
+    # Restore saved environment
+    os.environ.update(saved_env)

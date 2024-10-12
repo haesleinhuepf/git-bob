@@ -228,7 +228,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     from ._github_utilities import get_repository_file_contents, write_file_in_branch, create_branch, \
         check_if_file_exists, get_file_in_repository, execute_notebook_in_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells, \
-        restore_outputs_of_code_cells, execute_notebook, text_to_json
+        restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, restore_environment
     import os
 
     original_ipynb_file_content = None
@@ -317,11 +317,15 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
         os.makedirs(path_without_filename, exist_ok=True)
         os.chdir(path_without_filename)
 
+        # store environment variables
+        saved_environment = save_and_clear_environment()
+
         not_executed_notebook = new_content
 
         # Execute the notebook
         try:
             new_content, error_message = execute_notebook(new_content)
+            restore_environment(saved_environment)
             if error_message is None:
                 # scan for files the notebook created
                 list_of_files_text = prompt_function(f"""
@@ -345,6 +349,7 @@ Notebook:
             raise ValueError(f"Error during notebook execution: {e}")
         finally:
             os.chdir(current_dir)
+            restore_environment(saved_environment)
 
         print("Executed notebook", len(new_content))
 
