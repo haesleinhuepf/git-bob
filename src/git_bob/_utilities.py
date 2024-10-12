@@ -262,38 +262,41 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
         if "### File {url} content" in discussion:
             continue
 
-        if url_type == 'issue':
-            parts = url.split('/')
-            repo = parts[3] + '/' + parts[4]
-            try:
-                issue_number = int(parts[-1])
-            except:
-                continue
-            additional_content[url] = get_conversation_on_issue(repo, issue_number)
-        elif url_type == 'pull_request':
-            parts = url.split('/')
-            repo = parts[3] + '/' + parts[4]
-            try:
-                pr_number = int(parts[-1])
-            except:
-                continue
-                
-            # Get both the diff and discussion on pull request
-            additional_content[url] = (get_conversation_on_issue(repo, pr_number) +
-                                       get_diff_of_pull_request(repo, pr_number))
-        elif url_type == 'file':
-            parts = url.split('/')
-            repo = parts[3] + '/' + parts[4]
-            branch_name = parts[6]
-            file_path = '/'.join(parts[7:])
-            file_contents = get_file_in_repository (repo, branch_name, file_path).decoded_content.decode()
-            if url.endswith('.ipynb'):
-                file_contents = erase_outputs_of_code_cells(file_contents)
-            additional_content[url] = file_contents
-        elif url_type == 'image':
-            image = load_image_from_url(url)
-            image_content = prompt_visionlm(VISION_SYSTEM_MESSAGE + "\n\nDescribe this image.", image=url)
-            additional_content[url] = image_content
+        try:
+            if url_type == 'issue':
+                parts = url.split('/')
+                repo = parts[3] + '/' + parts[4]
+                try:
+                    issue_number = int(parts[-1])
+                except:
+                    continue
+                additional_content[url] = get_conversation_on_issue(repo, issue_number)
+            elif url_type == 'pull_request':
+                parts = url.split('/')
+                repo = parts[3] + '/' + parts[4]
+                try:
+                    pr_number = int(parts[-1])
+                except:
+                    continue
+
+                # Get both the diff and discussion on pull request
+                additional_content[url] = (get_conversation_on_issue(repo, pr_number) +
+                                           get_diff_of_pull_request(repo, pr_number))
+            elif url_type == 'file':
+                parts = url.split('/')
+                repo = parts[3] + '/' + parts[4]
+                branch_name = parts[6]
+                file_path = '/'.join(parts[7:])
+                file_contents = get_file_in_repository (repo, branch_name, file_path).decoded_content.decode()
+                if url.endswith('.ipynb'):
+                    file_contents = erase_outputs_of_code_cells(file_contents)
+                additional_content[url] = file_contents
+            elif url_type == 'image':
+                image = load_image_from_url(url)
+                image_content = prompt_visionlm(VISION_SYSTEM_MESSAGE + "\n\nDescribe this image.", image=url)
+                additional_content[url] = image_content
+        except Exception as e:
+            print(f"Error while processing URL {url}: {e}")
 
     # Modify the existing discussion content
     discussion = discussion.replace("\n#", "\n###")
