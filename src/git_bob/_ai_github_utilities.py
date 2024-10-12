@@ -411,10 +411,9 @@ Given a list of files in the repository {repository} and a github issues descrip
 {all_files}
 
 ## Your task
-Decide which of these files need to be modified, created, downloaded, renamed, copied, executed or deleted to solve #{issue} ? 
+Decide which of these files need to be modified, created, downloaded, renamed, copied or deleted to solve #{issue} ? 
 Downloads are necessary, if there is a url in the discussion and the linked file is needed in the proposed code.
-Executions of notebooks are NOT necessary if you just created or modified them as execution is part of the creation or modification.
-If the user asks for executing a notebook in the very last message only, then only execute it. Do not modify the notebook then.
+If the user asks for executing a notebook, consider this as modification.
 Keep the list of actions minimal.
 Response format:
 - For modifications: {{'action': 'modify', 'filename': '...'}}
@@ -477,11 +476,6 @@ Respond with the actions as JSON list.
                 new_filename = instruction['new_filename']
                 copy_file_in_repository(repository, branch_name, old_filename, new_filename)
                 commit_messages.append(f"Copied {old_filename} to {new_filename}.")
-            elif action == 'execute':
-                filename = instruction['filename']
-                print("Executing", filename)
-                execute_notebook_in_repository(repository, branch_name, filename)
-                commit_messages.append(f"Executed {filename}.")
         except Exception as e:
             traces = "    " + remove_ansi_escape_sequences(traceback.format_exc()).replace("\n", "\n    ")
             summary = f"""<details>
