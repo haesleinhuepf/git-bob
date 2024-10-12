@@ -162,7 +162,7 @@ Available actions:
 At the moment, these limitations can be observed:
 * `git-bob` was tested for Python projects mostly. It seems to be able to process Java and C++ as well.
 * It cannot solve issues where running and testing the code is required. 
-* It sometimes halucinates, especially in code reviews. E.g. it [claimed](https://github.com/haesleinhuepf/git-bob/pull/70) to have tested code, which is certainly not true.
+* It sometimes hallucinates, especially in code reviews. E.g. it [claimed](https://github.com/haesleinhuepf/git-bob/pull/70) to have tested code, which is certainly not true.
 * It cannot solve issues where changing long files is required, as the output of the LLMs is limited by a maximum number of tokens (e.g. 16k for `gpt-4o-2024-08-06`). When using OpenAI's models it combines output of multiple requests to a maximum file length about 64k tokens. It may then miss some spaces or a line break where responses were stiched. 
   When using github models, the maximum file length is 4k tokens. When using anthropic's claude, the maximum file length is 8k tokens.
 * When changing multiple files, it may introduce conflicts between the files, as it does not know about the changed contents of the other files.
