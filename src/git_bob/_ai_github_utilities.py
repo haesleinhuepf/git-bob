@@ -443,8 +443,8 @@ Respond with the actions as JSON list.
         print("Continue working on branch", branch_name)
 
     # sort instructions by action: downloads first, then the rest in original order
-    print("sorted instructions", instructions)
-    instructions = sorted(instructions, key=lambda x: x.get('action') == 'download')
+    print("unsorted instructions", instructions)
+    instructions = sorted(instructions, key=lambda x: x.get('action') != 'download')
     print("sorted instructions", instructions)
 
     errors = []
