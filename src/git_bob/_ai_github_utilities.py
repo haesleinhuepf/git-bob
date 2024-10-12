@@ -331,7 +331,10 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
             if error_message is None:
                 # scan for files the notebook created
                 list_of_files_text = prompt_function(f"""
-Extract a list of fileanames from the following jupyter notebook. Return the list as a JSON list and nothing else.
+Extract a list of filenames including path from the following jupyter notebook. 
+The path should be relative from the repository root, not from the notebooks's postion. 
+The position of the notebook is {filename}.
+Return the list as a JSON list and nothing else.
 
 Notebook:
 {not_executed_notebook}
