@@ -228,7 +228,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     from ._github_utilities import get_repository_file_contents, write_file_in_branch, create_branch, \
         check_if_file_exists, get_file_in_repository, execute_notebook_in_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells, \
-        restore_outputs_of_code_cells, execute_notebook
+        restore_outputs_of_code_cells, execute_notebook, text_to_json
+    import os
 
     original_ipynb_file_content = None
 
@@ -260,7 +261,7 @@ Return the entire new file content, do not shorten it.
         if filename.endswith('.py'):
             format_specific_instructions = " When writing new functions, use numpy-style docstrings."
         elif filename.endswith('.ipynb'):
-            format_specific_instructions = " In the new notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell."
+            format_specific_instructions = " In the new notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors."
         file_content_instruction = f"""
 Create the file "{filename}" to solve the issue #{issue}.{format_specific_instructions}
 
@@ -306,30 +307,58 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
         new_content = erase_outputs_of_code_cells(new_content)
         do_execute_notebook = True
 
+    created_files = []
     if do_execute_notebook:
         print("Executing the notebook", len(new_content))
         current_dir = os.getcwd()
         print("current_dir", current_dir)
-        path_without_filename = "/".join(filename.split("/")[:-1])
+        path_without_filename = os.path.dirname(filename)
+        print("path_without_filename", path_without_filename)
+        os.makedirs(path_without_filename, exist_ok=True)
         os.chdir(path_without_filename)
+
+        not_executed_notebook = new_content
 
         # Execute the notebook
         try:
-            new_content = execute_notebook(new_content)
-        except:
-            raise ValueError("Error during notebook execution.")
+            new_content, error_message = execute_notebook(new_content)
+            if error_message is None:
+                # scan for files the notebook created
+                list_of_files_text = prompt_function(f"""
+Extract a list of fileanames from the following jupyter notebook. Return the list as a JSON list and nothing else.
+
+Notebook:
+{not_executed_notebook}
+            """)
+                list_of_files = text_to_json(list_of_files_text)
+                print("------------------------")
+                for file in list_of_files:
+                    print("File created by notebook:", file, os.path.exists(file))
+                    if os.path.exists(file):
+                        created_files.append(path_without_filename + "/" + file)
+                        with open(file, 'rb') as f:
+                            file_content2 = f.read()
+                            write_file_in_branch(repository, branch_name, f"{path_without_filename}/{file}", file_content2, f"Adding {path_without_filename}/{file} created by notebook")
+                print("------------------------")
+
+        except Exception as e:
+            raise ValueError(f"Error during notebook execution: {e}")
         finally:
             os.chdir(current_dir)
+
         print("Executed notebook", len(new_content))
+
+    created_files.append(path_without_filename + "/" + filename)
 
     write_file_in_branch(repository, branch_name, filename, new_content + "\n", commit_message)
 
-    return commit_message
+    return commit_message + "\n\nCreated files:\n* " + "\n* ".join(created_files)
 
 
 def solve_github_issue(repository, issue, llm_model, prompt_function, base_branch=None):
     """
-    Attempt to solve a GitHub issue by modifying a single file and sending a pull-request.
+    Attempt to solve a GitHub issue by modifying a single file and sending a pull-request, or
+    commenting on a pull-request.
 
     Parameters
     ----------
@@ -496,14 +525,32 @@ The following changes were made in the files:
 {diffs_prompt}
 
 ## Your task
+
 Summarize the changes above to a one paragraph line Github pull-request message. 
+If there new files created, add links to them. 
+If there are images created, use the markdown syntax to display them.
+For file and image urls, prefix them with the repository name and the branch name: https://github.com/{repository}/blob/{branch_name}/
+For image urls, append "?raw=true" by the end of the url to display the image directly.
+
 Afterwards, summarize the summary in a single line, which will become the title of the pull-request.
-Do not add headline or any other formatting. Just respond with the paragraphe and the title in a new line below.
+Do not add headline or any other formatting. Just respond with the paragraph and the title in a new line below.
 """)
 
         pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
 
+
+        print("pull_request_description\n-------------")
+        print(pull_request_description)
+        print("-------------")
+        print("pull_request_title\n-------------")
+        print(pull_request_title)
+        print("-------------")
+
         full_report = remark + clean_output(repository, pull_request_description) + error_messages
+
+        print("full_report\n-------------")
+        print(full_report)
+        print("-------------")
 
         try:
             send_pull_request(repository,

@@ -119,8 +119,13 @@ def erase_outputs_of_code_cells(file_content):
     notebook : str
         The notebook content as a string.
     """
+    import re
     import json
-    notebook = json.loads(file_content)
+
+    # removed invalid characters
+    clean_file_content = re.sub(r'[\x00-\x1f\x7f]', '', file_content)
+
+    notebook = json.loads(clean_file_content)
     for cell in notebook.get('cells', []):
         if cell.get('cell_type') == 'code':
             cell['outputs'] = []
@@ -314,6 +319,7 @@ def execute_notebook(notebook_content, timeout=600, kernel_name='python3'):
     import nbformat
     from nbconvert.preprocessors import ExecutePreprocessor
     import jupyter_client
+    import traceback
 
     # Get the list of available kernels
     kernels = jupyter_client.kernelspec.KernelSpecManager().get_all_specs()
@@ -329,19 +335,20 @@ def execute_notebook(notebook_content, timeout=600, kernel_name='python3'):
     # Initialize the processor to execute the notebook
     ep = ExecutePreprocessor(timeout=timeout, kernel_name=kernel_name)
 
+    error = None
     try:
         # Execute the notebook
         ep.preprocess(notebook, {'metadata': {'path': './'}})
     except Exception as e:
+        # store traceback
+        error = traceback.format_exc()
         print("Error during notebook execution:", e)
-        pass # attempt to save the error in the notebook
-        # raise Exception("Error during notebook execution.")
 
     # Save executed notebook
     notebook_content = nbformat.writes(notebook)
 
     # If we reach here, execution was successful
-    return notebook_content
+    return notebook_content, error
 
 
 
@@ -396,8 +403,8 @@ def clean_output(repository, text):
     # if all lines start with spaces (except 1st and last), remove those spaces in all lines
     lines = text.split("\n")
     while (True):
-        if all([line.startswith(" ") for line in lines[1:-1]]):
-            text = lines[0] + "\n" + "\n".join([line[1:] for line in lines[1:]]) + "\n" + lines[-1]
+        if all([line.startswith(" ") for line in lines[1:]]):
+            text = lines[0] + "\n" + "\n".join([line[1:] for line in lines[1:]])
             lines = text.split("\n")
         else:
             break
