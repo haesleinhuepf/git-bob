@@ -354,7 +354,7 @@ Notebook:
 
         print("Executed notebook", len(new_content))
 
-    created_files.append(path_without_filename + "/" + filename)
+    created_files.append(filename)
 
     new_content = redact_text(new_content)
 
