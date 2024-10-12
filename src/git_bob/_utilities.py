@@ -170,6 +170,7 @@ def text_to_json(text):
         text = "[" +  text.split("[")[1]
     if "]" in text:
         text = text.split("]")[0] + "]"
+    text = text.replace("'", "\"")
 
     print("JSON?:", text)
 

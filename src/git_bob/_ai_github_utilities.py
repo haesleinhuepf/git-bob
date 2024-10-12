@@ -419,13 +419,13 @@ Downloads are necessary, if there is a url in the discussion and the linked file
 If the user asks for executing a notebook, consider this as modification.
 Keep the list of actions minimal.
 Response format:
-- For modifications: {{'action': 'modify', 'filename': '...'}}
-- For creations: {{'action': 'create', 'filename': '...'}}
-- For downloads: {{'action': 'download', 'source_url': '...', 'target_filename': '...'}}
-- For renames: {{'action': 'rename', 'old_filename': '...', 'new_filename': '...'}}
-- For copies: {{'action': 'copy', 'old_filename': '...', 'new_filename': '...'}}
-- For executions: {{'action': 'execute', 'filename': '...'}}
-- For deletions: {{'action': 'delete', 'filename': '...'}}
+- For modifications: {{"action": "modify", "filename": "..."}}
+- For creations: {{"action": "create", "filename": "..."}}
+- For downloads: {{"action": "download", "source_url": "...", "target_filename": "..."}}
+- For renames: {{"action": "rename", "old_filename": "...", "new_filename": "..."}}
+- For copies: {{"action": "copy", "old_filename": "...", "new_filename": "..."}}
+- For executions: {{"action": "execute", "filename": "..."}}
+- For deletions: {{"action": "delete", "filename": "..."}}
 Respond with the actions as JSON list.
 """)
 
