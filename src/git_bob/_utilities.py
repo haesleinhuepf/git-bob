@@ -472,6 +472,6 @@ def restore_environment(saved_env):
 def redact_text(text):
     """Hide sensitive information from a string"""
     for key in SENSIBLE_ENV_KEYS:
-        if key in os.environ:
+        if key in os.environ and len(os.environ.get(key)) > 0:
             text = text.replace(os.environ.get(key), "***")
     return text
