@@ -541,19 +541,7 @@ Do not add headline or any other formatting. Just respond with the paragraph and
 
         pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
 
-
-        print("pull_request_description\n-------------")
-        print(pull_request_description)
-        print("-------------")
-        print("pull_request_title\n-------------")
-        print(pull_request_title)
-        print("-------------")
-
         full_report = remark + clean_output(repository, pull_request_description) + error_messages
-
-        print("full_report\n-------------")
-        print(full_report)
-        print("-------------")
 
         try:
             send_pull_request(repository,
