@@ -357,7 +357,9 @@ def write_file_in_branch(repository, branch_name, file_path, new_content, commit
         repo.create_file(file_path, commit_message, new_content, branch=branch_name)
 
     # ensure the folder extists
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    path_name = str(os.path.dirname(file_path))
+    if len(path_name) > 0:
+        os.makedirs(path_name, exist_ok=True)
     # save the file
     if isinstance(new_content, bytes):
         with open(file_path, "wb") as f:

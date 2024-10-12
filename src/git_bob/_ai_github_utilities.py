@@ -316,7 +316,8 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
         print("current_dir", current_dir)
         path_without_filename = os.path.dirname(filename)
         print("path_without_filename", path_without_filename)
-        os.makedirs(path_without_filename, exist_ok=True)
+        if len(path_without_filename) > 0:
+            os.makedirs(path_without_filename, exist_ok=True)
         os.chdir(path_without_filename)
 
         # store environment variables
