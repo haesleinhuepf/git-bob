@@ -150,6 +150,9 @@ def restore_outputs_of_code_cells(new_content, original_ipynb_file_content):
     original_code_cells = [cell for cell in original_notebook['cells'] if cell['cell_type'] == 'code']
     new_code_cells = [cell for cell in new_notebook['cells'] if cell['cell_type'] == 'code']
 
+    if len(original_code_cells) != len(new_code_cells):
+        raise ValueError("Number of code cells in the original and new notebooks do not match.")
+    
     for o_cell, n_cell in zip(original_code_cells, new_code_cells):
         if "\n".join(o_cell['source']).strip() == "\n".join(n_cell['source']).strip():
             print("Original cell content", o_cell)
