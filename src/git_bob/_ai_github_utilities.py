@@ -25,7 +25,7 @@ def setup_ai_remark():
     run_id = Config.run_id
     repository = Config.repository
     if run_id is not None:
-        link = f""", [log](https://github.com/haesleinhuepf/{repository}/actions/runs/{run_id})"""
+        link = f""", [log](https://github.com/{repository}/actions/runs/{run_id})"""
     else:
         link = ""
     if AGENT_NAME != "git-bob":
