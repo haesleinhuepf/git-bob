@@ -52,7 +52,7 @@ def comment_on_issue(repository, issue, prompt_function):
     Log().log(f"-> comment_on_issue({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, list_repository_files, \
         get_repository_file_contents
-    from ._utilities import text_to_json, modify_discussion, clean_output
+    from ._utilities import text_to_json, modify_discussion, clean_output, redact_text
 
     ai_remark = setup_ai_remark()
 
@@ -106,7 +106,7 @@ In case code-changes are discussed, make a proposal of how new code could look l
 Do NOT explain your response or anything else. 
 Just respond to the discussion.
 """)
-    comment = clean_output(repository, comment)
+    comment = redact_text(clean_output(repository, comment))
 
     print("comment:", comment)
 
@@ -132,7 +132,7 @@ def review_pull_request(repository, issue, prompt_function):
     """
     Log().log(f"-> review_pull_request({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, get_diff_of_pull_request
-    from ._utilities import modify_discussion, clean_output
+    from ._utilities import modify_discussion, clean_output, redact_text
 
     ai_remark = setup_ai_remark()
 
@@ -164,7 +164,7 @@ Review this pull-request and contribute to the discussion.
 Do NOT explain your response or anything else. 
 Just respond to the discussion.
 """)
-    comment = clean_output(repository, comment)
+    comment = redact_text(clean_output(repository, comment))
 
     print("comment:", comment)
 
@@ -226,9 +226,10 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
     from ._github_utilities import get_repository_file_contents, write_file_in_branch, create_branch, \
-        check_if_file_exists, get_file_in_repository, execute_notebook_in_repository
+        check_if_file_exists, get_file_in_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells, \
-        restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, restore_environment
+        restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, \
+        restore_environment, redact_text
     import os
 
     original_ipynb_file_content = None
@@ -355,7 +356,9 @@ Notebook:
 
     created_files.append(path_without_filename + "/" + filename)
 
-    write_file_in_branch(repository, branch_name, filename, new_content + "\n", commit_message)
+    new_content = redact_text(new_content)
+
+    write_file_in_branch(repository, branch_name, filename, new_content + "\n", redact_text(commit_message))
 
     return commit_message + "\n\nCreated files:\n* " + "\n* ".join(created_files)
 
@@ -385,10 +388,10 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, \
         write_file_in_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, \
         get_diff_of_branches, get_conversation_on_issue, rename_file_in_repository, delete_file_from_repository, \
-        copy_file_in_repository, execute_notebook_in_repository, download_to_repository, add_comment_to_issue, \
+        copy_file_in_repository, download_to_repository, add_comment_to_issue, \
         get_github_repository
     from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion, \
-        remove_ansi_escape_sequences, clean_output
+        remove_ansi_escape_sequences, clean_output, redact_text
     from github.GithubException import GithubException
     import traceback
 
@@ -546,8 +549,8 @@ Do not add headline or any other formatting. Just respond with the paragraph and
             send_pull_request(repository,
                           source_branch=branch_name,
                           target_branch=base_branch,
-                          title=pull_request_title,
-                          description=full_report + f"\n\ncloses #{issue}")
+                          title=redact_text(pull_request_title),
+                          description=redact_text(full_report) + f"\n\ncloses #{issue}")
         except GithubException as e:
             add_comment_to_issue(repository, issue, f"{remark}Error creating pull-request: {e}{error_messages}")
     else:
@@ -567,7 +570,7 @@ Summarize the changes above to a one paragraph.
 Do not add headline or any other formatting. Just respond with the paragraphe below.
 """)
 
-        add_comment_to_issue(repository, issue, remark + clean_output(repository, modification_summary) + error_messages)
+        add_comment_to_issue(repository, issue, remark + redact_text(clean_output(repository, modification_summary)) + redact_text(error_messages))
 
 def split_issue_in_sub_issues(repository, issue, prompt_function):
     """
