@@ -502,11 +502,17 @@ Respond with the actions as JSON list.
     from ._ai_github_utilities import setup_ai_remark
     remark = setup_ai_remark() + "\n\n"
 
+    link_files_task = f"""
+If there are image files created, use the markdown syntax ![](url) to display them.
+If there other new files created, add markdown links to them. 
+For file and image urls, prefix them with the repository name and the branch name: https://github.com/{repository}/blob/{branch_name}/
+For image urls, append "?raw=true" by the end of the url to display the image directly.
+"""
 
     if branch_name != base_branch:
 
         pull_request_summary = prompt_function(f"""
-        {SYSTEM_PROMPT}
+{SYSTEM_PROMPT}
 Given a list of commit messages and a git diff, summarize the changes you made in the files.
 You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
 
@@ -527,10 +533,7 @@ The following changes were made in the files:
 ## Your task
 
 Summarize the changes above to a one paragraph line Github pull-request message. 
-If there new files created, add links to them. 
-If there are images created, use the markdown syntax to display them.
-For file and image urls, prefix them with the repository name and the branch name: https://github.com/{repository}/blob/{branch_name}/
-For image urls, append "?raw=true" by the end of the url to display the image directly.
+{link_files_task}
 
 Afterwards, summarize the summary in a single line, which will become the title of the pull-request.
 Do not add headline or any other formatting. Just respond with the paragraph and the title in a new line below.
@@ -562,18 +565,20 @@ Do not add headline or any other formatting. Just respond with the paragraph and
             add_comment_to_issue(repository, issue, f"{remark}Error creating pull-request: {e}{error_messages}")
     else:
         modification_summary = prompt_function(f"""
-                {SYSTEM_PROMPT}
-        Given a list of commit messages, summarize the changes you made.
+{SYSTEM_PROMPT}
+Given a list of commit messages, summarize the changes you made.
 
-        ## Commit messages
-        You committed these changes to these files
+## Commit messages
+You committed these changes to these files
 
-        {commit_messages_prompt}
+{commit_messages_prompt}
 
-        ## Your task
-        Summarize the changes above to a one paragraph.
-        Do not add headline or any other formatting. Just respond with the paragraphe below.
-        """)
+## Your task
+Summarize the changes above to a one paragraph.
+{link_files_task}
+
+Do not add headline or any other formatting. Just respond with the paragraphe below.
+""")
 
         add_comment_to_issue(repository, issue, remark + clean_output(repository, modification_summary) + error_messages)
 
