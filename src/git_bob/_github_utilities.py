@@ -50,6 +50,10 @@ def add_comment_to_issue(repository, issue, comment):
     # Get the issue object
     issue_obj = repo.get_issue(issue)
 
+    if len(comment) > 65535:
+        print("Comment is too long. Truncated to 65535 characters. This was the full comment:", comment)
+        comment = comment[:65535]
+
     # Add a new comment to the issue
     issue_obj.create_comment(comment)
 
@@ -492,9 +496,12 @@ def send_pull_request(repository, source_branch, target_branch, title, descripti
     """
     Log().log(f"-> send_pull_request({repository}, {source_branch}, {target_branch}, ...)")
 
-
     # Authenticate with GitHub
     repo = get_github_repository(repository)
+
+    if len(description) > 65535:
+        print("Description is too long. Truncated to 65535 characters. This was the full description:", description)
+        description = description[:65535]
 
     # Create a pull request
     pr = repo.create_pull(title=title, body=description, head=source_branch, base=target_branch)
