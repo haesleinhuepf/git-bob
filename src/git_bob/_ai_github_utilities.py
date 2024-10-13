@@ -1,9 +1,7 @@
 # This module contains utility functions for interacting with GitHub issues and pull requests using AI.
 # It includes functions for setting up AI remarks, commenting on issues, reviewing pull requests, and solving issues.
 import warnings
-
 from ._logger import Log
-import json
 import os
 
 AGENT_NAME = os.environ.get("GIT_BOB_AGENT_NAME", "git-bob")
@@ -205,7 +203,7 @@ In case filenames, variables and code-snippetes are mentioned, keep them in the 
     return summary
 
 
-def create_or_modify_file(repository, issue, filename, branch_name, issue_summary, prompt_function):
+def create_or_modify_file(repository, issue, filename, branch_name, issue_summary, prompt_function, number_of_attempts:int=3):
     """
     Create or modify a file in a GitHub repository.
 
@@ -232,22 +230,26 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         restore_environment, redact_text
     import os
 
-    original_ipynb_file_content = None
 
-    format_specific_instructions = ""
-    if filename.endswith('.py'):
-        format_specific_instructions = " When writing new functions, use numpy-style docstrings."
-    elif filename.endswith('.ipynb'):
-        format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors."
+    for attempt in range(number_of_attempts):
+        an_error_happened = False
 
-    if check_if_file_exists(repository, branch_name, filename):
-        file_content = get_file_in_repository(repository, branch_name, filename).decoded_content.decode()
-        print(filename, "will be overwritten")
-        if filename.endswith('.ipynb'):
-            print("Removing outputs from ipynb file")
-            original_ipynb_file_content = file_content
-            file_content = erase_outputs_of_code_cells(file_content)
-        file_content_instruction = f"""
+        original_ipynb_file_content = None
+
+        format_specific_instructions = ""
+        if filename.endswith('.py'):
+            format_specific_instructions = " When writing new functions, use numpy-style docstrings."
+        elif filename.endswith('.ipynb'):
+            format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors. Return the notebook in JSON format!"
+
+        if check_if_file_exists(repository, branch_name, filename):
+            file_content = get_file_in_repository(repository, branch_name, filename).decoded_content.decode()
+            print(filename, "will be overwritten")
+            if filename.endswith('.ipynb'):
+                print("Removing outputs from ipynb file")
+                original_ipynb_file_content = file_content
+                file_content = erase_outputs_of_code_cells(file_content)
+            file_content_instruction = f"""
 Modify the file "{filename}" to solve the issue #{issue}. {format_specific_instructions}
 If the discussion is long, some stuff might be already done. In that case, focus on what was said at the very end in the discussion.
 Keep your modifications absolutely minimal.
@@ -262,9 +264,9 @@ Modify content of the file "{filename}" to solve the issue above.
 Keep your modifications absolutely minimal.
 Return the entire new file content, do not shorten it.
 """
-    else:
-        print(filename, "will be created")
-        file_content_instruction = f"""
+        else:
+            print(filename, "will be created")
+            file_content_instruction = f"""
 Create the file "{filename}" to solve the issue #{issue}. {format_specific_instructions}
 
 ## Your task
@@ -272,7 +274,7 @@ Generate content for the file "{filename}" to solve the issue above.
 Keep it short.
 """
 
-    prompt = f"""
+        prompt = f"""
 {SYSTEM_PROMPT}
 Given a github issue summary (#{issue}) and optionally file content (filename {filename}), modify the file content or create the file content to solve the issue.
 
@@ -287,51 +289,51 @@ Given a github issue summary (#{issue}) and optionally file content (filename {f
 
 Respond ONLY the content of the file and afterwards a single line summarizing the changes you made (without mentioning the issue).
 """
-    print("Prompting for new file content...")
-    response = prompt_function(prompt)
+        print("Prompting for new file content...")
+        response = prompt_function(prompt)
 
-    new_content, commit_message = split_content_and_summary(response)
+        new_content, commit_message = split_content_and_summary(response)
 
-    print("New file content", new_content)
+        print("New file content", new_content)
 
-    do_execute_notebook = False
-    print("Summary", commit_message)
+        do_execute_notebook = False
+        print("Summary", commit_message)
 
-    if original_ipynb_file_content is not None:
-        try:
-            new_content = restore_outputs_of_code_cells(new_content, original_ipynb_file_content)
-        except ValueError as e:
-            warnings.warn(f"Could not restore outputs of code cells in {filename}: {e}")
+        if original_ipynb_file_content is not None:
+            try:
+                new_content = restore_outputs_of_code_cells(new_content, original_ipynb_file_content)
+            except ValueError as e:
+                warnings.warn(f"Could not restore outputs of code cells in {filename}: {e}")
+                do_execute_notebook = True
+
+        elif filename.endswith('.ipynb'):
+            print("Erasing outputs in generated ipynb file")
+            new_content = erase_outputs_of_code_cells(new_content)
             do_execute_notebook = True
 
-    elif filename.endswith('.ipynb'):
-        print("Erasing outputs in generated ipynb file")
-        new_content = erase_outputs_of_code_cells(new_content)
-        do_execute_notebook = True
+        created_files = []
+        if do_execute_notebook:
+            print("Executing the notebook", len(new_content))
+            current_dir = os.getcwd()
+            print("current_dir", current_dir)
+            path_without_filename = os.path.dirname(filename)
+            print("path_without_filename", path_without_filename)
+            if len(path_without_filename) > 0:
+                os.makedirs(path_without_filename, exist_ok=True)
+                os.chdir(path_without_filename)
 
-    created_files = []
-    if do_execute_notebook:
-        print("Executing the notebook", len(new_content))
-        current_dir = os.getcwd()
-        print("current_dir", current_dir)
-        path_without_filename = os.path.dirname(filename)
-        print("path_without_filename", path_without_filename)
-        if len(path_without_filename) > 0:
-            os.makedirs(path_without_filename, exist_ok=True)
-            os.chdir(path_without_filename)
+            # store environment variables
+            saved_environment = save_and_clear_environment()
 
-        # store environment variables
-        saved_environment = save_and_clear_environment()
+            not_executed_notebook = new_content
 
-        not_executed_notebook = new_content
-
-        # Execute the notebook
-        try:
-            new_content, error_message = execute_notebook(new_content)
-            restore_environment(saved_environment)
-            if error_message is None:
-                # scan for files the notebook created
-                list_of_files_text = prompt_function(f"""
+            # Execute the notebook
+            try:
+                new_content, error_message = execute_notebook(new_content)
+                restore_environment(saved_environment)
+                if error_message is None:
+                    # scan for files the notebook created
+                    list_of_files_text = prompt_function(f"""
 Extract a list of filenames including path from the following jupyter notebook. 
 The path should be relative from the repository root, not from the notebooks's postion. 
 The position of the notebook is {filename}.
@@ -340,28 +342,31 @@ Return the list as a JSON list and nothing else.
 Notebook:
 {not_executed_notebook}
             """)
-                list_of_files = text_to_json(list_of_files_text)
-                print("------------------------")
-                for file in list_of_files:
-                    print("File created by notebook:", file, os.path.exists(file))
-                    if os.path.exists(file):
-                        created_files.append(path_without_filename + "/" + file)
-                        with open(file, 'rb') as f:
-                            file_content2 = f.read()
-                            write_file_in_branch(repository, branch_name, f"{path_without_filename}/{file}", file_content2, f"Adding {path_without_filename}/{file} created by notebook")
-                print("------------------------")
+                    list_of_files = text_to_json(list_of_files_text)
+                    print("------------------------")
+                    for file in list_of_files:
+                        print("File created by notebook:", file, os.path.exists(file))
+                        if os.path.exists(file):
+                            created_files.append(path_without_filename + "/" + file)
+                            with open(file, 'rb') as f:
+                                file_content2 = f.read()
+                                write_file_in_branch(repository, branch_name, f"{path_without_filename}/{file}", file_content2, f"Adding {path_without_filename}/{file} created by notebook")
+                    print("------------------------")
 
-        except Exception as e:
-            raise ValueError(f"Error during notebook execution: {e}")
-        finally:
-            os.chdir(current_dir)
-            restore_environment(saved_environment)
+            except Exception as e:
+                raise ValueError(f"Error during notebook execution: {e}")
+            finally:
+                os.chdir(current_dir)
+                restore_environment(saved_environment)
 
-        print("Executed notebook", len(new_content))
+            print("Executed notebook", len(new_content))
 
-    created_files.append(filename)
+        created_files.append(filename)
 
-    new_content = redact_text(new_content)
+        new_content = redact_text(new_content)
+        if not an_error_happened:
+            break
+        print(f"An error happened. Retrying... {attempt+1}/{number_of_attempts}")
 
     write_file_in_branch(repository, branch_name, filename, new_content + "\n", redact_text(commit_message))
 
