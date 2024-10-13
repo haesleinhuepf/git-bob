@@ -470,27 +470,27 @@ Respond with the actions as JSON list.
 
         try:
             if action == 'create' or action == 'modify':
-                filename = instruction['filename']
+                filename = instruction['filename'].strip("/")
                 message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
                                                                  prompt_function)
                 commit_messages.append(message)
             elif action == 'download':
                 source_url = instruction['source_url']
-                target_filename = instruction['target_filename']
+                target_filename = instruction['target_filename'].strip("/")
                 download_to_repository(repository, branch_name, source_url, target_filename)
                 commit_messages.append(f"Downloaded {source_url}, saved as {target_filename}.")
             elif action == 'rename':
-                old_filename = instruction['old_filename']
-                new_filename = instruction['new_filename']
+                old_filename = instruction['old_filename'].strip("/")
+                new_filename = instruction['new_filename'].strip("/")
                 rename_file_in_repository(repository, branch_name, old_filename, new_filename)
                 commit_messages.append(f"Renamed {old_filename} to {new_filename}.")
             elif action == 'delete':
-                filename = instruction['filename']
+                filename = instruction['filename'].strip("/")
                 delete_file_from_repository(repository, branch_name, filename)
                 commit_messages.append(f"Deleted {filename}.")
             elif action == 'copy':
-                old_filename = instruction['old_filename']
-                new_filename = instruction['new_filename']
+                old_filename = instruction['old_filename'].strip("/")
+                new_filename = instruction['new_filename'].strip("/")
                 copy_file_in_repository(repository, branch_name, old_filename, new_filename)
                 commit_messages.append(f"Copied {old_filename} to {new_filename}.")
         except Exception as e:
