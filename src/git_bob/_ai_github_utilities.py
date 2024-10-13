@@ -294,7 +294,7 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
 
         new_content, commit_message = split_content_and_summary(response)
 
-        print("New file content", new_content)
+        print("New file content", len(new_content), "\n------------\n", new_content[:200], "\n------------")
 
         do_execute_notebook = False
         print("Summary", commit_message)
