@@ -347,10 +347,10 @@ Notebook:
                     for file in list_of_files:
                         print("File created by notebook:", file, os.path.exists(file))
                         if os.path.exists(file):
-                            created_files.append(path_without_filename + "/" + file)
+                            created_files.append(file)
                             with open(file, 'rb') as f:
                                 file_content2 = f.read()
-                                write_file_in_branch(repository, branch_name, f"{path_without_filename}/{file}", file_content2, f"Adding {path_without_filename}/{file} created by notebook")
+                                write_file_in_branch(repository, branch_name, f"{file}", file_content2, f"Adding {path_without_filename}/{file} created by notebook")
                     print("------------------------")
 
             except Exception as e:
