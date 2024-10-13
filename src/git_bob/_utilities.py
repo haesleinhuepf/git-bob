@@ -186,6 +186,8 @@ def is_github_url(url):
     """
     if not str(url).startswith('https://github.com'):
         return None
+    if "/.github" in url:
+        return None
     if '/issues/' in url:
         return 'issue'
     elif '/pull/' in url:

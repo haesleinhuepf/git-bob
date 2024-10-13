@@ -464,7 +464,7 @@ Respond with the actions as JSON list.
         for filename_key in ["filename", "new_filename", "old_filename", "target_filename"]:
             if filename_key in instruction.keys():
                 filename = instruction[filename_key]
-                if filename.startswith(".github/workflows"):
+                if ".github" in filename:
                     errors.append(f"Error processing {filename}: Modifying workflow files is not allowed.")
                     continue
 
