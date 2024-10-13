@@ -318,7 +318,7 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
         print("path_without_filename", path_without_filename)
         if len(path_without_filename) > 0:
             os.makedirs(path_without_filename, exist_ok=True)
-        os.chdir(path_without_filename)
+            os.chdir(path_without_filename)
 
         # store environment variables
         saved_environment = save_and_clear_environment()
