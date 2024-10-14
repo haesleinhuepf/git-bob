@@ -39,7 +39,7 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
   * [Anthropic (claude)](https://www.anthropic.com/api)
   * [GitHub Models Marketplace](https://github.com/marketplace/models)
   * [Google AI](https://ai.google.dev/gemini-api/docs/api-key)
-  * [KISSKI](apply for an API Key](https://services.kisski.de/services/en/service/?service=2-02-llm-service.json)
+  * [KISSKI](https://services.kisski.de/services/en/service/?service=2-02-llm-service.json)
   * [BLABLADOR](https://login.helmholtz.de/oauth2-as/oauth2-authz-web-entry)
 * configure GitHub actions to run the workflow on issues and pull requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
 
