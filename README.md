@@ -1,6 +1,7 @@
 # git-bob
 
 git-bob uses AI to solve GitHub issues and review pull requests. It runs inside the GitHub CI, no need to install anything on your computer.
+Read more in the [preprint](https://doi.org/10.5281/zenodo.13928832).
 
 ![demo_fix_typos.png](docs/images/banner.png)
 
@@ -184,6 +185,22 @@ There are similar projects out there
 
 Feedback and contributions are welcome! Just open an issue and let's discuss before you send a pull request. 
 A [human](https://haesleinhuepf.github.io) will respond and comment on your ideas!
+
+## Citation
+
+If you use git-bob, please cite it:
+```
+@misc{haase_2024_13928832,
+  author       = {Haase, Robert},
+  title        = {{Towards Transparency and Knowledge Exchange in AI- 
+                   assisted Data Analysis Code Generation}},
+  month        = oct,
+  year         = 2024,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.13928832},
+  url          = {https://doi.org/10.5281/zenodo.13928832}
+}
+```
 
 ## Acknowledgements
 
