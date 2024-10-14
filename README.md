@@ -43,6 +43,17 @@ There is a detailed [tutorial](docs/installation-tutorial.md) on how to install 
   * [BLABLADOR](https://login.helmholtz.de/oauth2-as/oauth2-authz-web-entry)
 * configure GitHub actions to run the workflow on issues and pull requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
 
+When using it in your repository, you can also set a custom system message, for example for:
+* [General Data Science / Python Programming](https://github.com/haesleinhuepf/git-bob-playground/blob/bf08b3526980e011f632c13f29ae65372aafa5c7/.github/workflows/git-bob.yml#L75)
+* [Bio-Image Analysis](https://github.com/haesleinhuepf/git-bob-bioimage-analysis-example/blob/main/.github/workflows/git-bob.yml#L75)
+* [Giving advice on a specific repository / library](https://github.com/haesleinhuepf/stackview/blob/afc662a71a39f298af9f183c06c3d37c95cc2015/.github/workflows/git-bob.yml#L58)
+* [Manuscript writing](https://github.com/haesleinhuepf/git-bob-manuscript/blob/49659f8a41854d4da696259e7c1316af2fc7c171/.github/workflows/comment-on-issue.yml#L49)
+
+Furthermore, to guide discussions, you may want to setup issue templates, e.g.
+* [General Python Programming Questions](https://github.com/haesleinhuepf/git-bob-playground/blob/main/.github/ISSUE_TEMPLATE/programming.md)
+* [Bio-Image Analysis](https://github.com/haesleinhuepf/git-bob-playground/blob/main/.github/ISSUE_TEMPLATE/bioimage_analysis.md)
+* [Statistics and Plotting](https://github.com/haesleinhuepf/git-bob-playground/blob/main/.github/ISSUE_TEMPLATE/statistics_plotting.md)
+
 ## Usage
 
 To trigger git-bob, you need to comment on an issue or pull request with the following command:
@@ -97,29 +108,11 @@ Here's the recommended workflow for using git-bob:
 
 ## Use-case examples
 
-### Solving GitHub issues
-
-`git-bob` can fix typos ([issue](https://github.com/haesleinhuepf/git-bob/issues/16), [pull request](https://github.com/haesleinhuepf/git-bob/pull/17)):
-
-<a href="docs/images/demo_fix_typos.png"><img src="docs/images/demo_fix_typos.png" width="400"></a>
-
-`git-bob` can improve code documentation ([issue](https://github.com/haesleinhuepf/git-bob/issues/19), [pull request](https://github.com/haesleinhuepf/git-bob/pull/21)):
-
-<a href="docs/images/demo_comment_code.png"><img src="docs/images/demo_comment_code.png" width="400"></a>
-
-### Review Pull Requests
-`git-bob` can review pull requests and provide feedback ([pull request](https://github.com/haesleinhuepf/git-bob/pull/11)):
-
-<a href="docs/images/demo_review_pull_request.png"><img src="docs/images/demo_review_pull_request.png" width="400"></a>
-
-### Splitting Issues
-
-To split a main issue into sub-issues, ask `git-bob split this issue`.
-
-### General prompting
-`git-bob` can also be exploited to answer questions ([issue](https://github.com/haesleinhuepf/git-bob/issues/20)).
-
-<a href="docs/images/demo_question.png"><img src="docs/images/demo_question.png" width="400"></a>
+* [Bio-image Analysis Support](https://github.com/haesleinhuepf/git-bob-playground/issues/13)
+* [Question-answering to specific Python libraries](https://github.com/haesleinhuepf/stackview/issues/79)
+* [Basic data analysis and plotting](https://github.com/NFDI4BIOIMAGE/training/issues/250)
+* [Documenting source code](https://github.com/haesleinhuepf/git-bob/pull/29)
+* [Assisting scientific manuscript writing](https://github.com/haesleinhuepf/git-bob-manuscript/pull/9)
 
 ## Installation for development
 
@@ -128,7 +121,7 @@ git clone https://github.com/haselinhuepf/git-bob.git
 cd git-bob
 ```
 
-### Installation as command-line tool (for development)
+### Usage as command-line tool (for development)
 
 You can also install git-bob locally and run it from the terminal. 
 In this case, create a [GitHub token](https://github.com/settings/tokens) and store it in an environment variable named `GITHUB_API_KEY`. 
