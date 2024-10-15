@@ -88,7 +88,7 @@ If you have multiple API-Key for different LLMs configured, you can specify the 
 git-bob ask claude-3-5-sonnet-20240620 to solve this issue.
 ```
 
-If you have two GitHub secrets `TWINE_USERNAME` and `TWINE_PASSWORD` configured, you can also use the following command to publish a new version of git-bob to PyPI:
+If you have two GitHub secrets `TWINE_USERNAME` and `TWINE_PASSWORD` configured, you can also use the following command to publish a new version of your library to PyPI:
 
 ```
 git-bob deploy
