@@ -810,40 +810,38 @@ def download_to_repository(repository, branch_name, source_url, target_filename)
     from ._logger import Log
     Log().log(f"-> download_to_repository({repository}, {branch_name}, {source_url}, {target_filename})")
 
-    if not source_url.startswith("https://github.com"):
-        raise Exception("Can only download from GitHub URLs.")
+    if not (source_url.startswith("https://github.com") or source_url.startswith("https://raw.githubusercontent.com")):
+        raise Exception("Can only download from GitHub URLs or raw GitHub content URLs.")
 
     if source_url.endswith(")"): # happens with ![]() markdown syntax
         source_url = source_url[:-1]
 
-    # Download the image
+    # Download the file
     response = requests.get(source_url)
     if response.status_code == 200:
-        image_content = response.content
+        file_content = response.content
     else:
-        raise Exception(f"Failed to download image. Status code: {response.status_code}")
+        raise Exception(f"Failed to download file. Status code: {response.status_code}")
 
-    # Upload the image to the GitHub repository using the GitHub API
+    # Upload the file to the GitHub repository using the GitHub API
     repo = get_github_repository(repository)
 
     commit_message = f"Downloaded {source_url}, saved as {target_filename}."
 
-    # save the file
+    # save the file locally
     with open(target_filename, "wb") as f:
-        f.write(image_content)
+        f.write(file_content)
 
     # Check if the file already exists
     try:
         contents = repo.get_contents(target_filename)
         # If file exists, we need to update it
-        repo.update_file(contents.path, commit_message, image_content, contents.sha, branch=branch_name)
-        print(f"Image '{target_filename}' successfully updated.")
+        repo.update_file(contents.path, commit_message, file_content, contents.sha, branch=branch_name)
+        Log().log(f"File '{target_filename}' successfully updated.")
     except:
-        # If file does not exist, we create a new one
-        repo.create_file(target_filename, commit_message, image_content, branch=branch_name)
-        print(f"Image '{target_filename}' successfully uploaded.")
-
-
+        # If file does not exist, create a new one
+        repo.create_file(target_filename, commit_message, file_content, branch=branch_name)
+        Log().log(f"File '{target_filename}' successfully uploaded.")
 
 
 def create_issue(repository, title, body):
@@ -872,5 +870,3 @@ def create_issue(repository, title, body):
 
     print(f"Issue created: #{issue_obj.number}")
     return issue_obj.number
-
-
