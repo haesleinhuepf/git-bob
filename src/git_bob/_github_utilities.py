@@ -837,7 +837,7 @@ def download_to_repository(repository, branch_name, source_url, target_filename)
         contents = repo.get_contents(target_filename)
         # If file exists, we need to update it
         repo.update_file(contents.path, commit_message, file_content, contents.sha, branch=branch_name)
-        Log().log(f"File '{target_filename}' successfully updated.")
+        print(f"File '{target_filename}' successfully updated.")
     except:
         # If file does not exist, create a new one
         repo.create_file(target_filename, commit_message, file_content, branch=branch_name)
