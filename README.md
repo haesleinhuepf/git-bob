@@ -166,6 +166,7 @@ At the moment, these limitations can be observed:
 * `git-bob` is incompatible with locally running open-source/-weight LLMs. 
   This might make sense when being executed locally only. In the GitHub-CI this might be impossible.
 * Recently tested `claude-3-5-sonnet-20240620`, `gpt-4o-2024-08-06`, `github_models:gpt-4o`, `github_models:meta-llama-3.1-405b-instruct` and `gemini-1.5-pro-002` produced useful results.
+* `git-bob` is not allowed to modify workflow files, because it also uses GitHub workflows.
 
 ## Similar projects
 
