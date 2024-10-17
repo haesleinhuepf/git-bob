@@ -522,7 +522,7 @@ Respond with the actions as JSON list.
 If there are image files created, use the markdown syntax ![](url) to display them.
 If there other new files created, add markdown links to them. 
 For file and image urls, prefix them with the repository name and the branch name: https://github.com/{repository}/blob/{branch_name}/
-For image urls, append "?raw=true" by the end of the url to display the image directly.
+For image urls, append "?raw=true" by the end of the url to display the image directly. Again, you MUST use the ![]() markdown syntax for image files.
 """
 
     if branch_name != base_branch:
