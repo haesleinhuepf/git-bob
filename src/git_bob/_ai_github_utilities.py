@@ -102,6 +102,8 @@ Respond to a github issue. Its entire discussion is given and additionally, cont
 Respond to the discussion above.
 In case code-changes are discussed, make a proposal of how new code could look like.
 Do NOT explain your response or anything else. 
+Do not repeat answers that were given already.
+Focus on the most recent discussion.
 Just respond to the discussion.
 """)
     comment = redact_text(clean_output(repository, comment))
