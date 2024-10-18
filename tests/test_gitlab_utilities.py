@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 from _gitlab_utilities import (
     get_gitlab_repository, add_comment_to_issue, list_issues,
-    get_conversation_on_issue, get_most_recently_commented_issue,
+    get_most_recently_commented_issue,
     list_repository_files, create_issue, get_most_recent_comment_on_issue,
     get_repository_file_contents, send_pull_request
 )
@@ -37,19 +37,6 @@ def test_list_issues(mocked_gitlab):
 
     issues = list_issues('example/repo', 'opened', 'fake_token')
     assert issues == {1: 'Issue 1', 2: 'Issue 2'}
-
-def test_get_conversation_on_issue(mocked_gitlab):
-    mocked_repo = MagicMock()
-    mocked_issue = MagicMock(title='Title', description='Body')
-    mocked_comments = [MagicMock(author={'username': 'user1'}, body='Comment 1')]
-    mocked_issue.notes.list.return_value = mocked_comments
-    mocked_repo.issues.get.return_value = mocked_issue
-    mocked_gitlab.projects.get.return_value = mocked_repo
-
-    conversation = get_conversation_on_issue('example/repo', 1, 'fake_token')
-    assert 'Title' in conversation
-    assert 'Body' in conversation
-    assert 'Comment 1' in conversation
 
 def test_get_most_recently_commented_issue(mocked_gitlab):
     mocked_repo = MagicMock()
