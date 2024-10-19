@@ -196,7 +196,7 @@ def get_repository_file_contents(repository, file_paths):
     return file_contents
 
 
-def send_pull_request(repository, source_branch, target_branch, title, description):
+def create_merge_request(repository, source_branch, target_branch, title, description):
     """
     Create a merge request from a defined branch into the target branch.
 
