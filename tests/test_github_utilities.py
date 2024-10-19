@@ -1,10 +1,10 @@
 def test_get_github_repository():
-    from git_bob._github_utilities import get_github_repository
-    assert get_github_repository("haesleinhuepf/git-bob").name == "git-bob"
+    from git_bob._github_utilities import get_repository_handle
+    assert get_repository_handle("haesleinhuepf/git-bob").name == "git-bob"
 
 def test_get_github_issue():
-    from git_bob._github_utilities import get_github_issue_details
-    assert "Issue #1: Testing conversational workflows" in get_github_issue_details("haesleinhuepf/git-bob", 1)
+    from git_bob._github_utilities import get_issue_details
+    assert "Issue #1: Testing conversational workflows" in get_issue_details("haesleinhuepf/git-bob", 1)
 
 def test_get_conversation_on_issue():
     from git_bob._github_utilities import get_conversation_on_issue
@@ -38,7 +38,7 @@ def test_list_repository_files():
 
 def test_get_repository_file_contents():
     from git_bob._github_utilities import get_repository_file_contents
-    content = get_repository_file_contents("haesleinhuepf/git-bob", "README.md")
+    content = get_repository_file_contents("haesleinhuepf/git-bob", "main", ["README.md"])
 
     assert len(list(content.keys())) == 1
     assert "README.md" in list(content.keys())
@@ -47,5 +47,5 @@ def test_get_repository_file_contents():
 
 def test_check_if_file_exists():
     from git_bob._github_utilities import check_if_file_exists
-    assert check_if_file_exists("haesleinhuepf/git-bob", "README.md")
-    assert not check_if_file_exists("haesleinhuepf/git-bob", "readme2.md")
+    assert check_if_file_exists("haesleinhuepf/git-bob", "main", "README.md")
+    assert not check_if_file_exists("haesleinhuepf/git-bob", "main", "readme2.md")
