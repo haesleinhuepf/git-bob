@@ -246,3 +246,126 @@ def create_branch(repository, branch_name, ref='main'):
     Log().log(f"-> create_branch({repository}, {branch_name}, {ref})")
     project = get_gitlab_project(repository)
     project.branches.create({'branch': branch_name, 'ref': ref})
+
+def check_if_file_exists(repository, file_path, ref='main'):
+    """
+    Check if a file exists in a given branch of the GitLab repository.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitLab project (e.g., "username/repo-name").
+    file_path : str
+        The path to the file in the repository.
+    ref : str, optional
+        The branch or tag name (default is 'main').
+
+    Returns
+    -------
+    bool
+        True if the file exists, else False.
+    """
+    Log().log(f"-> check_if_file_exists({repository}, {file_path}, {ref})")
+    project = get_gitlab_project(repository)
+    try:
+        project.files.get(file_path=file_path, ref=ref)
+        return True
+    except gitlab.exceptions.GitlabGetError:
+        return False
+
+def get_file_in_repository(repository, file_path, ref='main'):
+    """
+    Get a file object from a GitLab repository.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitLab project (e.g., "username/repo-name").
+    file_path : str
+        The path to the file in the repository.
+    ref : str, optional
+        The branch or tag name (default is 'main').
+
+    Returns
+    -------
+    gitlab.v4.objects.ProjectFile
+        The file object.
+    """
+    Log().log(f"-> get_file_in_repository({repository}, {file_path}, {ref})")
+    project = get_gitlab_project(repository)
+    return project.files.get(file_path=file_path, ref=ref)
+
+def send_pull_request(repository, source_branch, target_branch, title, description):
+    """
+    Send a merge request (equivalent to a pull request) in a GitLab repository.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitLab project (e.g., "username/repo-name").
+    source_branch : str
+        The name of the branch to merge from.
+    target_branch : str
+        The name of the branch to merge into.
+    title : str
+        The title of the merge request.
+    description : str
+        The description of the merge request.
+
+    Returns
+    -------
+    gitlab.v4.objects.MergeRequest
+        The merge request object.
+    """
+    Log().log(f"-> send_pull_request({repository}, {source_branch}, {target_branch})")
+    project = get_gitlab_project(repository)
+    mr = project.mergerequests.create({
+        'source_branch': source_branch,
+        'target_branch': target_branch,
+        'title': title,
+        'description': description
+    })
+    return mr
+
+def check_access_and_ask_for_approval(repository, user):
+    """
+    Check if a user has access to a repository and request approval if needed.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitLab project (e.g., "username/repo-name").
+    user : str
+        The username to check access for.
+
+    Returns
+    -------
+    bool
+        True if the user has access, else False.
+    """
+    Log().log(f"-> check_access_and_ask_for_approval({repository}, {user})")
+    project = get_gitlab_project(repository)
+    members = project.members.list()
+    for member in members:
+        if member.username == user:
+            return True
+    return False
+
+def get_contributors(repository):
+    """
+    Get a list of contributors to a GitLab project.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitLab project (e.g., "username/repo-name").
+
+    Returns
+    -------
+    list
+        A list of contributors' usernames.
+    """
+    Log().log(f"-> get_contributors({repository})")
+    project = get_gitlab_project(repository)
+    contributors = project.repository_contributors()
+    return [contributor['name'] for contributor in contributors]
