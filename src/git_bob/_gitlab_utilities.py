@@ -369,6 +369,17 @@ def get_file_in_repository(repository, branch_name, file_path):
         The file object.
     """
     Log().log(f"-> get_file_in_repository({repository}, {branch_name}, {file_path})")
+    if file_path.endswith(")"):
+        file_path = file_path[:-1]
+    if file_path.endswith("'"):
+        file_path = file_path[:-1]
+    if file_path.endswith('"'):
+        file_path = file_path[:-1]
+
+    if file_path.endswith("?raw=true"):
+        print("fixing file path")
+        file_path = file_path[:-9]
+
     project = get_repository_handle(repository)
     return project.files.get(file_path=file_path, ref=branch_name)
 
@@ -402,7 +413,7 @@ def send_pull_request(repository, source_branch, target_branch, title, descripti
         'title': title,
         'description': description
     })
-    return f"Pull request created: {mr}"
+    return f"Pull request created: {mr.web_url}"
 
 def check_access_and_ask_for_approval(user, repository, issue):
     """
@@ -493,8 +504,19 @@ def get_diff_of_pull_request(repository, pull_request):
     Log().log(f"-> get_diff_of_pull_request({repository}, {pull_request})")
     project = get_repository_handle(repository)
     mr = project.mergerequests.get(pull_request)
-    diffs = mr.diffs.list()
-    return "\n".join(diff.diff for diff in diffs)
+
+    # Get the diff
+    diff = mr.changes()['changes']
+
+    output = []
+
+    # Print the diff
+    for change in diff:
+        output.append(f"File: {change['old_path']} -> {change['new_path']}")
+        output.append(change['diff'])
+        output.append("\n")
+
+    return "\n".join(output)
 
 def add_reaction_to_issue(repository, issue, reaction="+1"):
     """
@@ -516,7 +538,7 @@ def add_reaction_to_issue(repository, issue, reaction="+1"):
     Log().log(f"-> add_reaction_to_issue({repository}, {issue}, {reaction})")
     project = get_repository_handle(repository)
     issue = project.issues.get(issue)
-    issue.awardemoji.create({'name': reaction})
+    issue.awardemojis.create({'name': reaction})
 
 def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
     """
@@ -536,12 +558,21 @@ def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
     None
     """
     Log().log(f"-> add_reaction_to_last_comment_in_issue({repository}, {issue}, {reaction})")
+    from datetime import datetime
     project = get_repository_handle(repository)
     issue = project.issues.get(issue)
     notes = issue.notes.list()
-    if notes:
-        last_note = notes[-1]
-        last_note.awardemoji.create({'name': reaction})
+
+    notes = sorted(notes, key=lambda x: datetime.strptime(x.created_at, '%Y-%m-%dT%H:%M:%S.%fZ'), reverse=False)
+
+    try:
+        if notes:
+            last_note = notes[-1]
+            last_note.awardemojis.create({"name":reaction})
+        else:
+            issue.awardemojis.create({"name":reaction})
+    except gitlab.exceptions.GitlabCreateError:
+        pass # already exists
 
 def get_diff_of_branches(repository, compare_branch, base_branch="main"):
     """
@@ -564,7 +595,10 @@ def get_diff_of_branches(repository, compare_branch, base_branch="main"):
     Log().log(f"-> get_diff_of_branches({repository}, {compare_branch}, {base_branch})")
     project = get_repository_handle(repository)
     compare = project.repository_compare(from_=base_branch, to=compare_branch)
-    return "\n".join(diff['diff'] for diff in compare['diffs'])
+    return "\n".join("File:" + diff['old_path'] + " -> " + diff['new_path'] +
+                     "\n----------------------------------------\n" +
+                     diff['diff'] for diff in compare['diffs'])
+
 
 def rename_file_in_repository(repository, branch_name, old_file_path, new_file_path, commit_message="Rename file"):
     """
@@ -638,7 +672,7 @@ def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_pa
     None
     """
     Log().log(f"-> copy_file_in_repository({repository}, {src_file_path}, {dest_file_path}, {branch_name})")
-    file_content = get_file_in_repository(repository, branch_name, src_file_path)
+    file_content = decode_file(get_file_in_repository(repository, branch_name, src_file_path))
     write_file_in_branch(repository, branch_name, dest_file_path, file_content, commit_message)
 
 def download_to_repository(repository, branch_name, source_url, target_filename):
@@ -662,6 +696,7 @@ def download_to_repository(repository, branch_name, source_url, target_filename)
     """
     Log().log(f"-> download_to_repository({repository}, {target_filename}, {source_url}, {branch_name})")
     import requests
+    import base64
 
     if source_url.endswith(")"): # happens with ![]() markdown syntax
         source_url = source_url[:-1]
@@ -672,6 +707,7 @@ def download_to_repository(repository, branch_name, source_url, target_filename)
     else:
         raise Exception(f"Failed to download file. Status code: {response.status_code}")
 
+    encoded_content = base64.b64encode(file_content).decode('utf-8')
 
     commit_message = f"Downloaded {source_url}, saved as {target_filename}."
 
@@ -679,7 +715,7 @@ def download_to_repository(repository, branch_name, source_url, target_filename)
     with open(target_filename, "wb") as f:
         f.write(file_content)
 
-    write_file_in_branch(repository, branch_name, target_filename, response.text, commit_message)
+    write_file_in_branch(repository, branch_name, target_filename, encoded_content, commit_message)
 
 def create_issue(repository, title, description):
     """
@@ -702,4 +738,4 @@ def create_issue(repository, title, description):
     Log().log(f"-> create_issue({repository}, {title}, ...)")
     project = get_repository_handle(repository)
     issue = project.issues.create({'title': title, 'description': description})
-    return issue
+    return issue.iid

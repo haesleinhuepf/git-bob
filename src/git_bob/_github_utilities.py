@@ -875,7 +875,7 @@ def create_issue(repository, title, description):
     repo = get_repository_handle(repository)
 
     # Create a new issue
-    issue_obj = repo.create_issue(title=title, description=description)
+    issue_obj = repo.create_issue(title=title, body=description)
 
     print(f"Issue created: #{issue_obj.number}")
     return issue_obj.number
