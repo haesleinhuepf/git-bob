@@ -17,7 +17,7 @@ def mocked_gitlab():
 def test_get_gitlab_repository(mocked_gitlab):
     mocked_repo = MagicMock()
     mocked_gitlab.projects.get.return_value = mocked_repo
-    repo = get_gitlab_repository('example/repo', 'fake_token')
+    repo = get_gitlab_repository('example/repo')
     assert repo == mocked_repo
 
 def test_add_comment_to_issue(mocked_gitlab):
@@ -26,7 +26,7 @@ def test_add_comment_to_issue(mocked_gitlab):
     mocked_repo.issues.get.return_value = mocked_issue
     mocked_gitlab.projects.get.return_value = mocked_repo
 
-    add_comment_to_issue('example/repo', 1, 'Test Comment', 'fake_token')
+    add_comment_to_issue('example/repo', 1, 'Test Comment')
     mocked_issue.notes.create.assert_called_once_with({'body': 'Test Comment'})
 
 def test_list_issues(mocked_gitlab):
@@ -35,7 +35,7 @@ def test_list_issues(mocked_gitlab):
     mocked_repo.issues.list.return_value = mocked_issues
     mocked_gitlab.projects.get.return_value = mocked_repo
 
-    issues = list_issues('example/repo', 'opened', 'fake_token')
+    issues = list_issues('example/repo', 'opened')
     assert issues == {1: 'Issue 1', 2: 'Issue 2'}
 
 def test_get_most_recently_commented_issue(mocked_gitlab):
@@ -44,17 +44,24 @@ def test_get_most_recently_commented_issue(mocked_gitlab):
     mocked_repo.issues.list.return_value = mocked_issues
     mocked_gitlab.projects.get.return_value = mocked_repo
 
-    recent_issue_id = get_most_recently_commented_issue('example/repo', 'fake_token')
+    recent_issue_id = get_most_recently_commented_issue('example/repo')
     assert recent_issue_id == 3
 
 def test_list_repository_files(mocked_gitlab):
     mocked_repo = MagicMock()
-    mocked_files = [MagicMock(type='blob', path='file1.py'), MagicMock(type='blob', path='file2.py')]
-    mocked_repo.repository_tree.return_value = mocked_files
+    mocked_files = [
+        MagicMock(type='blob', path='file1.py'), 
+        MagicMock(type='blob', path='file2.py'),
+        MagicMock(type='tree', path='folder')
+    ]
+    mocked_repo.repository_tree.side_effect = [
+        mocked_files,
+        [MagicMock(type='blob', path='folder/file3.py')]
+    ]
     mocked_gitlab.projects.get.return_value = mocked_repo
 
-    files = list_repository_files('example/repo', 'fake_token')
-    assert files == ['file1.py', 'file2.py']
+    files = list_repository_files('example/repo')
+    assert files == ['file1.py', 'file2.py', 'folder/file3.py']
 
 def test_create_issue(mocked_gitlab):
     mocked_repo = MagicMock()
@@ -62,7 +69,7 @@ def test_create_issue(mocked_gitlab):
     mocked_repo.issues.create.return_value = mocked_issue
     mocked_gitlab.projects.get.return_value = mocked_repo
 
-    issue_id = create_issue('example/repo', 'New Issue', 'New issue description', 'fake_token')
+    issue_id = create_issue('example/repo', 'New Issue', 'New issue description')
     assert issue_id == 10
 
 def test_get_most_recent_comment_on_issue(mocked_gitlab):
@@ -73,7 +80,7 @@ def test_get_most_recent_comment_on_issue(mocked_gitlab):
     mocked_repo.issues.get.return_value = mocked_issue
     mocked_gitlab.projects.get.return_value = mocked_repo
 
-    user, text = get_most_recent_comment_on_issue('example/repo', 1, 'fake_token')
+    user, text = get_most_recent_comment_on_issue('example/repo', 1)
     assert user == 'commenter'
     assert text == 'Latest Comment'
 
@@ -83,7 +90,7 @@ def test_get_repository_file_contents(mocked_gitlab):
     mocked_repo.files.get.return_value = mocked_file
     mocked_gitlab.projects.get.return_value = mocked_repo
 
-    file_contents = get_repository_file_contents('example/repo', ['file1.py'], 'fake_token')
+    file_contents = get_repository_file_contents('example/repo', ['file1.py'])
     assert file_contents['file1.py'] == 'content'
 
 def test_send_pull_request(mocked_gitlab):
@@ -92,5 +99,5 @@ def test_send_pull_request(mocked_gitlab):
     mocked_repo.mergerequests.create.return_value = mocked_mr
     mocked_gitlab.projects.get.return_value = mocked_repo
 
-    mr_url = send_pull_request('example/repo', 'branch1', 'main', 'MR Title', 'MR Description'[:65535], 'fake_token')
+    mr_url = send_pull_request('example/repo', 'branch1', 'main', 'MR Title', 'MR Description'[:65535])
     assert mr_url == 'Merge Request created: http://example.com/mr/1'
