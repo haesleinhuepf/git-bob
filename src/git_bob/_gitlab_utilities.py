@@ -602,7 +602,7 @@ def delete_file_from_repository(repository, branch_name, file_path, commit_messa
     project = get_repository_handle(repository)
     project.files.delete(file_path=file_path, branch=branch_name, commit_message=commit_message)
 
-def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_path, commit_message="Copy file):
+def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_path, commit_message="Copy file"):
     """
     Copy a file within a GitLab repository.
 
