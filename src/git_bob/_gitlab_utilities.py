@@ -2,7 +2,7 @@ import os
 from gitlab import Gitlab
 
 
-def get_gitlab_repository(repository, private_token):
+def get_gitlab_repository(repository):
     """
     Get the GitLab repository object.
 
@@ -10,20 +10,18 @@ def get_gitlab_repository(repository, private_token):
     ----------
     repository : str
         The repository identifier.
-    private_token : str
-        Private token for GitLab API authentication.
 
     Returns
     -------
     gitlab.v4.objects.Project
         The project object.
     """
-    gitlab_url = os.getenv('GITLAB_URL', 'https://gitlab.com')
-    gl = Gitlab(gitlab_url, private_token=private_token)
+    gl = Gitlab(os.getenv('GITLAB_URL', 'https://gitlab.com'),
+                private_token=os.getenv('GITLAB_API_KEY'))
     return gl.projects.get(repository)
 
 
-def add_comment_to_issue(repository, issue, comment, private_token):
+def add_comment_to_issue(repository, issue, comment):
     """
     Add a comment to a specific GitLab issue.
 
@@ -35,15 +33,13 @@ def add_comment_to_issue(repository, issue, comment, private_token):
         The issue number.
     comment : str
         The comment text.
-    private_token : str
-        Private token for GitLab API authentication.
     """
-    repo = get_gitlab_repository(repository, private_token)
+    repo = get_gitlab_repository(repository)
     issue_obj = repo.issues.get(issue)
     issue_obj.notes.create({'body': comment})
 
 
-def list_issues(repository, state="opened", private_token=None):
+def list_issues(repository, state="opened"):
     """
     List all GitLab issues with a defined state on a specified repository.
 
@@ -53,19 +49,17 @@ def list_issues(repository, state="opened", private_token=None):
         The repository identifier.
     state : str, optional
         The state of the issues to list (default is "opened").
-    private_token : str, optional
-        Private token for GitLab API authentication (default is None).
 
     Returns
     -------
     dict
         A dictionary mapping issue IDs to their titles.
     """
-    repo = get_gitlab_repository(repository, private_token)
+    repo = get_gitlab_repository(repository)
     return {issue.iid: issue.title for issue in repo.issues.list(state=state)}
 
 
-def get_most_recently_commented_issue(repository, private_token):
+def get_most_recently_commented_issue(repository):
     """
     Return the issue number of the issue in a repository with the most recent comment.
 
@@ -73,22 +67,20 @@ def get_most_recently_commented_issue(repository, private_token):
     ----------
     repository : str
         The repository identifier.
-    private_token : str
-        Private token for GitLab API authentication.
 
     Returns
     -------
     int
         The ID of the most recently commented issue.
     """
-    repo = get_gitlab_repository(repository, private_token)
+    repo = get_gitlab_repository(repository)
     issues = repo.issues.list(order_by="updated_at", sort="desc")
     if not issues:
         raise ValueError("No issue found")
     return issues[0].iid
 
 
-def list_repository_files(repository, private_token):
+def list_repository_files(repository):
     """
     List all files in a given GitLab repository.
 
@@ -96,20 +88,18 @@ def list_repository_files(repository, private_token):
     ----------
     repository : str
         The repository identifier.
-    private_token : str
-        Private token for GitLab API authentication.
 
     Returns
     -------
     list of str
         A list of file paths.
     """
-    repo = get_gitlab_repository(repository, private_token)
+    repo = get_gitlab_repository(repository)
     tree = repo.repository_tree()
     return [item['path'] for item in tree if item['type'] == 'blob']
 
 
-def create_issue(repository, title, body, private_token):
+def create_issue(repository, title, body):
     """
     Create a new GitLab issue.
 
@@ -121,20 +111,18 @@ def create_issue(repository, title, body, private_token):
         The issue title.
     body : str
         The issue body.
-    private_token : str
-        Private token for GitLab API authentication.
 
     Returns
     -------
     int
         The ID of the created issue.
     """
-    repo = get_gitlab_repository(repository, private_token)
+    repo = get_gitlab_repository(repository)
     issue_obj = repo.issues.create({'title': title, 'description': body})
     return issue_obj.iid
 
 
-def get_most_recent_comment_on_issue(repository, issue, private_token):
+def get_most_recent_comment_on_issue(repository, issue):
     """
     Retrieve the most recent comment on a specific GitLab issue.
 
@@ -144,15 +132,13 @@ def get_most_recent_comment_on_issue(repository, issue, private_token):
         The repository identifier.
     issue : int
         The issue number.
-    private_token : str
-        Private token for GitLab API authentication.
 
     Returns
     -------
     tuple
         A tuple containing the username of the commenter and the comment text.
     """
-    repo = get_gitlab_repository(repository, private_token)
+    repo = get_gitlab_repository(repository)
     issue_obj = repo.issues.get(issue)
     comments = issue_obj.notes.list(order_by='created_at', sort='desc')
 
@@ -170,7 +156,7 @@ def get_most_recent_comment_on_issue(repository, issue, private_token):
     return user, text
 
 
-def get_repository_file_contents(repository, file_paths, private_token):
+def get_repository_file_contents(repository, file_paths):
     """
     Retrieve the contents of specified files from a GitLab repository.
 
@@ -180,15 +166,13 @@ def get_repository_file_contents(repository, file_paths, private_token):
         The repository identifier.
     file_paths : list of str
         A list of file paths.
-    private_token : str
-        Private token for GitLab API authentication.
 
     Returns
     -------
     dict
         A dictionary mapping file paths to their contents or error message.
     """
-    repo = get_gitlab_repository(repository, private_token)
+    repo = get_gitlab_repository(repository)
     file_contents = {}
 
     for file_path in file_paths:
@@ -202,7 +186,7 @@ def get_repository_file_contents(repository, file_paths, private_token):
     return file_contents
 
 
-def send_pull_request(repository, source_branch, target_branch, title, description, private_token):
+def send_pull_request(repository, source_branch, target_branch, title, description):
     """
     Create a merge request from a defined branch into the target branch.
 
@@ -218,15 +202,13 @@ def send_pull_request(repository, source_branch, target_branch, title, descripti
         The title of the merge request.
     description : str
         The description of the merge request.
-    private_token : str
-        Private token for GitLab API authentication.
 
     Returns
     -------
     str
         The URL of the created merge request.
     """
-    repo = get_gitlab_repository(repository, private_token)
+    repo = get_gitlab_repository(repository)
 
     if len(description) > 65535:
         print("Description is too long. Truncated to 65535 characters. This was the full description:", description)
