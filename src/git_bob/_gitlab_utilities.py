@@ -125,3 +125,124 @@ def list_issues(repository: str, state: str = "opened") -> dict:
     project = get_gitlab_project(repository)
     issues = project.issues.list(state=state)
     return {issue.iid: issue.title for issue in issues}
+
+def get_gitlab_issue_details(repository, issue_id):
+    """
+    Fetch details of a specific GitLab issue.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitLab project (e.g., "username/repo-name").
+    issue_id : int
+        The ID of the issue to retrieve details for.
+
+    Returns
+    -------
+    dict
+        A dictionary containing issue details such as title and description.
+    """
+    Log().log(f"-> get_gitlab_issue_details({repository}, {issue_id})")
+    project = get_gitlab_project(repository)
+    issue = project.issues.get(issue_id)
+    return {'title': issue.title, 'description': issue.description}
+
+def list_repository_files(repository, ref='main'):
+    """
+    List all files in the specified GitLab repository branch.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitLab project (e.g., "username/repo-name").
+    ref : str, optional
+        The name of the branch to list files from (default is 'main').
+
+    Returns
+    -------
+    list
+        A list of file paths in the repository.
+    """
+    Log().log(f"-> list_repository_files({repository}, {ref})")
+    project = get_gitlab_project(repository)
+    items = project.repository_tree(ref=ref, recursive=True)
+    return [item['path'] for item in items if item['type'] == 'blob']
+
+def get_repository_file_contents(repository, file_path, ref='main'):
+    """
+    Get the contents of a file in a GitLab repository.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitLab project (e.g., "username/repo-name").
+    file_path : str
+        The path to the file in the repository.
+    ref : str, optional
+        The name of the branch or tag (default is 'main').
+
+    Returns
+    -------
+    str
+        The content of the file as a string.
+    """
+    Log().log(f"-> get_repository_file_contents({repository}, {file_path}, {ref})")
+    project = get_gitlab_project(repository)
+    file = project.files.get(file_path=file_path, ref=ref)
+    return file.decode().decode()
+
+def write_file_in_branch(repository, file_path, content, branch, commit_message):
+    """
+    Write or update a file in a specified branch of a GitLab repository.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitLab project (e.g., "username/repo-name").
+    file_path : str
+        The path to the file to be written or updated.
+    content : str
+        The content to write into the file.
+    branch : str
+        The name of the branch to write the changes to.
+    commit_message : str
+        The commit message associated with the change.
+
+    Returns
+    -------
+    None
+    """
+    Log().log(f"-> write_file_in_branch({repository}, {file_path}, {branch})")
+    project = get_gitlab_project(repository)
+    try:
+        file = project.files.get(file_path=file_path, ref=branch)
+        file.content = content
+        file.save(branch=branch, commit_message=commit_message)
+    except gitlab.exceptions.GitlabGetError:
+        project.files.create({
+            'file_path': file_path,
+            'branch': branch,
+            'content': content,
+            'commit_message': commit_message
+        })
+
+def create_branch(repository, branch_name, ref='main'):
+    """
+    Create a new branch in a GitLab repository.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitLab project (e.g., "username/repo-name").
+    branch_name : str
+        The name of the new branch to create.
+    ref : str, optional
+        The branch or tag name to create the new branch from (default is 'main').
+
+    Returns
+    -------
+    None
+    """
+    Log().log(f"-> create_branch({repository}, {branch_name}, {ref})")
+    project = get_gitlab_project(repository)
+    project.branches.create({'branch': branch_name, 'ref': ref})
