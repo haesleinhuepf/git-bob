@@ -287,7 +287,7 @@ def list_repository_files(repository: str) -> list:
     return all_files
 
 
-def get_repository_file_contents(repository: str, file_paths: list) -> dict:
+def get_repository_file_contents(repository: str, branch_name='main', file_paths: list) -> dict:
     """
     Retrieve the contents of specified files from a GitHub repository.
 
@@ -312,7 +312,7 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
     for file_path in file_paths:
         try:
             # Get the file content
-            file_content = get_file_in_repository (repository, "main", file_path).decoded_content.decode()
+            file_content = get_file_in_repository (repository, branch_name, file_path).decoded_content.decode()
 
             # store the content
             file_contents[file_path] = file_content

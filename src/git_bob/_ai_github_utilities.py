@@ -78,7 +78,7 @@ Respond with the filenames as JSON list.
 """)
     filenames = text_to_json(relevant_files)
 
-    file_content_dict = get_repository_file_contents(repository, filenames)
+    file_content_dict = get_repository_file_contents(repository, "main", filenames)
 
     temp = []
     for k, v in file_content_dict.items():

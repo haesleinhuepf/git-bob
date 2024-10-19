@@ -177,7 +177,7 @@ Description:
 
     return content
 
-def list_repository_files(repository):
+def list_repository_files(repository: str):
     """
     List all files in the specified GitLab repository branch.
 
@@ -185,8 +185,6 @@ def list_repository_files(repository):
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
-    ref : str, optional
-        The name of the branch to list files from (default is 'main').
 
     Returns
     -------
@@ -208,7 +206,7 @@ def list_repository_files(repository):
                 path_stack.append(item['path'])
     return files
 
-def get_repository_file_contents(repository:str, file_paths: list, ref='main'):
+def get_repository_file_contents(repository:str, branch_name='main', file_paths: list):
     """
     Get the contents of a file in a GitLab repository.
 
@@ -218,7 +216,7 @@ def get_repository_file_contents(repository:str, file_paths: list, ref='main'):
         The full name of the GitLab project (e.g., "username/repo-name").
     file_path : str
         The path to the file in the repository.
-    ref : str, optional
+    branch_name : str, optional
         The name of the branch or tag (default is 'main').
 
     Returns
@@ -226,13 +224,13 @@ def get_repository_file_contents(repository:str, file_paths: list, ref='main'):
     str
         The content of the file as a string.
     """
-    Log().log(f"-> get_repository_file_contents({repository}, {file_paths}, {ref})")
+    Log().log(f"-> get_repository_file_contents({repository}, {file_paths}, {branch_name})")
     project = get_repository_handle(repository)
 
     file_contents = {}
     for file_path in file_paths:
         try:
-            file = project.files.get(file_path=file_path, ref=ref)
+            file = project.files.get(file_path=file_path, ref=branch_name)
             file_contents[file_path] = file.decode().decode()
         except Exception as e:
             file_contents[file_path] = f"Error accessing {file_path}: {str(e)}"
