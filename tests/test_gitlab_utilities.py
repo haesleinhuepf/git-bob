@@ -4,7 +4,13 @@ from _gitlab_utilities import (
     get_gitlab_repository, add_comment_to_issue, list_issues,
     get_most_recently_commented_issue,
     list_repository_files, create_issue, get_most_recent_comment_on_issue,
-    get_repository_file_contents, send_pull_request
+    get_repository_file_contents, send_pull_request,
+    add_reaction_to_last_comment_in_issue, copy_file_in_repository,
+    download_to_repository, rename_file_in_repository, check_if_file_exists,
+    write_file_in_branch, check_access_and_ask_for_approval,
+    get_github_issue_details, get_contributors, get_conversation_on_issue,
+    get_diff_of_pull_request, create_branch, get_diff_of_branches,
+    delete_file_from_repository, add_reaction_to_issue
 )
 
 @pytest.fixture
