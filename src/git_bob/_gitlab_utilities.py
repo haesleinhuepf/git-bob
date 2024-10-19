@@ -82,7 +82,7 @@ def get_most_recently_commented_issue(repository):
 
 def list_repository_files(repository):
     """
-    List all files in a given GitLab repository.
+    List all files, including those in subfolders, in a given GitLab repository.
 
     Parameters
     ----------
@@ -95,8 +95,18 @@ def list_repository_files(repository):
         A list of file paths.
     """
     repo = get_gitlab_repository(repository)
-    tree = repo.repository_tree()
-    return [item['path'] for item in tree if item['type'] == 'blob']
+    files = []
+    path_stack = ['']
+    
+    while path_stack:
+        path = path_stack.pop()
+        tree = repo.repository_tree(path=path)
+        for item in tree:
+            if item['type'] == 'blob':
+                files.append(item['path'])
+            elif item['type'] == 'tree':
+                path_stack.append(item['path'])
+    return files
 
 
 def create_issue(repository, title, body):
