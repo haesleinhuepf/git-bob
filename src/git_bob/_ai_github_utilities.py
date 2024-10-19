@@ -226,7 +226,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
     from ._github_utilities import get_repository_file_contents, write_file_in_branch, create_branch, \
-        check_if_file_exists, get_file_in_repository
+        check_if_file_exists, get_file_in_repository, decode_file
     from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells, \
         restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, \
         restore_environment, redact_text
@@ -245,7 +245,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
             format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors. Return the notebook in JSON format!"
 
         if check_if_file_exists(repository, branch_name, filename):
-            file_content = get_file_in_repository(repository, branch_name, filename).decoded_content.decode()
+            file_content = decode_file(get_file_in_repository(repository, branch_name, filename))
             print(filename, "will be overwritten")
             if filename.endswith('.ipynb'):
                 print("Removing outputs from ipynb file")

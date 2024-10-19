@@ -237,13 +237,18 @@ def get_repository_file_contents(repository:str, branch_name, file_paths: list):
     for file_path in file_paths:
         try:
             file = project.files.get(file_path=file_path, ref=branch_name)
-            file_contents[file_path] = file.decode().decode()
+            file_contents[file_path] = decode_file(file)
         except Exception as e:
             file_contents[file_path] = f"Error accessing {file_path}: {str(e)}"
 
     return file_contents
 
-def write_file_in_branch(repository, branch_name, file_path, new_content, commit_message):
+
+def decode_file(file):
+    return file.decode().decode()
+
+
+def write_file_in_branch(repository, branch_name, file_path, new_content, commit_message="Update file"):
     """
     Write or update a file in a specified branch of a GitLab repository.
 
@@ -314,6 +319,9 @@ def create_branch(repository, parent_branch="main"):
     project = get_repository_handle(repository)
     new_branch_name = "git-bob-mod-" + ''.join(random.choices(string.ascii_letters + string.digits, k=10))
     project.branches.create({'branch': new_branch_name, 'ref': parent_branch})
+
+    return new_branch_name
+
 
 def check_if_file_exists(repository, branch_name, file_path):
     """

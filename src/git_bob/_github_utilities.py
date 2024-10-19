@@ -740,6 +740,10 @@ def rename_file_in_repository(repository, branch_name, old_file_path, new_file_p
     shutil.move(old_file_path, new_file_path)
 
 
+def decode_file(file):
+    return file.decoded_content.decode()
+
+
 def delete_file_from_repository(repository, branch_name, file_path, commit_message="Delete file"):
     """
     Delete a file from the specified GitHub repository on a given branch.
