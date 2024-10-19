@@ -206,7 +206,7 @@ def list_repository_files(repository: str):
                 path_stack.append(item['path'])
     return files
 
-def get_repository_file_contents(repository:str, branch_name='main', file_paths: list):
+def get_repository_file_contents(repository:str, branch_name, file_paths: list):
     """
     Get the contents of a file in a GitLab repository.
 

@@ -287,7 +287,7 @@ def list_repository_files(repository: str) -> list:
     return all_files
 
 
-def get_repository_file_contents(repository: str, branch_name='main', file_paths: list) -> dict:
+def get_repository_file_contents(repository: str, branch_name, file_paths: list) -> dict:
     """
     Retrieve the contents of specified files from a GitHub repository.
 
