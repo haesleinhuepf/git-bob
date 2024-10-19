@@ -142,12 +142,18 @@ def get_issue_details(repository, issue_id):
     Returns
     -------
     dict
-        A dictionary containing issue details such as title and description.
+        A dictionary containing issue details such as title and description, 
+        and additional fields like labels and assignees to mirror the GitHub utility.
     """
     Log().log(f"-> get_gitlab_issue_details({repository}, {issue_id})")
     project = get_repository_handle(repository)
     issue = project.issues.get(issue_id)
-    return {'title': issue.title, 'description': issue.description}
+    return {
+        'title': issue.title, 
+        'description': issue.description,
+        'labels': issue.labels,
+        'assignees': [assignee['username'] for assignee in issue.assignees]
+    }
 
 def list_repository_files(repository, ref='main'):
     """
