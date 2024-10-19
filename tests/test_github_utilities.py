@@ -36,18 +36,16 @@ def test_list_repository_files():
     assert "src/git_bob/__init__.py" in files
     assert "playground/python_basics.ipynb" in files
 
-
 def test_get_repository_file_contents():
     from git_bob._github_utilities import get_repository_file_contents
-    content = get_repository_file_contents("haesleinhuepf/git-bob", ["README.md"])
+    content = get_repository_file_contents("haesleinhuepf/git-bob", "README.md")
 
     assert len(list(content.keys())) == 1
     assert "README.md" in list(content.keys())
     assert content["README.md"].startswith("# git-bob")
     assert "## Acknowledgements" in content["README.md"]
 
-
 def test_check_if_file_exists():
     from git_bob._github_utilities import check_if_file_exists
-    assert check_if_file_exists("haesleinhuepf/git-bob", "main", "README.md")
-    assert not check_if_file_exists("haesleinhuepf/git-bob", "main", "readme2.md")
+    assert check_if_file_exists("haesleinhuepf/git-bob", "README.md")
+    assert not check_if_file_exists("haesleinhuepf/git-bob", "readme2.md")
