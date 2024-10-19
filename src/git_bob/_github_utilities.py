@@ -332,6 +332,8 @@ def write_file_in_branch(repository, branch_name, file_path, new_content, commit
     ----------
     repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
+    branch_name : str
+        The name of the branch to write the changes to.
     file_path : str
         A file path within the repository to change the contents of.
     new_content : str

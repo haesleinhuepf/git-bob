@@ -128,34 +128,56 @@ def list_issues(repository: str, state: str = "opened") -> dict:
     issues = project.issues.list(state=state)
     return {issue.iid: issue.title for issue in issues}
 
-def get_issue_details(repository, issue_id):
+def get_issue_details(repository: str, issue: int) -> str:
     """
-    Fetch details of a specific GitLab issue.
+    Retrieve detailed information about a specific GitLab issue.
 
     Parameters
     ----------
     repository : str
-        The full name of the GitLab project (e.g., "username/repo-name").
-    issue_id : int
-        The ID of the issue to retrieve details for.
+        The ID or URL-encoded path of the GitLab project.
+    issue : int
+        The internal ID of the issue to retrieve details for.
 
     Returns
     -------
-    dict
-        A dictionary containing issue details such as title and description, 
-        and additional fields like labels and assignees to mirror the GitHub utility.
+    str
+        A string containing detailed information about the issue.
     """
-    Log().log(f"-> get_gitlab_issue_details({repository}, {issue_id})")
-    project = get_repository_handle(repository)
-    issue = project.issues.get(issue_id)
-    return {
-        'title': issue.title, 
-        'description': issue.description,
-        'labels': issue.labels,
-        'assignees': [assignee['username'] for assignee in issue.assignees]
-    }
+    Log().log(f"-> get_gitlab_issue_details({repository}, {issue})")
 
-def list_repository_files(repository, ref='main'):
+    # Get the project
+    project = get_repository_handle(repository)
+
+    # Fetch the specified issue
+    issue = project.issues.get(issue)
+
+    # Format issue details
+    content = f"""
+Issue #{issue.iid}: {issue.title}
+State: {issue.state}
+Created at: {issue.created_at}
+Updated at: {issue.updated_at}
+Closed at: {issue.closed_at}
+Author: {issue.author['username']}
+Assignees: {', '.join([assignee['username'] for assignee in issue.assignees])}
+Labels: {', '.join(issue.labels)}
+Comments: {issue.user_notes_count}
+Description:
+{issue.description}
+"""
+
+    # Add comments if any
+    if issue.user_notes_count > 0:
+        content += "\n\nComments:"
+        notes = issue.notes.list()
+        for note in notes:
+            if not note.system:  # Exclude system-generated notes
+                content += f"\n\nComment by {note.author['username']} on {note.created_at}:\n{note.body}"
+
+    return content
+
+def list_repository_files(repository):
     """
     List all files in the specified GitLab repository branch.
 
@@ -171,12 +193,22 @@ def list_repository_files(repository, ref='main'):
     list
         A list of file paths in the repository.
     """
-    Log().log(f"-> list_repository_files({repository}, {ref})")
-    project = get_repository_handle(repository)
-    items = project.repository_tree(ref=ref, recursive=True)
-    return [item['path'] for item in items if item['type'] == 'blob']
+    Log().log(f"-> list_repository_files({repository})")
+    repo = get_repository_handle(repository)
+    files = []
+    path_stack = ['']
 
-def get_repository_file_contents(repository, file_path, ref='main'):
+    while path_stack:
+        path = path_stack.pop()
+        tree = repo.repository_tree(path=path)
+        for item in tree:
+            if item['type'] == 'blob':
+                files.append(item['path'])
+            elif item['type'] == 'tree':
+                path_stack.append(item['path'])
+    return files
+
+def get_repository_file_contents(repository:str, file_paths: list, ref='main'):
     """
     Get the contents of a file in a GitLab repository.
 
@@ -194,12 +226,20 @@ def get_repository_file_contents(repository, file_path, ref='main'):
     str
         The content of the file as a string.
     """
-    Log().log(f"-> get_repository_file_contents({repository}, {file_path}, {ref})")
+    Log().log(f"-> get_repository_file_contents({repository}, {file_paths}, {ref})")
     project = get_repository_handle(repository)
-    file = project.files.get(file_path=file_path, ref=ref)
-    return file.decode().decode()
 
-def write_file_in_branch(repository, file_path, content, branch, commit_message):
+    file_contents = {}
+    for file_path in file_paths:
+        try:
+            file = project.files.get(file_path=file_path, ref=ref)
+            file_contents[file_path] = file.decode().decode()
+        except Exception as e:
+            file_contents[file_path] = f"Error accessing {file_path}: {str(e)}"
+
+    return file_contents
+
+def write_file_in_branch(repository, branch_name, file_path, new_content, commit_message):
     """
     Write or update a file in a specified branch of a GitLab repository.
 
@@ -207,12 +247,12 @@ def write_file_in_branch(repository, file_path, content, branch, commit_message)
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
+    branch_name : str
+        The name of the branch to write the changes to.
     file_path : str
         The path to the file to be written or updated.
-    content : str
+    new_content : str
         The content to write into the file.
-    branch : str
-        The name of the branch to write the changes to.
     commit_message : str
         The commit message associated with the change.
 
@@ -220,21 +260,36 @@ def write_file_in_branch(repository, file_path, content, branch, commit_message)
     -------
     None
     """
-    Log().log(f"-> write_file_in_branch({repository}, {file_path}, {branch})")
+    Log().log(f"-> write_file_in_branch({repository}, {branch_name}, {file_path})")
     project = get_repository_handle(repository)
     try:
-        file = project.files.get(file_path=file_path, ref=branch)
-        file.content = content
-        file.save(branch=branch, commit_message=commit_message)
+        file = project.files.get(file_path=file_path, ref=branch_name)
+        file.content = new_content
+        file.save(branch=branch_name, commit_message=commit_message)
     except gitlab.exceptions.GitlabGetError:
         project.files.create({
             'file_path': file_path,
-            'branch': branch,
-            'content': content,
+            'branch': branch_name,
+            'content': new_content,
             'commit_message': commit_message
         })
 
-def create_branch(repository, branch_name, ref='main'):
+    # ensure the folder extists
+    path_name = str(os.path.dirname(file_path))
+    if len(path_name) > 0:
+        os.makedirs(path_name, exist_ok=True)
+    # save the file
+    if isinstance(new_content, bytes):
+        with open(file_path, "wb") as f:
+            f.write(new_content)
+    else:
+        with open(file_path, "w") as f:
+            f.write(new_content)
+
+    return f"File {file_path} successfully created in repository {repository} branch {branch_name}."
+
+
+def create_branch(repository, parent_branch="main"):
     """
     Create a new branch in a GitLab repository.
 
@@ -242,20 +297,21 @@ def create_branch(repository, branch_name, ref='main'):
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
-    branch_name : str
-        The name of the new branch to create.
-    ref : str, optional
+    parent_branch : str
         The branch or tag name to create the new branch from (default is 'main').
 
     Returns
     -------
     None
     """
-    Log().log(f"-> create_branch({repository}, {branch_name}, {ref})")
+    Log().log(f"-> create_branch({repository}, {parent_branch})")
+    import random
+    import string
     project = get_repository_handle(repository)
-    project.branches.create({'branch': branch_name, 'ref': ref})
+    new_branch_name = "git-bob-mod-" + ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    project.branches.create({'branch': new_branch_name, 'ref': parent_branch})
 
-def check_if_file_exists(repository, file_path, ref='main'):
+def check_if_file_exists(repository, branch_name, file_path):
     """
     Check if a file exists in a given branch of the GitLab repository.
 
@@ -263,25 +319,26 @@ def check_if_file_exists(repository, file_path, ref='main'):
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
+    branch_name : str, optional
+        The branch or tag name (default is 'main').
     file_path : str
         The path to the file in the repository.
-    ref : str, optional
-        The branch or tag name (default is 'main').
 
     Returns
     -------
     bool
         True if the file exists, else False.
     """
-    Log().log(f"-> check_if_file_exists({repository}, {file_path}, {ref})")
+    Log().log(f"-> check_if_file_exists({repository}, {branch_name}, {file_path})")
     project = get_repository_handle(repository)
     try:
-        project.files.get(file_path=file_path, ref=ref)
+        project.files.get(file_path=file_path, ref=branch_name)
         return True
     except gitlab.exceptions.GitlabGetError:
         return False
 
-def get_file_in_repository(repository, file_path, ref='main'):
+@lru_cache(maxsize=1)
+def get_file_in_repository(repository, branch_name, file_path):
     """
     Get a file object from a GitLab repository.
 
@@ -289,19 +346,19 @@ def get_file_in_repository(repository, file_path, ref='main'):
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
+    branch_name : str, optional
+        The branch or tag name.
     file_path : str
         The path to the file in the repository.
-    ref : str, optional
-        The branch or tag name (default is 'main').
 
     Returns
     -------
     gitlab.v4.objects.ProjectFile
         The file object.
     """
-    Log().log(f"-> get_file_in_repository({repository}, {file_path}, {ref})")
+    Log().log(f"-> get_file_in_repository({repository}, {branch_name}, {file_path})")
     project = get_repository_handle(repository)
-    return project.files.get(file_path=file_path, ref=ref)
+    return project.files.get(file_path=file_path, ref=branch_name)
 
 def send_pull_request(repository, source_branch, target_branch, title, description):
     """
@@ -333,9 +390,9 @@ def send_pull_request(repository, source_branch, target_branch, title, descripti
         'title': title,
         'description': description
     })
-    return mr
+    return f"Pull request created: {mr}"
 
-def check_access_and_ask_for_approval(repository, user):
+def check_access_and_ask_for_approval(repository, user, issue):
     """
     Check if a user has access to a repository and request approval if needed.
 
@@ -345,19 +402,41 @@ def check_access_and_ask_for_approval(repository, user):
         The full name of the GitLab project (e.g., "username/repo-name").
     user : str
         The username to check access for.
+    issue : int
+        The issue number related to the access request.
 
     Returns
     -------
     bool
         True if the user has access, else False.
     """
-    Log().log(f"-> check_access_and_ask_for_approval({repository}, {user})")
+    Log().log(f"-> check_access_and_ask_for_approval({repository}, {user}, {issue})")
+    access = False
     project = get_repository_handle(repository)
     members = project.members.list()
     for member in members:
         if member.username == user:
-            return True
-    return False
+            access = True
+
+    if not access:
+        print("User does not have access rights.")
+
+        remark = setup_ai_remark()
+        agent_name = os.getenv('AGENT_NAME', 'git-bob')
+
+        add_comment_to_issue(repository, issue, f"""
+{remark}
+
+Hi @{user}, 
+
+thanks for reaching out! Unfortunately, I'm not allowed to respond to you directly. 
+I need approval from a person who has access.
+
+Best,
+{agent_name}
+""")
+        return False
+    return True
 
 def get_contributors(repository):
     """
@@ -378,7 +457,7 @@ def get_contributors(repository):
     contributors = project.repository_contributors()
     return [contributor['name'] for contributor in contributors]
 
-def get_diff_of_pull_request(repository, mr_id):
+def get_diff_of_pull_request(repository, pull_request):
     """
     Get the diff of a specific merge request in a GitLab repository.
 
@@ -386,7 +465,7 @@ def get_diff_of_pull_request(repository, mr_id):
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
-    mr_id : int
+    pull_request : int
         The ID of the merge request to get the diff for.
 
     Returns
@@ -394,13 +473,13 @@ def get_diff_of_pull_request(repository, mr_id):
     str
         The diff as a string.
     """
-    Log().log(f"-> get_diff_of_pull_request({repository}, {mr_id})")
+    Log().log(f"-> get_diff_of_pull_request({repository}, {pull_request})")
     project = get_repository_handle(repository)
-    mr = project.mergerequests.get(mr_id)
+    mr = project.mergerequests.get(pull_request)
     diffs = mr.diffs.list()
     return "\n".join(diff.diff for diff in diffs)
 
-def add_reaction_to_issue(repository, issue_id, emoji):
+def add_reaction_to_issue(repository, issue, reaction="+1"):
     """
     Add a reaction to a specific issue in a GitLab repository.
 
@@ -408,21 +487,21 @@ def add_reaction_to_issue(repository, issue_id, emoji):
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
-    issue_id : int
+    issue : int
         The ID of the issue to add a reaction to.
-    emoji : str
-        The emoji code to add as a reaction.
+    reaction : str
+        The emoji code to add as a reaction. Default is "+1".
 
     Returns
     -------
     None
     """
-    Log().log(f"-> add_reaction_to_issue({repository}, {issue_id}, {emoji})")
+    Log().log(f"-> add_reaction_to_issue({repository}, {issue}, {reaction})")
     project = get_repository_handle(repository)
-    issue = project.issues.get(issue_id)
-    issue.awardemoji.create({'name': emoji})
+    issue = project.issues.get(issue)
+    issue.awardemoji.create({'name': reaction})
 
-def add_reaction_to_last_comment_in_issue(repository, issue_id, emoji):
+def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
     """
     Add a reaction to the last comment in a specific issue in a GitLab repository.
 
@@ -430,22 +509,22 @@ def add_reaction_to_last_comment_in_issue(repository, issue_id, emoji):
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
-    issue_id : int
+    issue : int
         The ID of the issue to add a reaction to the last comment.
-    emoji : str
+    reaction : str
         The emoji code to add as a reaction.
 
     Returns
     -------
     None
     """
-    Log().log(f"-> add_reaction_to_last_comment_in_issue({repository}, {issue_id}, {emoji})")
+    Log().log(f"-> add_reaction_to_last_comment_in_issue({repository}, {issue}, {reaction})")
     project = get_repository_handle(repository)
-    issue = project.issues.get(issue_id)
+    issue = project.issues.get(issue)
     notes = issue.notes.list()
     if notes:
         last_note = notes[-1]
-        last_note.awardemoji.create({'name': emoji})
+        last_note.awardemoji.create({'name': reaction})
 
 def get_diff_of_branches(repository, source_branch, target_branch):
     """
@@ -470,7 +549,7 @@ def get_diff_of_branches(repository, source_branch, target_branch):
     compare = project.repository_compare(from_=target_branch, to=source_branch)
     return "\n".join(diff['diff'] for diff in compare['diffs'])
 
-def rename_file_in_repository(repository, old_file_path, new_file_path, branch, commit_message):
+def rename_file_in_repository(repository, branch_name, old_file_path, new_file_path, commit_message):
     """
     Rename a file in a GitLab repository.
 
@@ -478,12 +557,12 @@ def rename_file_in_repository(repository, old_file_path, new_file_path, branch, 
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
+    branch_name : str
+        The name of the branch where the rename operation will take place.
     old_file_path : str
         The current path of the file.
     new_file_path : str
         The new path of the file.
-    branch : str
-        The name of the branch where the rename operation will take place.
     commit_message : str
         The commit message associated with the rename.
 
@@ -491,13 +570,13 @@ def rename_file_in_repository(repository, old_file_path, new_file_path, branch, 
     -------
     None
     """
-    Log().log(f"-> rename_file_in_repository({repository}, {old_file_path}, {new_file_path}, {branch})")
+    Log().log(f"-> rename_file_in_repository({repository}, {old_file_path}, {new_file_path}, {branch_name})")
     project = get_repository_handle(repository)
-    file = project.files.get(file_path=old_file_path, ref=branch)
+    file = project.files.get(file_path=old_file_path, ref=branch_name)
     file.path = new_file_path
-    file.save(branch=branch, commit_message=commit_message)
+    file.save(branch=branch_name, commit_message=commit_message)
 
-def delete_file_from_repository(repository, file_path, branch, commit_message):
+def delete_file_from_repository(repository, branch_name, file_path, commit_message):
     """
     Delete a file from a GitLab repository.
 
@@ -507,7 +586,7 @@ def delete_file_from_repository(repository, file_path, branch, commit_message):
         The full name of the GitLab project (e.g., "username/repo-name").
     file_path : str
         The path to the file to delete.
-    branch : str
+    branch_name : str
         The name of the branch from which to delete the file.
     commit_message : str
         The commit message associated with the delete operation.
@@ -516,11 +595,11 @@ def delete_file_from_repository(repository, file_path, branch, commit_message):
     -------
     None
     """
-    Log().log(f"-> delete_file_from_repository({repository}, {file_path}, {branch})")
+    Log().log(f"-> delete_file_from_repository({repository}, {file_path}, {branch_name})")
     project = get_repository_handle(repository)
-    project.files.delete(file_path=file_path, branch=branch, commit_message=commit_message)
+    project.files.delete(file_path=file_path, branch=branch_name, commit_message=commit_message)
 
-def copy_file_in_repository(repository, source_file_path, dest_file_path, branch, commit_message):
+def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_path, commit_message):
     """
     Copy a file within a GitLab repository.
 
@@ -528,11 +607,11 @@ def copy_file_in_repository(repository, source_file_path, dest_file_path, branch
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
-    source_file_path : str
+    src_file_path : str
         The path to the source file to copy.
     dest_file_path : str
         The destination path for the copied file.
-    branch : str
+    branch_name : str
         The name of the branch where the copy operation will take place.
     commit_message : str
         The commit message associated with the copy.
@@ -541,12 +620,11 @@ def copy_file_in_repository(repository, source_file_path, dest_file_path, branch
     -------
     None
     """
-    Log().log(f"-> copy_file_in_repository({repository}, {source_file_path}, {dest_file_path}, {branch})")
-    project = get_repository_handle(repository)
-    file_content = get_repository_file_contents(repository, source_file_path, branch)
-    write_file_in_branch(repository, dest_file_path, file_content, branch, commit_message)
+    Log().log(f"-> copy_file_in_repository({repository}, {src_file_path}, {dest_file_path}, {branch_name})")
+    file_content = get_file_in_repository(repository, branch_name, src_file_path)
+    write_file_in_branch(repository, branch_name, dest_file_path, file_content, commit_message)
 
-def download_to_repository(repository, file_path, url, branch, commit_message):
+def download_to_repository(repository, branch_name, source_url, target_filename):
     """
     Download a file from a URL and store it in the GitLab repository.
 
@@ -554,23 +632,37 @@ def download_to_repository(repository, file_path, url, branch, commit_message):
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
-    file_path : str
-        The path in the repository where the file will be stored.
-    url : str
-        The URL to download the file from.
-    branch : str
+    branch_name : str
         The name of the branch where the file will be added or updated.
-    commit_message : str
-        The commit message associated with the download operation.
+    source_url : str
+        The URL to download the file from.
+    target_filename : str
+        The path in the repository where the file will be stored.
 
     Returns
     -------
     None
     """
-    Log().log(f"-> download_to_repository({repository}, {file_path}, {url}, {branch})")
+    Log().log(f"-> download_to_repository({repository}, {target_filename}, {source_url}, {branch_name})")
     import requests
-    response = requests.get(url)
-    write_file_in_branch(repository, file_path, response.text, branch, commit_message)
+
+    if source_url.endswith(")"): # happens with ![]() markdown syntax
+        source_url = source_url[:-1]
+
+    response = requests.get(source_url)
+    if response.status_code == 200:
+        file_content = response.content
+    else:
+        raise Exception(f"Failed to download file. Status code: {response.status_code}")
+
+
+    commit_message = f"Downloaded {source_url}, saved as {target_filename}."
+
+    # save the file locally
+    with open(target_filename, "wb") as f:
+        f.write(file_content)
+
+    write_file_in_branch(repository, branch_name, target_filename, response.text, commit_message)
 
 def create_issue(repository, title, description):
     """
