@@ -30,6 +30,8 @@ jobs:
         pip install -e .
 
     - name: Test with pytest and generate coverage
+      env:
+        GITLAB_API_KEY: "${{ secrets.GITLAB_API_KEY }}"
       run: |
         pytest --cov=./ --cov-report=xml
 
