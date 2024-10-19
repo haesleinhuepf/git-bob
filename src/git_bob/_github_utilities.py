@@ -295,6 +295,8 @@ def get_repository_file_contents(repository: str, branch_name, file_paths: list)
     ----------
     repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
+    branch_name : str, optional
+        The name of the branch or tag (default is 'main').
     file_paths : list
         A list of file paths within the repository to retrieve the contents of.
 
