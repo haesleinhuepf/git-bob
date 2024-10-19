@@ -98,9 +98,14 @@ def get_most_recent_comment_on_issue(repository, issue):
         A tuple containing the username of the commenter and the comment text.
     """
     Log().log(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
+    from datetime import datetime
+
     project = get_repository_handle(repository)
     issue_obj = project.issues.get(issue)
     notes = issue_obj.notes.list()
+
+    notes = sorted(notes, key=lambda x: datetime.strptime(x.created_at, '%Y-%m-%dT%H:%M:%S.%fZ'), reverse=False)
+
     if notes:
         last_note = notes[-1]
         return last_note.author['username'], last_note.body
