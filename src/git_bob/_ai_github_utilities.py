@@ -189,9 +189,9 @@ def summarize_github_issue(repository, issue, prompt_function):
         The language model to use for generating the summary.
     """
     Log().log(f"-> summarize_github_issue({repository}, {issue})")
-    from ._github_utilities import get_github_issue_details
+    from ._github_utilities import get_issue_details
 
-    issue_conversation = get_github_issue_details(repository, issue)
+    issue_conversation = get_issue_details(repository, issue)
 
     summary = prompt_function(f"""
 Summarize the most important details of this issue #{issue} in the repository {repository}. 
@@ -397,17 +397,17 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
 
     Log().log(f"-> solve_github_issue({repository}, {issue})")
 
-    from ._github_utilities import get_github_issue_details, list_repository_files, get_repository_file_contents, \
+    from ._github_utilities import get_issue_details, list_repository_files, get_repository_file_contents, \
         write_file_in_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, \
         get_diff_of_branches, get_conversation_on_issue, rename_file_in_repository, delete_file_from_repository, \
         copy_file_in_repository, download_to_repository, add_comment_to_issue, \
-        get_github_repository
+        get_repository_handle
     from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion, \
         remove_ansi_escape_sequences, clean_output, redact_text
     from github.GithubException import GithubException
     import traceback
 
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     discussion = modify_discussion(get_conversation_on_issue(repository, issue))
     print("Discussion:", discussion)

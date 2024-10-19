@@ -7,7 +7,7 @@ from ._logger import Log
 import gitlab
 
 @lru_cache(maxsize=1)
-def get_gitlab_project(repository):
+def get_repository_handle(repository):
     """
     Get the GitLab project object.
 
@@ -39,9 +39,11 @@ def add_comment_to_issue(repository, issue, comment):
         The comment text to add to the issue.
     """
     Log().log(f"-> add_comment_to_issue({repository}, {issue}, ...)")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     issue_obj = project.issues.get(issue)
     issue_obj.notes.create({'body': comment})
+
+    print(f"Comment added to issue #{issue} in repository {repository}.")
 
 def get_conversation_on_issue(repository, issue):
     """
@@ -60,7 +62,7 @@ def get_conversation_on_issue(repository, issue):
         The conversation string containing the issue title, body, and comments.
     """
     Log().log(f"-> get_conversation_on_issue({repository}, {issue})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     issue_obj = project.issues.get(issue)
     conversation = f"Issue Title: {issue_obj.title}\n\nIssue Body:\n{issue_obj.description}\n\n"
     notes = issue_obj.notes.list()
@@ -73,7 +75,7 @@ def get_most_recently_commented_issue(repository):
     Return the ID of the issue in a project where the last comment was posted.
     """
     Log().log(f"-> get_most_recently_commented_issue({repository})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     issues = project.issues.list(order_by='updated_at', sort='desc')
     if not issues:
         raise ValueError("No issues available")
@@ -96,7 +98,7 @@ def get_most_recent_comment_on_issue(repository, issue):
         A tuple containing the username of the commenter and the comment text.
     """
     Log().log(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     issue_obj = project.issues.get(issue)
     notes = issue_obj.notes.list()
     if notes:
@@ -122,11 +124,11 @@ def list_issues(repository: str, state: str = "opened") -> dict:
         A dictionary of issues where keys are issue ids and values are issue titles.
     """
     Log().log(f"-> list_issues({repository}, {state})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     issues = project.issues.list(state=state)
     return {issue.iid: issue.title for issue in issues}
 
-def get_gitlab_issue_details(repository, issue_id):
+def get_issue_details(repository, issue_id):
     """
     Fetch details of a specific GitLab issue.
 
@@ -143,7 +145,7 @@ def get_gitlab_issue_details(repository, issue_id):
         A dictionary containing issue details such as title and description.
     """
     Log().log(f"-> get_gitlab_issue_details({repository}, {issue_id})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     issue = project.issues.get(issue_id)
     return {'title': issue.title, 'description': issue.description}
 
@@ -164,7 +166,7 @@ def list_repository_files(repository, ref='main'):
         A list of file paths in the repository.
     """
     Log().log(f"-> list_repository_files({repository}, {ref})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     items = project.repository_tree(ref=ref, recursive=True)
     return [item['path'] for item in items if item['type'] == 'blob']
 
@@ -187,7 +189,7 @@ def get_repository_file_contents(repository, file_path, ref='main'):
         The content of the file as a string.
     """
     Log().log(f"-> get_repository_file_contents({repository}, {file_path}, {ref})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     file = project.files.get(file_path=file_path, ref=ref)
     return file.decode().decode()
 
@@ -213,7 +215,7 @@ def write_file_in_branch(repository, file_path, content, branch, commit_message)
     None
     """
     Log().log(f"-> write_file_in_branch({repository}, {file_path}, {branch})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     try:
         file = project.files.get(file_path=file_path, ref=branch)
         file.content = content
@@ -244,7 +246,7 @@ def create_branch(repository, branch_name, ref='main'):
     None
     """
     Log().log(f"-> create_branch({repository}, {branch_name}, {ref})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     project.branches.create({'branch': branch_name, 'ref': ref})
 
 def check_if_file_exists(repository, file_path, ref='main'):
@@ -266,7 +268,7 @@ def check_if_file_exists(repository, file_path, ref='main'):
         True if the file exists, else False.
     """
     Log().log(f"-> check_if_file_exists({repository}, {file_path}, {ref})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     try:
         project.files.get(file_path=file_path, ref=ref)
         return True
@@ -292,7 +294,7 @@ def get_file_in_repository(repository, file_path, ref='main'):
         The file object.
     """
     Log().log(f"-> get_file_in_repository({repository}, {file_path}, {ref})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     return project.files.get(file_path=file_path, ref=ref)
 
 def send_pull_request(repository, source_branch, target_branch, title, description):
@@ -318,7 +320,7 @@ def send_pull_request(repository, source_branch, target_branch, title, descripti
         The merge request object.
     """
     Log().log(f"-> send_pull_request({repository}, {source_branch}, {target_branch})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     mr = project.mergerequests.create({
         'source_branch': source_branch,
         'target_branch': target_branch,
@@ -344,7 +346,7 @@ def check_access_and_ask_for_approval(repository, user):
         True if the user has access, else False.
     """
     Log().log(f"-> check_access_and_ask_for_approval({repository}, {user})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     members = project.members.list()
     for member in members:
         if member.username == user:
@@ -366,7 +368,7 @@ def get_contributors(repository):
         A list of contributors' usernames.
     """
     Log().log(f"-> get_contributors({repository})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     contributors = project.repository_contributors()
     return [contributor['name'] for contributor in contributors]
 
@@ -387,7 +389,7 @@ def get_diff_of_pull_request(repository, mr_id):
         The diff as a string.
     """
     Log().log(f"-> get_diff_of_pull_request({repository}, {mr_id})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     mr = project.mergerequests.get(mr_id)
     diffs = mr.diffs.list()
     return "\n".join(diff.diff for diff in diffs)
@@ -410,7 +412,7 @@ def add_reaction_to_issue(repository, issue_id, emoji):
     None
     """
     Log().log(f"-> add_reaction_to_issue({repository}, {issue_id}, {emoji})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     issue = project.issues.get(issue_id)
     issue.awardemoji.create({'name': emoji})
 
@@ -432,7 +434,7 @@ def add_reaction_to_last_comment_in_issue(repository, issue_id, emoji):
     None
     """
     Log().log(f"-> add_reaction_to_last_comment_in_issue({repository}, {issue_id}, {emoji})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     issue = project.issues.get(issue_id)
     notes = issue.notes.list()
     if notes:
@@ -458,7 +460,7 @@ def get_diff_of_branches(repository, source_branch, target_branch):
         The diff as a string.
     """
     Log().log(f"-> get_diff_of_branches({repository}, {source_branch}, {target_branch})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     compare = project.repository_compare(from_=target_branch, to=source_branch)
     return "\n".join(diff['diff'] for diff in compare['diffs'])
 
@@ -484,7 +486,7 @@ def rename_file_in_repository(repository, old_file_path, new_file_path, branch, 
     None
     """
     Log().log(f"-> rename_file_in_repository({repository}, {old_file_path}, {new_file_path}, {branch})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     file = project.files.get(file_path=old_file_path, ref=branch)
     file.path = new_file_path
     file.save(branch=branch, commit_message=commit_message)
@@ -509,7 +511,7 @@ def delete_file_from_repository(repository, file_path, branch, commit_message):
     None
     """
     Log().log(f"-> delete_file_from_repository({repository}, {file_path}, {branch})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     project.files.delete(file_path=file_path, branch=branch, commit_message=commit_message)
 
 def copy_file_in_repository(repository, source_file_path, dest_file_path, branch, commit_message):
@@ -534,7 +536,7 @@ def copy_file_in_repository(repository, source_file_path, dest_file_path, branch
     None
     """
     Log().log(f"-> copy_file_in_repository({repository}, {source_file_path}, {dest_file_path}, {branch})")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     file_content = get_repository_file_contents(repository, source_file_path, branch)
     write_file_in_branch(repository, dest_file_path, file_content, branch, commit_message)
 
@@ -583,6 +585,6 @@ def create_issue(repository, title, description):
         The issue object.
     """
     Log().log(f"-> create_issue({repository}, {title}, ...)")
-    project = get_gitlab_project(repository)
+    project = get_repository_handle(repository)
     issue = project.issues.create({'title': title, 'description': description})
     return issue
