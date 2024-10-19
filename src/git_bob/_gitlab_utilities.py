@@ -390,16 +390,16 @@ def send_pull_request(repository, source_branch, target_branch, title, descripti
     })
     return f"Pull request created: {mr}"
 
-def check_access_and_ask_for_approval(repository, user, issue):
+def check_access_and_ask_for_approval(user, repository, issue):
     """
     Check if a user has access to a repository and request approval if needed.
 
     Parameters
     ----------
-    repository : str
-        The full name of the GitLab project (e.g., "username/repo-name").
     user : str
         The username to check access for.
+    repository : str
+        The full name of the GitLab project (e.g., "username/repo-name").
     issue : int
         The issue number related to the access request.
 
@@ -408,13 +408,18 @@ def check_access_and_ask_for_approval(repository, user, issue):
     bool
         True if the user has access, else False.
     """
-    Log().log(f"-> check_access_and_ask_for_approval({repository}, {user}, {issue})")
+    Log().log(f"-> check_access_and_ask_for_approval({user}, {repository}, {issue})")
+    groups = os.getenv('GIT_BOB_ACCESS_GROUPS', 'members').split(',')
+
+    from ._ai_github_utilities import setup_ai_remark
     access = False
     project = get_repository_handle(repository)
-    members = project.members.list()
-    for member in members:
-        if member.username == user:
-            access = True
+
+    if "members" in groups:
+        members = project.members.list()
+        for member in members:
+            if member.username == user:
+                access = True
 
     if not access:
         print("User does not have access rights.")
@@ -524,7 +529,7 @@ def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
         last_note = notes[-1]
         last_note.awardemoji.create({'name': reaction})
 
-def get_diff_of_branches(repository, source_branch, target_branch):
+def get_diff_of_branches(repository, compare_branch, base_branch="main"):
     """
     Get the diff between two branches in a GitLab repository.
 
@@ -532,9 +537,9 @@ def get_diff_of_branches(repository, source_branch, target_branch):
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
-    source_branch : str
+    compare_branch : str
         The name of the source branch.
-    target_branch : str
+    base_branch : str
         The name of the target branch.
 
     Returns
@@ -542,12 +547,12 @@ def get_diff_of_branches(repository, source_branch, target_branch):
     str
         The diff as a string.
     """
-    Log().log(f"-> get_diff_of_branches({repository}, {source_branch}, {target_branch})")
+    Log().log(f"-> get_diff_of_branches({repository}, {compare_branch}, {base_branch})")
     project = get_repository_handle(repository)
-    compare = project.repository_compare(from_=target_branch, to=source_branch)
+    compare = project.repository_compare(from_=base_branch, to=compare_branch)
     return "\n".join(diff['diff'] for diff in compare['diffs'])
 
-def rename_file_in_repository(repository, branch_name, old_file_path, new_file_path, commit_message):
+def rename_file_in_repository(repository, branch_name, old_file_path, new_file_path, commit_message="Rename file"):
     """
     Rename a file in a GitLab repository.
 
@@ -574,7 +579,7 @@ def rename_file_in_repository(repository, branch_name, old_file_path, new_file_p
     file.path = new_file_path
     file.save(branch=branch_name, commit_message=commit_message)
 
-def delete_file_from_repository(repository, branch_name, file_path, commit_message):
+def delete_file_from_repository(repository, branch_name, file_path, commit_message="Delete file"):
     """
     Delete a file from a GitLab repository.
 
@@ -597,7 +602,7 @@ def delete_file_from_repository(repository, branch_name, file_path, commit_messa
     project = get_repository_handle(repository)
     project.files.delete(file_path=file_path, branch=branch_name, commit_message=commit_message)
 
-def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_path, commit_message):
+def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_path, commit_message="Copy file):
     """
     Copy a file within a GitLab repository.
 

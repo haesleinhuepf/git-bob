@@ -574,6 +574,7 @@ def get_contributors(repository):
     """
     Get the list of contributors to a GitHub repository.
     """
+    Log().log(f"-> get_contributors({repository})")
     repo = get_repository_handle(repository)
 
     return [member.login for member in repo.get_contributors()]
@@ -846,7 +847,7 @@ def download_to_repository(repository, branch_name, source_url, target_filename)
         print(f"File '{target_filename}' successfully uploaded.")
 
 
-def create_issue(repository, title, body):
+def create_issue(repository, title, description):
     """
     Create a new GitHub issue.
 
@@ -856,7 +857,7 @@ def create_issue(repository, title, body):
         The full name of the GitHub repository (e.g., "username/repo-name").
     title : str
         The title of the GitHub issue.
-    body : str
+    description : str
         The detailed description of the GitHub issue.
 
     Returns
@@ -868,7 +869,7 @@ def create_issue(repository, title, body):
     repo = get_repository_handle(repository)
 
     # Create a new issue
-    issue_obj = repo.create_issue(title=title, body=body)
+    issue_obj = repo.create_issue(title=title, description=description)
 
     print(f"Issue created: #{issue_obj.number}")
     return issue_obj.number
