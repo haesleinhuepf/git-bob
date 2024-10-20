@@ -1,8 +1,9 @@
 # This module contains utility functions for interacting with GitHub issues and pull requests using AI.
 # It includes functions for setting up AI remarks, commenting on issues, reviewing pull requests, and solving issues.
-import warnings
-from ._logger import Log
 import os
+import warnings
+
+from ._logger import Log
 
 AGENT_NAME = os.environ.get("GIT_BOB_AGENT_NAME", "git-bob")
 SYSTEM_PROMPT = os.environ.get("SYSTEM_MESSAGE", f"You are an AI-based coding assistant named {AGENT_NAME}. You are an excellent Python programmer and software engineer.")
@@ -48,8 +49,6 @@ def comment_on_issue(repository, issue, prompt_function):
         The function to generate the comment.
     """
     Log().log(f"-> comment_on_issue({repository}, {issue})")
-    from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, list_repository_files, \
-        get_repository_file_contents
     from ._utilities import text_to_json, modify_discussion, clean_output, redact_text, Config
 
     ai_remark = setup_ai_remark()
@@ -131,7 +130,6 @@ def review_pull_request(repository, issue, prompt_function):
         The function to generate the review comment.
     """
     Log().log(f"-> review_pull_request({repository}, {issue})")
-    from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, get_diff_of_pull_request
     from ._utilities import modify_discussion, clean_output, redact_text, Config
 
     ai_remark = setup_ai_remark()
@@ -189,7 +187,6 @@ def summarize_github_issue(repository, issue, prompt_function):
         The language model to use for generating the summary.
     """
     Log().log(f"-> summarize_github_issue({repository}, {issue})")
-    from ._github_utilities import get_issue_details
     from ._utilities import Config
 
     issue_conversation = Config.git_utilities.get_issue_details(repository, issue)
@@ -226,9 +223,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         The function to generate the file modification content.
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
-    from ._github_utilities import get_repository_file_contents, write_file_in_branch, create_branch, \
-        check_if_file_exists, get_file_in_repository, decode_file
-    from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells, \
+    from ._utilities import split_content_and_summary, erase_outputs_of_code_cells, \
         restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, \
         restore_environment, redact_text, Config
     import os
@@ -398,12 +393,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
 
     Log().log(f"-> solve_github_issue({repository}, {issue})")
 
-    from ._github_utilities import get_issue_details, list_repository_files, get_repository_file_contents, \
-        write_file_in_branch, send_pull_request, add_comment_to_issue, create_branch, check_if_file_exists, \
-        get_diff_of_branches, get_conversation_on_issue, rename_file_in_repository, delete_file_from_repository, \
-        copy_file_in_repository, download_to_repository, add_comment_to_issue, \
-        get_repository_handle
-    from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion, \
+    from ._utilities import split_content_and_summary, text_to_json, modify_discussion, \
         remove_ansi_escape_sequences, clean_output, redact_text, Config
     from github.GithubException import GithubException
     from gitlab.exceptions import GitlabCreateError
@@ -606,7 +596,7 @@ def split_issue_in_sub_issues(repository, issue, prompt_function):
     """
     Log().log(f"-> split_issue_in_sub_issues({repository}, {issue},...)")
     from ._utilities import text_to_json, Config
-    from ._github_utilities import create_issue, add_comment_to_issue, get_conversation_on_issue
+    from ._github_utilities import create_issue
 
     discussion = Config.git_utilities.get_conversation_on_issue(repository, issue)
     ai_remark = setup_ai_remark()+ "\n"
