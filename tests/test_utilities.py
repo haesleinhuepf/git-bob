@@ -47,7 +47,8 @@ def test_create_or_modify_file_ipynb():
     assert modified_notebook["cells"][0]["execution_count"] is None
 
 def test_modify_discussion():
-    from git_bob._utilities import modify_discussion
+    from git_bob._utilities import modify_discussion, Config
+    Config.git_server_url = "https://github.com/"
     discussion = """
     Check this issue hhttps://github.com/haesleinhuepf/git-bob/pull/1 ,
     this PR https://github.com/haesleinhuepf/git-bob/pull/3 ,
