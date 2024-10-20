@@ -63,7 +63,8 @@ def test_modify_discussion():
 
 
 def test_append_result():
-    from git_bob._utilities import append_result
+    from git_bob._utilities import append_result, Config
+    Config.git_server_url = "https://github.com/"
     assert append_result("""
 blabla 
 
@@ -100,7 +101,8 @@ Just tagging strangers: @anyoneelse and friends: @haesleinhuepf
 
 ```
     """
-    from git_bob._utilities import clean_output
+    from git_bob._utilities import clean_output, Config
+    Config.git_server_url = "https://github.com/"
     result = clean_output("haesleinhuepf/git-bob", test)
 
     print(result)
@@ -129,7 +131,8 @@ blabla
 
 def test_saved_environment():
     import os
-    from git_bob._utilities import save_and_clear_environment, restore_environment
+    from git_bob._utilities import save_and_clear_environment, restore_environment, Config
+    Config.git_server_url = "https://github.com/"
     os.environ['TEST_KEY'] = '123'
     saved_env = save_and_clear_environment()
     assert os.environ.get("TEST_KEY") is None
