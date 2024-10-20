@@ -185,8 +185,7 @@ def command_line_interface():
         split_issue_in_sub_issues(repository, issue, prompt)
     elif f"{agent_name} solve" in text or f"{agent_name} try" in text:
         if f"{agent_name} try" in text:
-            from ._github_utilities import create_branch
-            target_branch = create_branch(repository, base_branch)
+            target_branch = Config.git_utilities.create_branch(repository, base_branch)
         else:
             target_branch = base_branch
         # could be issue or modifying code in a PR
