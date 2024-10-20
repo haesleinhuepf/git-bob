@@ -516,7 +516,8 @@ Respond with the actions as JSON list.
         url_template = f"""{Config.git_server_url}{repository}/blob/{branch_name}/
 For image urls, append "?raw = true" by the end of the url to display the image directly. """
     elif Config.running_in_gitlab_ci:
-        url_template = f"{Config.git_server_url}{Config.git_server_url}{repository}/-/raw/{branch_name}/\n"
+        url_template = f"""{Config.git_server_url}{repository}/-/blob/{branch_name}/
+For image urls, use "/raw/" instead of "/blob/". """
 
     link_files_task = f"""
 If there are image files created, use the markdown syntax ![](url) to display them.
