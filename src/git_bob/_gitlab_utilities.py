@@ -24,6 +24,8 @@ def get_repository_handle(repository):
     from ._utilities import Config
     access_token = os.getenv('GITLAB_API_KEY')
     git_server_url = Config.git_server_url
+    print("git_server_url", git_server_url)
+    print("repository", repository)
     gl = gitlab.Gitlab(url=git_server_url, private_token=access_token)
     return gl.projects.get(repository)
 
