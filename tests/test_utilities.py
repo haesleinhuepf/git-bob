@@ -75,6 +75,10 @@ fffff
 
 
 def test_clean_output1():
+    from git_bob._utilities import Config
+    import git_bob._github_utilities as gu
+    Config.git_utilities = gu
+
     test = """
 ```markdown
 git-bob comment
@@ -112,11 +116,15 @@ Just tagging strangers: @anyoneelse and friends: @haesleinhuepf
 
 
 def test_clean_output2():
+    from git_bob._utilities import Config
+    import git_bob._github_utilities as gu
+    Config.git_utilities = gu
+
     test = """
     blabla
 ```
     """
-    reference = test = """
+    reference = """
 blabla
 ```
     """
