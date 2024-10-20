@@ -55,6 +55,7 @@ jobs:
         KISSKI_API_KEY: "${{ secrets.KISSKI_API_KEY }}"
         BLABLADOR_API_KEY: "${{ secrets.BLABLADOR_API_KEY }}"
         GITHUB_API_KEY: "${{ secrets.GITHUB_TOKEN }}"
+        GITLAB_API_KEY: "${{ secrets.GITLAB_API_KEY }}"
         GITHUB_RUN_ID: "${{ github.run_id }}"
         TWINE_USERNAME: "${{ secrets.TWINE_USERNAME }}"
         TWINE_PASSWORD: "${{ secrets.TWINE_PASSWORD }}"

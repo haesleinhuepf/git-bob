@@ -6,7 +6,7 @@ from functools import lru_cache
 from ._logger import Log
 
 @lru_cache(maxsize=1)
-def get_github_repository(repository):
+def get_repository_handle(repository):
     """
     Get the GitHub repository object.
 
@@ -45,7 +45,7 @@ def add_comment_to_issue(repository, issue, comment):
     """
     Log().log(f"-> add_comment_to_issue({repository}, {issue}, ...)")
 
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     # Get the issue object
     issue_obj = repo.get_issue(issue)
@@ -78,7 +78,7 @@ def get_conversation_on_issue(repository, issue):
     """
     Log().log(f"-> get_conversation_on_issue({repository}, {issue})")
 
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     # Get the issue by number
     issue_obj = repo.get_issue(issue)
@@ -102,7 +102,7 @@ def get_most_recently_commented_issue(repository):
     Return the issue number of the issue in a repository where the last comment was posted.
     """
     Log().log(f"-> get_most_recently_commented_issue({repository})")
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     most_recent_comment = None
     issue = None
@@ -140,7 +140,7 @@ def get_most_recent_comment_on_issue(repository, issue):
         A tuple containing the username of the commenter and the comment text.
     """
     Log().log(f"-> get_most_recent_comment_on_issue({repository}, {issue})")
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
 
     # Get the issue by number
@@ -185,7 +185,7 @@ def list_issues(repository: str, state: str = "open") -> dict:
     """
     Log().log(f"-> list_issues({repository}, {state})")
 
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     # Fetch all issues with the specified state
     issues = repo.get_issues(state=state)
@@ -198,7 +198,7 @@ def list_issues(repository: str, state: str = "open") -> dict:
     return result
 
 
-def get_github_issue_details(repository: str, issue: int) -> str:
+def get_issue_details(repository: str, issue: int) -> str:
     """
     Retrieve detailed information about a specific GitHub issue.
 
@@ -216,7 +216,7 @@ def get_github_issue_details(repository: str, issue: int) -> str:
     """
     Log().log(f"-> get_github_issue_details({repository}, {issue})")
 
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     # Fetch the specified issue
     issue = repo.get_issue(number=issue)
@@ -266,7 +266,7 @@ def list_repository_files(repository: str) -> list:
     Log().log(f"-> list_repository_files({repository})")
 
     # Initialize Github client
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     # Get all contents of the repository
     contents = repo.get_contents("")
@@ -287,7 +287,7 @@ def list_repository_files(repository: str) -> list:
     return all_files
 
 
-def get_repository_file_contents(repository: str, file_paths: list) -> dict:
+def get_repository_file_contents(repository: str, branch_name, file_paths: list) -> dict:
     """
     Retrieve the contents of specified files from a GitHub repository.
 
@@ -295,6 +295,8 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
     ----------
     repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
+    branch_name : str, optional
+        The name of the branch or tag (default is 'main').
     file_paths : list
         A list of file paths within the repository to retrieve the contents of.
 
@@ -312,7 +314,7 @@ def get_repository_file_contents(repository: str, file_paths: list) -> dict:
     for file_path in file_paths:
         try:
             # Get the file content
-            file_content = get_file_in_repository (repository, "main", file_path).decoded_content.decode()
+            file_content = get_file_in_repository (repository, branch_name, file_path).decoded_content.decode()
 
             # store the content
             file_contents[file_path] = file_content
@@ -332,6 +334,8 @@ def write_file_in_branch(repository, branch_name, file_path, new_content, commit
     ----------
     repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
+    branch_name : str
+        The name of the branch to write the changes to.
     file_path : str
         A file path within the repository to change the contents of.
     new_content : str
@@ -347,7 +351,7 @@ def write_file_in_branch(repository, branch_name, file_path, new_content, commit
     Log().log(f"-> write_file_in_new_branch({repository}, {branch_name}, {file_path}, ...)")
 
     # Authenticate with GitHub
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     # Commit the changes
     if check_if_file_exists(repository, branch_name, file_path):
@@ -393,7 +397,7 @@ def create_branch(repository, parent_branch="main"):
     import string
 
     # Authenticate with GitHub
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     # Get the main branch
     main_branch = repo.get_branch(parent_branch)
@@ -468,7 +472,7 @@ def get_file_in_repository(repository, branch_name, file_path):
         file_path = file_path[:-9]
 
     print("loading file content...", file_path)
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
     return repo.get_contents(file_path, ref=branch_name)
 
 
@@ -499,7 +503,7 @@ def send_pull_request(repository, source_branch, target_branch, title, descripti
     Log().log(f"-> send_pull_request({repository}, {source_branch}, {target_branch}, ...)")
 
     # Authenticate with GitHub
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     if len(description) > 65535:
         print("Description is too long. Truncated to 65535 characters. This was the full description:", description)
@@ -536,7 +540,7 @@ def check_access_and_ask_for_approval(user, repository, issue):
     from ._ai_github_utilities import setup_ai_remark
     access = False
 
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     members = [member.login for member in repo.get_collaborators()]
 
@@ -572,7 +576,8 @@ def get_contributors(repository):
     """
     Get the list of contributors to a GitHub repository.
     """
-    repo = get_github_repository(repository)
+    Log().log(f"-> get_contributors({repository})")
+    repo = get_repository_handle(repository)
 
     return [member.login for member in repo.get_contributors()]
 
@@ -595,7 +600,7 @@ def get_diff_of_pull_request(repository, pull_request):
 
     Log().log(f"-> get_diff_of_pull_request({repository}, {pull_request})")
     # Authenticate with GitHub
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     pull_request = repo.get_pull(pull_request)
 
@@ -624,7 +629,7 @@ def add_reaction_to_issue(repository, issue, reaction="+1"):
     """
     Log().log(f"-> add_reaction_to_issue({repository}, {issue}, {reaction})")
 
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     # Fetch the specified issue
     issue = repo.get_issue(number=issue)
@@ -645,7 +650,7 @@ def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
     """
     Log().log(f"-> add_reaction_to_last_comment_in_issue({repository}, {issue}, {reaction})")
 
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     # Get the issue by number
     issue_obj = repo.get_issue(issue)
@@ -678,7 +683,7 @@ def get_diff_of_branches(repository, compare_branch, base_branch="main"):
         The diff between the specified branches as a string.
     """
     # Get the repository
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     # Get the comparison between branches
     comparison = repo.compare(base_branch, compare_branch)
@@ -721,7 +726,7 @@ def rename_file_in_repository(repository, branch_name, old_file_path, new_file_p
     Log().log(f"-> rename_file_in_repository({repository}, {branch_name}, {old_file_path}, {new_file_path})")
 
     # Authenticate with GitHub
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     file = get_file_in_repository(repository, branch_name, old_file_path)
     # Create a new file with the old content at the new path
@@ -733,6 +738,10 @@ def rename_file_in_repository(repository, branch_name, old_file_path, new_file_p
     # move file locally using shutil
     import shutil
     shutil.move(old_file_path, new_file_path)
+
+
+def decode_file(file):
+    return file.decoded_content.decode()
 
 
 def delete_file_from_repository(repository, branch_name, file_path, commit_message="Delete file"):
@@ -758,7 +767,7 @@ def delete_file_from_repository(repository, branch_name, file_path, commit_messa
     Log().log(f"-> delete_file_in_repository({repository}, {branch_name}, {file_path})")
 
     # Authenticate with GitHub
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     file = get_file_in_repository(repository, branch_name, file_path)
     repo.delete_file(file.path, commit_message, file.sha, branch=branch_name)
@@ -789,7 +798,7 @@ def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_pa
     Log().log(f"-> copy_file_in_repository({repository}, {branch_name}, {src_file_path}, {dest_file_path})")
 
     # Authenticate with GitHub
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     file = get_file_in_repository(repository, branch_name, src_file_path)
     file_content = file.decoded_content.decode()
@@ -824,7 +833,7 @@ def download_to_repository(repository, branch_name, source_url, target_filename)
         raise Exception(f"Failed to download file. Status code: {response.status_code}")
 
     # Upload the file to the GitHub repository using the GitHub API
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     commit_message = f"Downloaded {source_url}, saved as {target_filename}."
 
@@ -844,7 +853,7 @@ def download_to_repository(repository, branch_name, source_url, target_filename)
         print(f"File '{target_filename}' successfully uploaded.")
 
 
-def create_issue(repository, title, body):
+def create_issue(repository, title, description):
     """
     Create a new GitHub issue.
 
@@ -854,7 +863,7 @@ def create_issue(repository, title, body):
         The full name of the GitHub repository (e.g., "username/repo-name").
     title : str
         The title of the GitHub issue.
-    body : str
+    description : str
         The detailed description of the GitHub issue.
 
     Returns
@@ -863,10 +872,16 @@ def create_issue(repository, title, body):
         The number of the created issue.
     """
     Log().log(f"-> create_issue({repository}, {title})")
-    repo = get_github_repository(repository)
+    repo = get_repository_handle(repository)
 
     # Create a new issue
-    issue_obj = repo.create_issue(title=title, body=body)
+    issue_obj = repo.create_issue(title=title, body=description)
 
     print(f"Issue created: #{issue_obj.number}")
     return issue_obj.number
+
+
+def get_default_branch_name(repository):
+    """Determine name of default branch"""
+    repo = get_repository_handle(repository)
+    return repo.get_branch(repo.default_branch).name

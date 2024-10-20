@@ -55,6 +55,10 @@ Furthermore, to guide discussions, you may want to setup issue templates, e.g.
 * [Bio-Image Analysis](https://github.com/haesleinhuepf/git-bob-playground/blob/main/.github/ISSUE_TEMPLATE/bioimage_analysis.md)
 * [Statistics and Plotting](https://github.com/haesleinhuepf/git-bob-playground/blob/main/.github/ISSUE_TEMPLATE/statistics_plotting.md)
 
+## Installation as gitlab pipeline
+
+Since version 0.10.0 git-bob has experimental support for [gitlab](https://gitlab.com). You find detailed instructions how to install it [here](docs/installation-tutorial-gitlab.md).
+
 ## Usage
 
 To trigger git-bob, you need to comment on an issue or pull request with the following command:
@@ -114,6 +118,7 @@ Here's the recommended workflow for using git-bob:
 * [Basic data analysis and plotting](https://github.com/NFDI4BIOIMAGE/training/issues/250)
 * [Documenting source code](https://github.com/haesleinhuepf/git-bob/pull/29)
 * [Assisting scientific manuscript writing](https://github.com/haesleinhuepf/git-bob-manuscript/pull/9)
+* [Plotting a circle of triangles (in gitlab)](https://gitlab.com/haesleinhuepf/git-bob-gitlab-playground/-/issues/8)
 
 ## Installation for development
 

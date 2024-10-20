@@ -47,9 +47,14 @@ def test_create_or_modify_file_ipynb():
     assert modified_notebook["cells"][0]["execution_count"] is None
 
 def test_modify_discussion():
+    from git_bob._utilities import Config
+    import git_bob._github_utilities as gu
+    Config.git_utilities = gu
+    Config.git_server_url = "https://github.com"
+
     from git_bob._utilities import modify_discussion
     discussion = """
-    Check this issue hhttps://github.com/haesleinhuepf/git-bob/pull/1 ,
+    Check this issue https://github.com/haesleinhuepf/git-bob/pull/1 ,
     this PR https://github.com/haesleinhuepf/git-bob/pull/3 ,
     this file https://github.com/haesleinhuepf/bia-bob/blob/main/setup.cfg and
     this website https://haesleinhuepf.github.io/ 
@@ -75,6 +80,10 @@ fffff
 
 
 def test_clean_output1():
+    from git_bob._utilities import Config
+    import git_bob._github_utilities as gu
+    Config.git_utilities = gu
+
     test = """
 ```markdown
 git-bob comment
@@ -112,19 +121,20 @@ Just tagging strangers: @anyoneelse and friends: @haesleinhuepf
 
 
 def test_clean_output2():
-    test = """
+    from git_bob._utilities import Config
+    import git_bob._github_utilities as gu
+    Config.git_utilities = gu
+
+    test = """    
     blabla
 ```
     """
-    reference = test = """
-blabla
-```
-    """
+    reference = """blabla"""
 
     from git_bob._utilities import clean_output
     result = clean_output("haesleinhuepf/git-bob", test)
 
-    assert test == reference
+    assert result == reference
 
 def test_saved_environment():
     import os
