@@ -1,12 +1,27 @@
 def test_get_gitlab_repository():
+    from git_bob._utilities import Config
+    import git_bob._gitlab_utilities as gu
+    Config.git_utilities = gu
+    Config.git_server_url = "https://gitlab.com"
+
     from git_bob._gitlab_utilities import get_repository_handle
     assert get_repository_handle("haesleinhuepf/git-bob").name == "git-bob"
 
 def test_get_gitlab_issue():
+    from git_bob._utilities import Config
+    import git_bob._gitlab_utilities as gu
+    Config.git_utilities = gu
+    Config.git_server_url = "https://gitlab.com"
+
     from git_bob._gitlab_utilities import get_issue_details
     assert "the world looks good" in get_issue_details("haesleinhuepf/git-bob", 1)
 
 def test_get_conversation_on_issue():
+    from git_bob._utilities import Config
+    import git_bob._gitlab_utilities as gu
+    Config.git_utilities = gu
+    Config.git_server_url = "https://gitlab.com"
+
     from git_bob._gitlab_utilities import get_conversation_on_issue
     conversation = get_conversation_on_issue("haesleinhuepf/git-bob", 1)
 
@@ -14,6 +29,11 @@ def test_get_conversation_on_issue():
     assert "France" not in conversation
 
 def test_get_most_recent_comment_on_issue():
+    from git_bob._utilities import Config
+    import git_bob._gitlab_utilities as gu
+    Config.git_utilities = gu
+    Config.git_server_url = "https://gitlab.com"
+
     from git_bob._gitlab_utilities import get_most_recent_comment_on_issue
     user, comment = get_most_recent_comment_on_issue("haesleinhuepf/git-bob", 12)
 
@@ -21,6 +41,11 @@ def test_get_most_recent_comment_on_issue():
     assert "Berlin" in comment
 
 def test_list_issues():
+    from git_bob._utilities import Config
+    import git_bob._gitlab_utilities as gu
+    Config.git_utilities = gu
+    Config.git_server_url = "https://gitlab.com"
+
     from git_bob._gitlab_utilities import list_issues
     closed_issues = list(list_issues("haesleinhuepf/git-bob", state="closed").keys())
 
@@ -28,6 +53,11 @@ def test_list_issues():
     assert 4 in closed_issues
 
 def test_list_repository_files():
+    from git_bob._utilities import Config
+    import git_bob._gitlab_utilities as gu
+    Config.git_utilities = gu
+    Config.git_server_url = "https://gitlab.com"
+
     from git_bob._gitlab_utilities import list_repository_files
     files = list(list_repository_files("haesleinhuepf/git-bob"))
 
@@ -37,6 +67,11 @@ def test_list_repository_files():
     assert "playground/python_basics.ipynb" in files
 
 def test_get_repository_file_contents():
+    from git_bob._utilities import Config
+    import git_bob._gitlab_utilities as gu
+    Config.git_utilities = gu
+    Config.git_server_url = "https://gitlab.com"
+
     from git_bob._gitlab_utilities import get_repository_file_contents
     content = get_repository_file_contents("haesleinhuepf/git-bob", "main", ["README.md"])
 
@@ -46,6 +81,11 @@ def test_get_repository_file_contents():
     assert "## Acknowledgements" in content["README.md"]
 
 def test_check_if_file_exists():
+    from git_bob._utilities import Config
+    import git_bob._gitlab_utilities as gu
+    Config.git_utilities = gu
+    Config.git_server_url = "https://gitlab.com"
+
     from git_bob._gitlab_utilities import check_if_file_exists
     assert check_if_file_exists("haesleinhuepf/git-bob", "main", "README.md")
     assert not check_if_file_exists("haesleinhuepf/git-bob", "main", "readme2.md")
