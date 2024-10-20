@@ -1,6 +1,6 @@
 # Installation in git-lab
 
-Since version 0.10.0 git-bob has experimental support for [gitlab](https://gitlab.com).
+Since version 0.10.1 git-bob has experimental support for [gitlab](https://gitlab.com).
 Feedback about the instructions provided here are very [welcome](https://github.com/haesleinhuepf/git-bob/issues/new)!
 
 For demonstration purposes, a [playground repository on gitlab.com](https://gitlab.com/haesleinhuepf/git-bob-gitlab-playground) has been set up as demonstrated in the following.
