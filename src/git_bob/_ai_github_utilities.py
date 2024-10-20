@@ -465,7 +465,7 @@ Respond with the actions as JSON list.
         try:
             if action == 'create' or action == 'modify':
                 filename = instruction['filename'].strip("/")
-                message = filename + ":" + Config.git_utilities.create_or_modify_file(repository, issue, filename, branch_name, discussion,
+                message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
                                                                  prompt_function)
                 commit_messages.append(message)
             elif action == 'download':
