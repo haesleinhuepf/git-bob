@@ -69,7 +69,8 @@ def command_line_interface():
     # determine need to respond and access rights
     repository = sys.argv[2] if len(sys.argv) > 2 else None
     issue_str = sys.argv[3] if len(sys.argv) > 3 else None
-    if issue_str.startswith("!"):
+    if issue_str is not None and issue_str.startswith("!"):
+        print("It's a gitlab merge request!")
         Config.is_pull_request = True
         pull_request = int(issue_str)
         issue_str = issue_str[1:]
