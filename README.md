@@ -55,6 +55,10 @@ Furthermore, to guide discussions, you may want to setup issue templates, e.g.
 * [Bio-Image Analysis](https://github.com/haesleinhuepf/git-bob-playground/blob/main/.github/ISSUE_TEMPLATE/bioimage_analysis.md)
 * [Statistics and Plotting](https://github.com/haesleinhuepf/git-bob-playground/blob/main/.github/ISSUE_TEMPLATE/statistics_plotting.md)
 
+## Installation as gitlab pipeline
+
+Since version 0.10.0 git-bob has experimental support for [gitlab](https://gitlab.com). You find detailed instructions how to install it [here](docs/installation-tutorial-gitlab.md).
+
 ## Usage
 
 To trigger git-bob, you need to comment on an issue or pull request with the following command:
