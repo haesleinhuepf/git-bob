@@ -279,17 +279,30 @@ def write_file_in_branch(repository, branch_name, file_path, new_content, commit
     if isinstance(new_content, bytes):
         new_content = base64.b64encode(new_content).decode('utf-8')
 
-    try:
-        file = project.files.get(file_path=file_path, ref=branch_name)
-        file.content = new_content
-        file.save(branch=branch_name, commit_message=commit_message)
-    except gitlab.exceptions.GitlabGetError:
-        project.files.create({
-            'file_path': file_path,
-            'branch': branch_name,
-            'content': new_content,
-            'commit_message': commit_message
-        })
+        try:
+            file = project.files.get(file_path=file_path, ref=branch_name)
+            file.content = new_content
+            file.save(branch=branch_name, commit_message=commit_message)
+        except gitlab.exceptions.GitlabGetError:
+            project.files.create({
+                'file_path': file_path,
+                'branch': branch_name,
+                'content': new_content,
+                'encoding': 'base64',
+                'commit_message': commit_message
+            })
+    else:
+        try:
+            file = project.files.get(file_path=file_path, ref=branch_name)
+            file.content = new_content
+            file.save(branch=branch_name, commit_message=commit_message)
+        except gitlab.exceptions.GitlabGetError:
+            project.files.create({
+                'file_path': file_path,
+                'branch': branch_name,
+                'content': new_content,
+                'commit_message': commit_message
+            })
 
     # ensure the folder extists
     path_name = str(os.path.dirname(file_path))
@@ -715,7 +728,7 @@ def download_to_repository(repository, branch_name, source_url, target_filename)
     else:
         raise Exception(f"Failed to download file. Status code: {response.status_code}")
 
-    encoded_content = base64.b64encode(file_content).decode('utf-8')
+    #encoded_content = base64.b64encode(file_content).decode('utf-8')
 
     commit_message = f"Downloaded {source_url}, saved as {target_filename}."
 
@@ -723,7 +736,7 @@ def download_to_repository(repository, branch_name, source_url, target_filename)
     with open(target_filename, "wb") as f:
         f.write(file_content)
 
-    write_file_in_branch(repository, branch_name, target_filename, encoded_content, commit_message)
+    write_file_in_branch(repository, branch_name, target_filename, file_content, commit_message)
 
 def create_issue(repository, title, description):
     """
