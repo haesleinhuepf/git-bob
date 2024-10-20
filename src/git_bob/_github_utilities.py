@@ -879,3 +879,9 @@ def create_issue(repository, title, description):
 
     print(f"Issue created: #{issue_obj.number}")
     return issue_obj.number
+
+
+def get_default_branch_name(repository):
+    """Determine name of default branch"""
+    repo = get_repository_handle(repository)
+    return repo.get_branch(repo.default_branch).name

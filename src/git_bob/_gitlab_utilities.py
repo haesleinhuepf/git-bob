@@ -741,3 +741,8 @@ def create_issue(repository, title, description):
     project = get_repository_handle(repository)
     issue = project.issues.create({'title': title, 'description': description})
     return issue.iid
+
+def get_default_branch_name(repository):
+    """Determine name of default branch"""
+    repo = get_repository_handle(repository)
+    return repo.default_branch
