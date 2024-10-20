@@ -172,6 +172,8 @@ def command_line_interface():
             print("Issue is a not a PR")
             pull_request = None
             base_branch = repo.default_branch
+    elif Config.running_in_gitlab_ci:
+        base_branch = Config.git_utilities.get_default_branch_name(repository)
 
     # execute the task
     if f"{agent_name} comment" in text:
