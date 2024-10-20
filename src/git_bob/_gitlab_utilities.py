@@ -272,11 +272,13 @@ def write_file_in_branch(repository, branch_name, file_path, new_content, commit
     None
     """
     Log().log(f"-> write_file_in_branch({repository}, {branch_name}, {file_path})")
+    import base64
+
     project = get_repository_handle(repository)
 
-    if not isinstance(new_content, bytes):
-        new_content = new_content.encode('utf-8')
-    
+    if isinstance(new_content, bytes):
+        new_content = base64.b64encode(new_content).decode('utf-8')
+
     try:
         file = project.files.get(file_path=file_path, ref=branch_name)
         file.content = new_content
