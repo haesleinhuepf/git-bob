@@ -115,11 +115,14 @@ Just tagging strangers: @anyoneelse and friends: @haesleinhuepf
 
 
 def test_clean_output2():
+    from git_bob._utilities import Config
+    Config.git_server_url = "https://github.com/"
+
     test = """
     blabla
 ```
     """
-    reference = test = """
+    reference = """
 blabla
 ```
     """
