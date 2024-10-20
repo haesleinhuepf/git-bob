@@ -118,6 +118,7 @@ Here's the recommended workflow for using git-bob:
 * [Basic data analysis and plotting](https://github.com/NFDI4BIOIMAGE/training/issues/250)
 * [Documenting source code](https://github.com/haesleinhuepf/git-bob/pull/29)
 * [Assisting scientific manuscript writing](https://github.com/haesleinhuepf/git-bob-manuscript/pull/9)
+* [Plotting a circle of triangles (in gitlab)](https://gitlab.com/haesleinhuepf/git-bob-gitlab-playground/-/issues/8)
 
 ## Installation for development
 
