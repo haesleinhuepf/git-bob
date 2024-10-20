@@ -52,7 +52,7 @@ class Config:
     issue = None
     running_in_github_ci = None
     running_in_gitlab_ci = None
-    git_server_url = None
+    git_server_url = "https://github.com/"
     git_utilities = None
     is_pull_request = None
 
