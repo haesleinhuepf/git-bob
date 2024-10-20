@@ -57,7 +57,7 @@ Furthermore, to guide discussions, you may want to setup issue templates, e.g.
 
 ## Installation as gitlab pipeline
 
-Since version 0.10.0 git-bob has experimental support for [gitlab](https://gitlab.com). You find detailed instructions how to install it [here](docs/installation-tutorial-gitlab.md).
+Since version 0.10.1 git-bob has experimental support for [gitlab](https://gitlab.com). You find detailed instructions how to install it [here](docs/installation-tutorial-gitlab.md).
 
 ## Usage
 
