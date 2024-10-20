@@ -73,13 +73,13 @@ def quick_first_response(repository, issue):
     import sys
     import os
     from ._ai_github_utilities import setup_ai_remark
-    from ._github_utilities import add_comment_to_issue, add_reaction_to_last_comment_in_issue
+
 
     run_id = os.environ.get("GITHUB_RUN_ID")
     ai_remark = setup_ai_remark()
 
     # add reaction to issue
-    add_reaction_to_last_comment_in_issue(repository, issue, "+1")
+    Config.git_utilities.add_reaction_to_last_comment_in_issue(repository, issue, "+1")
 
 
 def split_content_and_summary(text):
@@ -247,7 +247,7 @@ def image_to_url(image):
 
 def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
     import re
-    from ._github_utilities import get_conversation_on_issue, get_diff_of_pull_request, get_file_in_repository
+    #from ._github_utilities import get_conversation_on_issue, get_diff_of_pull_request, get_file_in_repository
 
     # Regex to find URLs in the discussion
     url_pattern = r'(https?://[^\s]+)'
@@ -278,7 +278,7 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
                     issue_number = int(parts[-1])
                 except:
                     continue
-                additional_content[url] = get_conversation_on_issue(repo, issue_number)
+                additional_content[url] = Config.git_utilities.get_conversation_on_issue(repo, issue_number)
             elif url_type == 'pull_request':
                 parts = url.split('/')
                 repo = parts[3] + '/' + parts[4]
@@ -288,14 +288,14 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
                     continue
 
                 # Get both the diff and discussion on pull request
-                additional_content[url] = (get_conversation_on_issue(repo, pr_number) +
-                                           get_diff_of_pull_request(repo, pr_number))
+                additional_content[url] = (Config.git_utilities.get_conversation_on_issue(repo, pr_number) +
+                                           Config.git_utilities.get_diff_of_pull_request(repo, pr_number))
             elif url_type == 'file':
                 parts = url.split('/')
                 repo = parts[3] + '/' + parts[4]
                 branch_name = parts[6]
                 file_path = '/'.join(parts[7:])
-                file_contents = get_file_in_repository (repo, branch_name, file_path).decoded_content.decode()
+                file_contents = Config.git_utilities.get_file_in_repository (repo, branch_name, file_path).decoded_content.decode()
                 if url.endswith('.ipynb'):
                     file_contents = erase_outputs_of_code_cells(file_contents)
                 additional_content[url] = file_contents
@@ -406,15 +406,15 @@ def run_cli(command:str, check=False, verbose=False):
 
 
 def deploy(repository, issue):
-    from ._github_utilities import add_comment_to_issue
+    #from ._github_utilities import add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark
     result1 = run_cli("python setup.py sdist bdist_wheel")
     result2 = run_cli("twine upload dist/*")
-    add_comment_to_issue(repository, issue, setup_ai_remark() + remove_ansi_escape_sequences(f"\n# Deployment report\n\n{result1}\n{result2}"))
+    Config.git_utilities.add_comment_to_issue(repository, issue, setup_ai_remark() + remove_ansi_escape_sequences(f"\n# Deployment report\n\n{result1}\n{result2}"))
 
 
 def clean_output(repository, text):
-    from ._github_utilities import get_contributors
+    #from ._github_utilities import get_contributors
     # if all lines start with spaces (except 1st and last), remove those spaces in all lines
     lines = text.split("\n")
     while (True):
@@ -434,7 +434,7 @@ def clean_output(repository, text):
     for i in range(0, len(temp), 2):
         temp[i] = temp[i].replace("@", "@ ")
     text = "```".join(temp)
-    contributors = get_contributors(repository)
+    contributors = Config.git_utilities.get_contributors(repository)
     for c in contributors:
         text = text.replace("@ " + c, "@" + c)
     return text

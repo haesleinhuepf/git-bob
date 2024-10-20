@@ -25,9 +25,11 @@ def command_line_interface():
     if "https://github.com" in Config.git_server_url:
         import git_bob._github_utilities as gu
         Config.git_utilities = gu
+        print("Using gitHUB utilities")
     else:
         import git_bob._gitlab_utilities as gu
         Config.git_utilities = gu
+        print("Using gitLAB utilities")
 
     agent_name = os.environ.get("GIT_BOB_AGENT_NAME", "git-bob")
 
