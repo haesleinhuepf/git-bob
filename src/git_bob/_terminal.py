@@ -21,11 +21,19 @@ def command_line_interface():
     timeout_in_seconds = os.environ.get("TIMEOUT_IN_SECONDS", 900) # 15 minutes
     Config.llm_name = os.environ.get("GIT_BOB_LLM_NAME", "gpt-4o-2024-08-06")
     Config.run_id = os.environ.get("GITHUB_RUN_ID", None)
+    Config.git_server_url = os.environ.get("GIT_SERVER_URL", "https://github.com/")
+    if "https://github.com" in Config.git_server_url:
+        import git_bob._github_utilities as gu
+        Config.git_utilities = gu
+    else:
+        import git_bob._gitlab_utilities as gu
+        Config.git_utilities = gu
 
     agent_name = os.environ.get("GIT_BOB_AGENT_NAME", "git-bob")
 
     from git_bob import __version__
     Log().log(f"I am {agent_name} " + str(__version__))
+    Log().log(f"Accessing {Config.git_server_url}")
 
 
     prompt_handlers = init_prompt_handlers()
@@ -44,13 +52,13 @@ def command_line_interface():
     task = sys.argv[1]
 
     # test if we're running in the github-CI
-    running_in_github_ci = task.endswith("-action")
-    Config.running_in_github_ci = running_in_github_ci
+    Config.running_in_github_ci = task.endswith("-action") and "https://github.com" in Config.git_server_url
+    Config.running_in_gitlab_ci = task.endswith("-action") and not "https://github.com" in Config.git_server_url
     task = task.replace("-action", "")
 
     # setting timeout
-    if running_in_github_ci:
-        print(f"Running in GitHub-CI. Setting timeout to {timeout_in_seconds / 60} minutes.")
+    if Config.running_in_github_ci or Config.running_in_gitlab_ci:
+        print(f"Running in CI. Setting timeout to {timeout_in_seconds / 60} minutes.")
         # in case we run in the github-CI, we set a timeout
         def handler(signum, frame):
             print("Process timed out")
@@ -60,14 +68,23 @@ def command_line_interface():
 
     # determine need to respond and access rights
     repository = sys.argv[2] if len(sys.argv) > 2 else None
-    issue = int(sys.argv[3]) if len(sys.argv) > 3 else None
+    issue_str = sys.argv[3] if len(sys.argv) > 3 else None
+    if issue_str.startswith("!"):
+        Config.is_pull_request = True
+        pull_request = int(issue_str)
+        issue_str = issue_str[1:]
+    else:
+        pull_request = None
+        Config.is_pull_request = False
+    issue = int(issue_str) if len(sys.argv) > 3 else None
     if issue is None:
-        issue = get_most_recently_commented_issue(repository)
+        # todo: remove this and fail here instead https://github.com/haesleinhuepf/git-bob/issues/385
+        issue = Config.git_utilities.get_most_recently_commented_issue(repository)
 
     Config.repository = repository
     Config.issue = issue
 
-    user, text = get_most_recent_comment_on_issue(repository, issue)
+    user, text = Config.git_utilities.get_most_recent_comment_on_issue(repository, issue)
     text = text.lower()
 
     print("text: ", text)
@@ -109,7 +126,7 @@ def command_line_interface():
     text = text.replace(f"{agent_name} apply", f"{agent_name} solve")
 
     # determine task to do
-    if running_in_github_ci:
+    if Config.running_in_github_ci or Config.running_in_gitlab_ci:
         if not (f"{agent_name} comment" in text or f"{agent_name} solve" in text or f"{agent_name} try" in text or f"{agent_name} split" in text or f"{agent_name} deploy" in text):
             print("They didn't speak to me. I show myself out:", text)
             sys.exit(0)
@@ -117,7 +134,7 @@ def command_line_interface():
         if ai_remark in text:
             print("No need to respond to myself. I show myself out.")
             sys.exit(0)
-        if not check_access_and_ask_for_approval(user, repository, issue):
+        if not Config.git_utilities.check_access_and_ask_for_approval(user, repository, issue):
             sys.exit(1)
     else:
         # when running from terminal (e.g. for development), we modify the text to include the command from the terminal
@@ -136,21 +153,22 @@ def command_line_interface():
     quick_first_response(repository, issue)
 
     # determine if it is a PR
-    repo = get_repository_handle(repository)
-    try:
-        pull_request = repo.get_pull(issue)
-        base_branch = pull_request.head.ref
-        print("Issue is a a PR - switching to the branch", base_branch)
-        run_cli("git fetch --all", verbose=True)
-        run_cli(f"git checkout -b {base_branch} origin/{base_branch}", verbose=True)
+    if Config.running_in_github_ci:
+        repo = Config.git_utilities.get_repository_handle(repository)
+        try:
+            pull_request = repo.get_pull(issue)
+            base_branch = pull_request.head.ref
+            print("Issue is a a PR - switching to the branch", base_branch)
+            run_cli("git fetch --all", verbose=True)
+            run_cli(f"git checkout -b {base_branch} origin/{base_branch}", verbose=True)
 
-        # Extract source (head) and target (base) branches
-        base_branch = pull_request.head.ref
-        #target_branch = pull_request.base.ref
-    except UnknownObjectException:
-        print("Issue is a not a PR")
-        pull_request = None
-        base_branch = repo.default_branch
+            # Extract source (head) and target (base) branches
+            #base_branch = pull_request.head.ref
+            #target_branch = pull_request.base.ref
+        except UnknownObjectException:
+            print("Issue is a not a PR")
+            pull_request = None
+            base_branch = repo.default_branch
 
     # execute the task
     if f"{agent_name} comment" in text:

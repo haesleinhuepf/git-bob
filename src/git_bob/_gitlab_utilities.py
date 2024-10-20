@@ -21,8 +21,10 @@ def get_repository_handle(repository):
     gitlab.v4.objects.Project
         The GitLab project object.
     """
+    from ._utilities import Config
     access_token = os.getenv('GITLAB_API_KEY')
-    gl = gitlab.Gitlab(private_token=access_token)
+    git_server_url = Config.git_server_url
+    gl = gitlab.Gitlab(url=git_server_url, private_token=access_token)
     return gl.projects.get(repository)
 
 def add_comment_to_issue(repository, issue, comment):

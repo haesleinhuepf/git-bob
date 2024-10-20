@@ -51,6 +51,10 @@ class Config:
     repository = None
     issue = None
     running_in_github_ci = None
+    running_in_gitlab_ci = None
+    git_server_url = None
+    git_utilities = None
+    is_pull_request = None
 
 
 class ErrorReporting:
@@ -184,9 +188,11 @@ def is_github_url(url):
     """
     Check if the given URL is a GitHub URL and determine its type.
     """
-    if not str(url).startswith('https://github.com'):
+    if not str(url).startswith(Config.git_server_url):
         return None
     if "/.github" in url:
+        return None
+    if ".gitlab-ci.yml" in url:
         return None
     if '/issues/' in url:
         return 'issue'
@@ -441,6 +447,7 @@ SENSIBLE_ENV_KEYS = ["ANTHROPIC_API_KEY",
                     "KISSKI_API_KEY",
                     "BLABLADOR_API_KEY",
                     "GITHUB_API_KEY",
+                    "GITLAB_API_KEY",
                     "TWINE_USERNAME",
                     "TWINE_PASSWORD"]
 

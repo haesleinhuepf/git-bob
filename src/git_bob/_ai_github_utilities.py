@@ -22,7 +22,7 @@ def setup_ai_remark():
     model = Config.llm_name
     run_id = Config.run_id
     repository = Config.repository
-    if run_id is not None:
+    if run_id is not None and Config.running_in_github_ci:
         link = f""", [log](https://github.com/{repository}/actions/runs/{run_id})"""
     else:
         link = ""
@@ -466,7 +466,7 @@ Respond with the actions as JSON list.
         for filename_key in ["filename", "new_filename", "old_filename", "target_filename"]:
             if filename_key in instruction.keys():
                 filename = instruction[filename_key]
-                if ".github" in filename:
+                if ".github" in filename or ".gitlab" in filename:
                     errors.append(f"Error processing {filename}: Modifying workflow files is not allowed.")
                     continue
 
@@ -518,12 +518,13 @@ Respond with the actions as JSON list.
     commit_messages_prompt = "* " + "\n* ".join(commit_messages)
 
     from ._ai_github_utilities import setup_ai_remark
+    from ._utilities import Config
     remark = setup_ai_remark() + "\n\n"
 
     link_files_task = f"""
 If there are image files created, use the markdown syntax ![](url) to display them.
 If there other new files created, add markdown links to them. 
-For file and image urls, prefix them with the repository name and the branch name: https://github.com/{repository}/blob/{branch_name}/
+For file and image urls, prefix them with the repository name and the branch name: {Config.git_server_url}{repository}/blob/{branch_name}/
 For image urls, append "?raw=true" by the end of the url to display the image directly. Again, you MUST use the ![]() markdown syntax for image files.
 """
 
