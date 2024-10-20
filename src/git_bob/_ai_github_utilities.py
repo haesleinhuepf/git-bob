@@ -512,11 +512,17 @@ Respond with the actions as JSON list.
     from ._utilities import Config
     remark = setup_ai_remark() + "\n\n"
 
+    if Config.running_in_github_ci:
+        url_template = f"""{Config.git_server_url}{repository}/blob/{branch_name}/
+For image urls, append "?raw = true" by the end of the url to display the image directly. """
+    elif Config.running_in_gitlab_ci:
+        url_template = f"{Config.git_server_url}{Config.git_server_url}{repository}/-/raw/{branch_name}/\n"
+
     link_files_task = f"""
 If there are image files created, use the markdown syntax ![](url) to display them.
 If there other new files created, add markdown links to them. 
-For file and image urls, prefix them with the repository name and the branch name: {Config.git_server_url}{repository}/blob/{branch_name}/
-For image urls, append "?raw=true" by the end of the url to display the image directly. Again, you MUST use the ![]() markdown syntax for image files.
+For file and image urls, prefix them with the repository name and the branch name: {url_template}
+Again, you MUST use the ![]() markdown syntax for image files.
 """
 
     if branch_name != base_branch:
