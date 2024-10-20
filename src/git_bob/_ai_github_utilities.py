@@ -50,14 +50,14 @@ def comment_on_issue(repository, issue, prompt_function):
     Log().log(f"-> comment_on_issue({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, list_repository_files, \
         get_repository_file_contents
-    from ._utilities import text_to_json, modify_discussion, clean_output, redact_text
+    from ._utilities import text_to_json, modify_discussion, clean_output, redact_text, Config
 
     ai_remark = setup_ai_remark()
 
-    discussion = modify_discussion(get_conversation_on_issue(repository, issue))
+    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue))
     print("Discussion:", discussion)
 
-    all_files = "* " + "\n* ".join(list_repository_files(repository))
+    all_files = "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository))
 
     relevant_files = prompt_function(f"""
 {SYSTEM_PROMPT}
@@ -78,7 +78,7 @@ Respond with the filenames as JSON list.
 """)
     filenames = text_to_json(relevant_files)
 
-    file_content_dict = get_repository_file_contents(repository, "main", filenames)
+    file_content_dict = Config.git_utilities.get_repository_file_contents(repository, "main", filenames)
 
     temp = []
     for k, v in file_content_dict.items():
@@ -110,7 +110,7 @@ Just respond to the discussion.
 
     print("comment:", comment)
 
-    add_comment_to_issue(repository, issue, f"""        
+    Config.git_utilities.add_comment_to_issue(repository, issue, f"""        
 {ai_remark}
 
 {comment}
@@ -132,14 +132,14 @@ def review_pull_request(repository, issue, prompt_function):
     """
     Log().log(f"-> review_pull_request({repository}, {issue})")
     from ._github_utilities import get_conversation_on_issue, add_comment_to_issue, get_diff_of_pull_request
-    from ._utilities import modify_discussion, clean_output, redact_text
+    from ._utilities import modify_discussion, clean_output, redact_text, Config
 
     ai_remark = setup_ai_remark()
 
-    discussion = modify_discussion(get_conversation_on_issue(repository, issue))
+    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue))
     print("Discussion:", discussion)
 
-    file_changes = get_diff_of_pull_request(repository, issue)
+    file_changes = Config.git_utilities.get_diff_of_pull_request(repository, issue)
 
     print("file_changes:", file_changes)
 
@@ -168,7 +168,7 @@ Just respond to the discussion.
 
     print("comment:", comment)
 
-    add_comment_to_issue(repository, issue, f"""        
+    Config.git_utilities.add_comment_to_issue(repository, issue, f"""        
 {ai_remark}
 
 {comment}
@@ -190,8 +190,9 @@ def summarize_github_issue(repository, issue, prompt_function):
     """
     Log().log(f"-> summarize_github_issue({repository}, {issue})")
     from ._github_utilities import get_issue_details
+    from ._utilities import Config
 
-    issue_conversation = get_issue_details(repository, issue)
+    issue_conversation = Config.git_utilities.get_issue_details(repository, issue)
 
     summary = prompt_function(f"""
 Summarize the most important details of this issue #{issue} in the repository {repository}. 
@@ -229,7 +230,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         check_if_file_exists, get_file_in_repository, decode_file
     from ._utilities import remove_outer_markdown, split_content_and_summary, erase_outputs_of_code_cells, \
         restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, \
-        restore_environment, redact_text
+        restore_environment, redact_text, Config
     import os
 
 
@@ -244,8 +245,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         elif filename.endswith('.ipynb'):
             format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors. Return the notebook in JSON format!"
 
-        if check_if_file_exists(repository, branch_name, filename):
-            file_content = decode_file(get_file_in_repository(repository, branch_name, filename))
+        if Config.git_utilities.check_if_file_exists(repository, branch_name, filename):
+            file_content = Config.git_utilities.decode_file(Config.git_utilities.get_file_in_repository(repository, branch_name, filename))
             print(filename, "will be overwritten")
             if filename.endswith('.ipynb'):
                 print("Removing outputs from ipynb file")
@@ -352,7 +353,7 @@ Notebook:
                             created_files.append(file)
                             with open(file, 'rb') as f:
                                 file_content2 = f.read()
-                                write_file_in_branch(repository, branch_name, f"{file}", file_content2, f"Adding {path_without_filename}/{file} created by notebook")
+                                Config.git_utilities.write_file_in_branch(repository, branch_name, f"{file}", file_content2, f"Adding {path_without_filename}/{file} created by notebook")
                     print("------------------------")
 
             except Exception as e:
@@ -370,7 +371,7 @@ Notebook:
             break
         print(f"An error happened. Retrying... {attempt+1}/{number_of_attempts}")
 
-    write_file_in_branch(repository, branch_name, filename, new_content + "\n", redact_text(commit_message))
+    Config.git_utilities.write_file_in_branch(repository, branch_name, filename, new_content + "\n", redact_text(commit_message))
 
     return commit_message + "\n\nCreated files:\n* " + "\n* ".join(created_files)
 
@@ -403,16 +404,17 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
         copy_file_in_repository, download_to_repository, add_comment_to_issue, \
         get_repository_handle
     from ._utilities import remove_outer_markdown, split_content_and_summary, text_to_json, modify_discussion, \
-        remove_ansi_escape_sequences, clean_output, redact_text
+        remove_ansi_escape_sequences, clean_output, redact_text, Config
     from github.GithubException import GithubException
+    from gitlab.exceptions import GitlabCreateError
     import traceback
 
-    repo = get_repository_handle(repository)
+    repo = Config.git_utilities.get_repository_handle(repository)
 
-    discussion = modify_discussion(get_conversation_on_issue(repository, issue))
+    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue))
     print("Discussion:", discussion)
 
-    all_files = "* " + "\n* ".join(list_repository_files(repository))
+    all_files = "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository))
 
     modifications = prompt_function(f"""
 Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files need to be modified, renamed or deleted to solve the issue.
@@ -444,9 +446,9 @@ Respond with the actions as JSON list.
     instructions = text_to_json(modifications)
 
     # create a new branch
-    if base_branch is None or base_branch == repo.get_branch(repo.default_branch).name:
+    if base_branch is None or base_branch == Config.git_utilities.get_default_branch_name(repository):
         # create a new branch
-        branch_name = create_branch(repository, parent_branch=base_branch)
+        branch_name = Config.git_utilities.create_branch(repository, parent_branch=base_branch)
         print("Created branch", branch_name)
     else:
         # continue on the current branch
@@ -473,27 +475,27 @@ Respond with the actions as JSON list.
         try:
             if action == 'create' or action == 'modify':
                 filename = instruction['filename'].strip("/")
-                message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
+                message = filename + ":" + Config.git_utilities.create_or_modify_file(repository, issue, filename, branch_name, discussion,
                                                                  prompt_function)
                 commit_messages.append(message)
             elif action == 'download':
                 source_url = instruction['source_url']
                 target_filename = instruction['target_filename'].strip("/")
-                download_to_repository(repository, branch_name, source_url, target_filename)
+                Config.git_utilities.download_to_repository(repository, branch_name, source_url, target_filename)
                 commit_messages.append(f"Downloaded {source_url}, saved as {target_filename}.")
             elif action == 'rename':
                 old_filename = instruction['old_filename'].strip("/")
                 new_filename = instruction['new_filename'].strip("/")
-                rename_file_in_repository(repository, branch_name, old_filename, new_filename)
+                Config.git_utilities.rename_file_in_repository(repository, branch_name, old_filename, new_filename)
                 commit_messages.append(f"Renamed {old_filename} to {new_filename}.")
             elif action == 'delete':
                 filename = instruction['filename'].strip("/")
-                delete_file_from_repository(repository, branch_name, filename)
+                Config.git_utilities.delete_file_from_repository(repository, branch_name, filename)
                 commit_messages.append(f"Deleted {filename}.")
             elif action == 'copy':
                 old_filename = instruction['old_filename'].strip("/")
                 new_filename = instruction['new_filename'].strip("/")
-                copy_file_in_repository(repository, branch_name, old_filename, new_filename)
+                Config.git_utilities.copy_file_in_repository(repository, branch_name, old_filename, new_filename)
                 commit_messages.append(f"Copied {old_filename} to {new_filename}.")
         except Exception as e:
             traces = "    " + remove_ansi_escape_sequences(traceback.format_exc()).replace("\n", "\n    ")
@@ -512,12 +514,11 @@ Respond with the actions as JSON list.
     print(error_messages)
 
     # get a diff of all changes
-    diffs_prompt = get_diff_of_branches(repository, branch_name, base_branch=base_branch)
+    diffs_prompt = Config.git_utilities.get_diff_of_branches(repository, branch_name, base_branch=base_branch)
 
     # summarize the changes
     commit_messages_prompt = "* " + "\n* ".join(commit_messages)
 
-    from ._ai_github_utilities import setup_ai_remark
     from ._utilities import Config
     remark = setup_ai_remark() + "\n\n"
 
@@ -563,13 +564,16 @@ Do not add headline or any other formatting. Just respond with the paragraph and
         full_report = remark + clean_output(repository, pull_request_description) + error_messages
 
         try:
-            send_pull_request(repository,
+            Config.git_utilities.send_pull_request(repository,
                           source_branch=branch_name,
                           target_branch=base_branch,
                           title=redact_text(pull_request_title),
                           description=redact_text(full_report) + f"\n\ncloses #{issue}")
         except GithubException as e:
-            add_comment_to_issue(repository, issue, f"{remark}Error creating pull-request: {e}{error_messages}")
+            Config.git_utilities.add_comment_to_issue(repository, issue, f"{remark}Error creating pull-request: {e}{error_messages}")
+        except GitlabCreateError as e:
+            Config.git_utilities.add_comment_to_issue(repository, issue, f"{remark}Error creating pull-request: {e}{error_messages}")
+
     else:
         modification_summary = prompt_function(f"""
 {SYSTEM_PROMPT}
@@ -587,7 +591,7 @@ Summarize the changes above to a one paragraph.
 Do not add headline or any other formatting. Just respond with the paragraphe below.
 """)
 
-        add_comment_to_issue(repository, issue, remark + redact_text(clean_output(repository, modification_summary)) + redact_text(error_messages))
+        Config.git_utilities.add_comment_to_issue(repository, issue, remark + redact_text(clean_output(repository, modification_summary)) + redact_text(error_messages))
 
 def split_issue_in_sub_issues(repository, issue, prompt_function):
     """
@@ -601,10 +605,10 @@ def split_issue_in_sub_issues(repository, issue, prompt_function):
         The main issue number.
     """
     Log().log(f"-> split_issue_in_sub_issues({repository}, {issue},...)")
-    from ._utilities import text_to_json
+    from ._utilities import text_to_json, Config
     from ._github_utilities import create_issue, add_comment_to_issue, get_conversation_on_issue
 
-    discussion = get_conversation_on_issue(repository, issue)
+    discussion = Config.git_utilities.get_conversation_on_issue(repository, issue)
     ai_remark = setup_ai_remark()+ "\n"
 
     # Implement the prompt to parse the discussion
@@ -653,6 +657,6 @@ Do not explain your response or anything else. Just respond the relevant informa
     # Create a comment on the main issue with the list of sub-issues
     sub_issue_links = "\n".join([f"- #{num}" for num in sub_issue_numbers])
     comment_text = f"Sub-issues have been created:\n{sub_issue_links}"
-    add_comment_to_issue(repository, issue, ai_remark + comment_text)
+    Config.git_utilities.add_comment_to_issue(repository, issue, ai_remark + comment_text)
 
     return sub_issue_numbers
