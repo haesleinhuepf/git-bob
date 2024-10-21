@@ -491,20 +491,18 @@ def file_list_from_commit_message_dict(repository, branch_name, commit_messages)
     list_of_links = []
     for k, v in commit_messages.items():
 
-        if Config.running_in_github_ci:
+        if "https://github.com/" in Config.git_server_url:
             url_template = f"{Config.git_server_url}{repository}/blob/{branch_name}/"
-        elif Config.running_in_gitlab_ci:
-            url_template = f"{Config.git_server_url}{repository}/-/blob/{branch_name}/"
         else:
-            url_template = ""
+            url_template = f"{Config.git_server_url}{repository}/-/blob/{branch_name}/"
 
         suffix = ""
         prefix = ""
         if k.endswith(".png") or k.endswith(".jpg") or k.endswith(".gif"):
             prefix = "!"
-            if Config.running_in_github_ci:
+            if "https://github.com/" in Config.git_server_url:
                 suffix = "?raw=true"
-            elif Config.running_in_gitlab_ci:
+            else:
                 url_template = url_template.replace("/blob/", "/raw/")
 
         list_of_links.append(f"{prefix}[{k}]({url_template}{k}{suffix})")
