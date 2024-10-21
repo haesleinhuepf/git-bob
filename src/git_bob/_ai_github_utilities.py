@@ -514,9 +514,9 @@ Respond with the actions as JSON list.
     file_list_text = ""
     for md_link in file_list:
         if md_link.startswith("!"):
-            file_list_text = file_list_text + "* " + md_link[1:] + ": <explanation>\n\n" + md_link + "\n\n"
+            file_list_text = file_list_text + "* " + md_link[1:] + " <explanation>\n\n" + md_link + "\n\n"
         else:
-            file_list_text = file_list_text + "* " + md_link[1:] + ": <explanation>\n\n"
+            file_list_text = file_list_text + "* " + md_link[1:] + " <explanation>\n\n"
 
     from ._utilities import Config
     remark = setup_ai_remark() + "\n\n"
@@ -559,6 +559,7 @@ Do not add headlines or any other formatting. Just respond with the paragraph, t
         pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
 
         pull_request_description = ensure_images_shown(pull_request_description, file_list)
+        pull_request_description = pull_request_description.replace("\n* ![", "\n![")
 
         full_report = remark + clean_output(repository, pull_request_description) + error_messages
 
