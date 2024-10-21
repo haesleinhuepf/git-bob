@@ -531,7 +531,7 @@ Respond with the actions as JSON list.
         pull_request_summary = prompt_function(f"""
 {SYSTEM_PROMPT}
 Given a Github issue description, a list of commit messages, a git diff and a list of mark-down links, summarize the changes you made in the files.
-Add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
+Add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file. Keep the list as it is otherwise.
 You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
 
 ## Github Issue #{issue} Discussion
@@ -555,7 +555,7 @@ The following changes were made in the files:
 ## Your task
 
 Summarize the changes above to a one paragraph which will be Github pull-request message. 
-Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
+Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file. Keep the list as it is otherwise.
 
 Afterwards, summarize the summary in a single line, which will become the title of the pull-request.
 Do not add headlines or any other formatting. Just respond with the paragraph, the list of markdown links with explanations and the title in a new line below.
