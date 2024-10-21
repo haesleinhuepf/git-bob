@@ -412,6 +412,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
 
     modifications = prompt_function(f"""
 Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files need to be modified, renamed or deleted to solve the issue.
+In case the task is to analyse data, create synthetic data, or draw a plot, consider creating a notebook for this.
 
 ## Github Issue #{issue} Discussion
 
@@ -432,7 +433,6 @@ Response format:
 - For downloads: {{"action": "download", "source_url": "...", "target_filename": "..."}}
 - For renames: {{"action": "rename", "old_filename": "...", "new_filename": "..."}}
 - For copies: {{"action": "copy", "old_filename": "...", "new_filename": "..."}}
-- For executions: {{"action": "execute", "filename": "..."}}
 - For deletions: {{"action": "delete", "filename": "..."}}
 Respond with the actions as JSON list.
 """)
