@@ -515,7 +515,7 @@ Respond with the actions as JSON list.
     # summarize the changes
     commit_messages_prompt = "* " + "\n* ".join([f"{k}: {v}" for k,v in commit_messages.items()])
 
-    file_list = file_list_from_commit_message_dict(commit_messages)
+    file_list = file_list_from_commit_message_dict(repository, branch_name, commit_messages)
     file_list_text = ""
     for md_link in file_list:
         if md_link.startswith("!"):
