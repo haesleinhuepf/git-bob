@@ -11,7 +11,7 @@ For demonstration purposes, a [playground repository on gitlab.com](https://gitl
 * Add the [.gitlab-ci.yml](../.gitlab/.gitlab-ci.yml) to the root folder of your repository. 
   In this file, make the following modifications:
   * If you are working with an own gitlab instance, modify the variable `GIT_SERVER_URL`. Enter the url of your server and finish with "/".
-  * In the line `- pip install git-bob==0.10.1` consider updating the version number.
+  * In the line `- pip install git-bob==0.11.0` consider updating the version number.
 * Add a requirements.txt (or remove the line `- pip install -r requirements.txt`) from the yml file.
 
 ## Setting access tokens
