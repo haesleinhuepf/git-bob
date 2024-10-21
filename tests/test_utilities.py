@@ -198,3 +198,27 @@ def test_ensure_images_shown():
     """
 
     assert reference == ensure_images_shown(test, liste)
+
+
+def test_get_modified_files():
+    from git_bob._utilities import get_file_info, get_modified_files
+
+    file_info = get_file_info()
+
+    with open("test.txt", 'w') as f:
+        f.write("hello")
+    with open("docs/test.md", 'w') as f:
+        f.write("world")
+    with open("docs/installation-tutorial.md", "r") as f:
+        content = f.read()
+    with open("docs/installation-tutorial.md", "w") as f:
+        f.write(content)
+
+    files = get_modified_files(file_info)
+
+    assert "test.txt" in files
+    assert "docs/test.md" in files
+    assert "docs/installation-tutorial.md" in files
+
+    assert len(files) == 3
+

@@ -520,3 +520,33 @@ def ensure_images_shown(markdown, list_of_markdown_image_links):
                 markdown = markdown.replace(i[1:], i)
     return markdown
 
+
+def get_file_info(root_dir='.'):
+    """Get a dictionary of files with their last change dates"""
+    import os
+    file_info = {}
+    for root, dirs, files in os.walk(root_dir):
+        for file in files:
+            file_path = os.path.join(root, file)
+            file_info[file_path] = os.path.getmtime(file_path)
+    return file_info
+
+def get_modified_files(old_file_info, root_dir='.'):
+    """Get a list of modified files since get_file_info was called"""
+    import os
+    modified_files = []
+    for root, dirs, files in os.walk(root_dir):
+        for file in files:
+            file_path = os.path.join(root, file)
+            if file_path not in old_file_info:
+                modified_files.append(file_path)  # New file
+            elif os.path.getmtime(file_path) != old_file_info[file_path]:
+                modified_files.append(file_path)  # Modified file
+
+    result = []
+    for m in modified_files:
+        m = m.replace("\\", "/")
+        if m.startswith("./"):
+            m = m[2:]
+        result.append(m)
+    return result

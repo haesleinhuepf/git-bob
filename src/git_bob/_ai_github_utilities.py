@@ -229,7 +229,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
     from ._utilities import split_content_and_summary, erase_outputs_of_code_cells, \
         restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, \
-        restore_environment, redact_text, Config
+        restore_environment, redact_text, Config, get_file_info, get_modified_files
     import os
 
     created_files = {}
@@ -329,31 +329,25 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
 
             not_executed_notebook = new_content
 
+            # read existing files + creation dates recursively
+            file_info = get_file_info()
+
             # Execute the notebook
             try:
                 new_content, error_message = execute_notebook(new_content)
                 restore_environment(saved_environment)
-                if error_message is None:
-                    # scan for files the notebook created
-                    list_of_files_text = prompt_function(f"""
-Extract a list of filenames including path from the following jupyter notebook. 
-The path should be relative from the repository root, not from the notebooks's postion. 
-The position of the notebook is {filename}.
-Return the list as a JSON list and nothing else.
 
-Notebook:
-{not_executed_notebook}
-            """)
-                    list_of_files = text_to_json(list_of_files_text)
-                    print("------------------------")
-                    for file in list_of_files:
-                        print("File created by notebook:", file, os.path.exists(file))
-                        if os.path.exists(file):
-                            created_files[file] = f"Adding {path_without_filename}/{file} created by notebook"
-                            with open(file, 'rb') as f:
-                                file_content2 = f.read()
-                                Config.git_utilities.write_file_in_branch(repository, branch_name, f"{file}", file_content2, created_files[file])
-                    print("------------------------")
+                # scan for files the notebook created
+                list_of_files = get_modified_files(file_info)
+                print("------------------------")
+                for file in list_of_files:
+                    print("File created by notebook:", file, os.path.exists(file))
+                    if os.path.exists(file):
+                        created_files[file] = f"Adding {path_without_filename}/{file} created by notebook"
+                        with open(file, 'rb') as f:
+                            file_content2 = f.read()
+                            Config.git_utilities.write_file_in_branch(repository, branch_name, f"{file}", file_content2, created_files[file])
+                print("------------------------")
 
             except Exception as e:
                 raise ValueError(f"Error during notebook execution: {e}")
