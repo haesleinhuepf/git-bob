@@ -526,20 +526,11 @@ Respond with the actions as JSON list.
     from ._utilities import Config
     remark = setup_ai_remark() + "\n\n"
 
-
-
-    link_files_task = f"""
-If there are image files created, use the markdown syntax ![](url) to display them.
-If there other new files created, add markdown links to them. 
-For file and image urls, prefix them with the repository name and the branch name: {url_template}
-Again, you MUST use the ![]() markdown syntax for image files.
-"""
-
     if branch_name != base_branch:
 
         pull_request_summary = prompt_function(f"""
 {SYSTEM_PROMPT}
-Given an Github issue description, list of commit messages, a git diff and a list of mark-down links, summarize the changes you made in the files.
+Given a Github issue description, a list of commit messages, a git diff and a list of mark-down links, summarize the changes you made in the files.
 Add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
 You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
 
@@ -559,7 +550,7 @@ The following changes were made in the files:
 
 ## List of links
 
-{link_files_task}
+{file_list_text}
 
 ## Your task
 
@@ -588,16 +579,26 @@ Do not add headlines or any other formatting. Just respond with the paragraph, t
     else:
         modification_summary = prompt_function(f"""
 {SYSTEM_PROMPT}
-Given a list of commit messages, summarize the changes you made.
+Given a Github issue description, a list of commit messages, and a list of mark-down links, summarize the changes you made in the files.
+Add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
+You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
+
+## Github Issue #{issue} Discussion
+
+{discussion}
 
 ## Commit messages
 You committed these changes to these files
 
 {commit_messages_prompt}
 
+## List of links
+
+{file_list_text}
+
 ## Your task
 Summarize the changes above to a one paragraph.
-{link_files_task}
+Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
 
 Do not add headline or any other formatting. Just respond with the paragraphe below.
 """)
