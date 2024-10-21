@@ -398,7 +398,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     Log().log(f"-> solve_github_issue({repository}, {issue})")
 
     from ._utilities import split_content_and_summary, text_to_json, modify_discussion, \
-        remove_ansi_escape_sequences, clean_output, redact_text, Config
+        remove_ansi_escape_sequences, clean_output, redact_text, Config, file_list_from_commit_message_dict
     from github.GithubException import GithubException
     from gitlab.exceptions import GitlabCreateError
     import traceback
