@@ -145,3 +145,39 @@ def test_saved_environment():
     restore_environment(saved_env)
     assert saved_env.get("TEST_KEY") is not None
 
+
+def test_file_list_from_commit_message_dict_github():
+    from git_bob._utilities import file_list_from_commit_message_dict, Config
+    Config.running_in_gitlab_ci = False
+    Config.running_in_github_ci = True
+    Config.git_server_url = "https://github.com/"
+    repository = "haesleinhuepf/git-bob"
+    branch_name = "test"
+    commit_message_dict = {"new_image.png":"added image",
+                           "text_file.txt":"modified text",
+                           "playground/plot.jpg":"new plot"}
+
+    result = file_list_from_commit_message_dict(repository, branch_name, commit_message_dict)
+
+    assert len(result) == 3
+    assert "![new_image.png](https://github.com/haesleinhuepf/git-bob/blob/test/new_image.png?raw=true)" in result
+    assert "[text_file.txt](https://github.com/haesleinhuepf/git-bob/blob/test/text_file.txt)" in result
+    assert "![playground/plot.jpg](https://github.com/haesleinhuepf/git-bob/blob/test/playground/plot.jpg?raw=true)" in result
+
+def test_file_list_from_commit_message_dict_gitlab():
+    from git_bob._utilities import file_list_from_commit_message_dict, Config
+    Config.running_in_gitlab_ci = True
+    Config.running_in_github_ci = False
+    Config.git_server_url = "https://gitlab.com/"
+    repository = "haesleinhuepf/git-bob"
+    branch_name = "test"
+    commit_message_dict = {"new_image.png":"added image",
+                           "text_file.txt":"modified text",
+                           "playground/plot.jpg":"new plot"}
+
+    result = file_list_from_commit_message_dict(repository, branch_name, commit_message_dict)
+
+    assert len(result) == 3
+    assert "![new_image.png](https://gitlab.com/haesleinhuepf/git-bob/-/raw/test/new_image.png)" in result
+    assert "[text_file.txt](https://gitlab.com/haesleinhuepf/git-bob/-/blob/test/text_file.txt)" in result
+    assert "![playground/plot.jpg](https://gitlab.com/haesleinhuepf/git-bob/-/raw/test/playground/plot.jpg)" in result

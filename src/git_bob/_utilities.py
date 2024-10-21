@@ -485,3 +485,27 @@ def redact_text(text):
         if key in os.environ and len(os.environ.get(key)) > 0:
             text = text.replace(os.environ.get(key), "***")
     return text
+
+
+def file_list_from_commit_message_dict(repository, branch_name, commit_messages):
+    list_of_links = []
+    for k, v in commit_messages.items():
+
+        if Config.running_in_github_ci:
+            url_template = f"{Config.git_server_url}{repository}/blob/{branch_name}/"
+        elif Config.running_in_gitlab_ci:
+            url_template = f"{Config.git_server_url}{repository}/-/blob/{branch_name}/"
+        else:
+            url_template = ""
+
+        suffix = ""
+        prefix = ""
+        if k.endswith(".png") or k.endswith(".jpg") or k.endswith(".gif"):
+            prefix = "!"
+            if Config.running_in_github_ci:
+                suffix = "?raw=true"
+            elif Config.running_in_gitlab_ci:
+                url_template = url_template.replace("/blob/", "/raw/")
+
+        list_of_links.append(f"{prefix}[{k}]({url_template}{k}{suffix})")
+    return list_of_links
