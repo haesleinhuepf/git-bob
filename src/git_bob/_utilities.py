@@ -485,3 +485,68 @@ def redact_text(text):
         if key in os.environ and len(os.environ.get(key)) > 0:
             text = text.replace(os.environ.get(key), "***")
     return text
+
+
+def file_list_from_commit_message_dict(repository, branch_name, commit_messages):
+    list_of_links = []
+    for k, v in commit_messages.items():
+
+        if "https://github.com/" in Config.git_server_url:
+            url_template = f"{Config.git_server_url}{repository}/blob/{branch_name}/"
+        else:
+            url_template = f"{Config.git_server_url}{repository}/-/blob/{branch_name}/"
+
+        suffix = ""
+        prefix = ""
+        if k.endswith(".png") or k.endswith(".jpg") or k.endswith(".gif"):
+            prefix = "!"
+            if "https://github.com/" in Config.git_server_url:
+                suffix = "?raw=true"
+            else:
+                url_template = url_template.replace("/blob/", "/raw/")
+
+        list_of_links.append(f"{prefix}[{k}]({url_template}{k}{suffix})")
+    return list_of_links
+
+
+def ensure_images_shown(markdown, list_of_markdown_image_links):
+    """
+    If [bla](bla.png) in markdown, but not ![bla](bla.png), add the ! in front.
+    """
+
+    for i in list_of_markdown_image_links:
+        if i[0] == "!":
+            if i[1:] in markdown and i not in markdown:
+                markdown = markdown.replace(i[1:], i)
+    return markdown
+
+
+def get_file_info(root_dir='.'):
+    """Get a dictionary of files with their last change dates"""
+    import os
+    file_info = {}
+    for root, dirs, files in os.walk(root_dir):
+        for file in files:
+            file_path = os.path.join(root, file)
+            file_info[file_path] = os.path.getmtime(file_path)
+    return file_info
+
+def get_modified_files(old_file_info, root_dir='.'):
+    """Get a list of modified files since get_file_info was called"""
+    import os
+    modified_files = []
+    for root, dirs, files in os.walk(root_dir):
+        for file in files:
+            file_path = os.path.join(root, file)
+            if file_path not in old_file_info:
+                modified_files.append(file_path)  # New file
+            elif os.path.getmtime(file_path) != old_file_info[file_path]:
+                modified_files.append(file_path)  # Modified file
+
+    result = []
+    for m in modified_files:
+        m = m.replace("\\", "/")
+        if m.startswith("./"):
+            m = m[2:]
+        result.append(m)
+    return result

@@ -145,3 +145,80 @@ def test_saved_environment():
     restore_environment(saved_env)
     assert saved_env.get("TEST_KEY") is not None
 
+
+def test_file_list_from_commit_message_dict_github():
+    from git_bob._utilities import file_list_from_commit_message_dict, Config
+    Config.running_in_gitlab_ci = False
+    Config.running_in_github_ci = True
+    Config.git_server_url = "https://github.com/"
+    repository = "haesleinhuepf/git-bob"
+    branch_name = "test"
+    commit_message_dict = {"new_image.png":"added image",
+                           "text_file.txt":"modified text",
+                           "playground/plot.jpg":"new plot"}
+
+    result = file_list_from_commit_message_dict(repository, branch_name, commit_message_dict)
+
+    assert len(result) == 3
+    assert "![new_image.png](https://github.com/haesleinhuepf/git-bob/blob/test/new_image.png?raw=true)" in result
+    assert "[text_file.txt](https://github.com/haesleinhuepf/git-bob/blob/test/text_file.txt)" in result
+    assert "![playground/plot.jpg](https://github.com/haesleinhuepf/git-bob/blob/test/playground/plot.jpg?raw=true)" in result
+
+def test_file_list_from_commit_message_dict_gitlab():
+    from git_bob._utilities import file_list_from_commit_message_dict, Config
+    Config.running_in_gitlab_ci = True
+    Config.running_in_github_ci = False
+    Config.git_server_url = "https://gitlab.com/"
+    repository = "haesleinhuepf/git-bob"
+    branch_name = "test"
+    commit_message_dict = {"new_image.png":"added image",
+                           "text_file.txt":"modified text",
+                           "playground/plot.jpg":"new plot"}
+
+    result = file_list_from_commit_message_dict(repository, branch_name, commit_message_dict)
+
+    assert len(result) == 3
+    assert "![new_image.png](https://gitlab.com/haesleinhuepf/git-bob/-/raw/test/new_image.png)" in result
+    assert "[text_file.txt](https://gitlab.com/haesleinhuepf/git-bob/-/blob/test/text_file.txt)" in result
+    assert "![playground/plot.jpg](https://gitlab.com/haesleinhuepf/git-bob/-/raw/test/playground/plot.jpg)" in result
+
+
+def test_ensure_images_shown():
+    from git_bob._utilities import ensure_images_shown
+
+    test = """
+    * [bla](bla.png)
+    * [blu](blu.txt)
+    """
+    liste = ["![bla](bla.png)", "[blu](blu.txt)"]
+
+    reference = """
+    * ![bla](bla.png)
+    * [blu](blu.txt)
+    """
+
+    assert reference == ensure_images_shown(test, liste)
+
+
+def test_get_modified_files():
+    from git_bob._utilities import get_file_info, get_modified_files
+
+    file_info = get_file_info()
+
+    with open("test.txt", 'w') as f:
+        f.write("hello")
+    with open("docs/test.md", 'w') as f:
+        f.write("world")
+    with open("docs/installation-tutorial.md", "r") as f:
+        content = f.read()
+    with open("docs/installation-tutorial.md", "w") as f:
+        f.write(content)
+
+    files = get_modified_files(file_info)
+
+    assert "test.txt" in files
+    assert "docs/test.md" in files
+    assert "docs/installation-tutorial.md" in files
+
+    assert len(files) == 3
+

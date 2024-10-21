@@ -221,17 +221,22 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         The summary of the issue to solve.
     prompt_function : function
         The function to generate the file modification content.
+
+    Returns
+    -------
+    dictionary of filename: commit_message for all created files
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
     from ._utilities import split_content_and_summary, erase_outputs_of_code_cells, \
         restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, \
-        restore_environment, redact_text, Config
+        restore_environment, redact_text, Config, get_file_info, get_modified_files
     import os
 
-
+    created_files = {}
     for attempt in range(number_of_attempts):
         an_error_happened = False
 
+        created_files = {}
         original_ipynb_file_content = None
 
         format_specific_instructions = ""
@@ -309,7 +314,6 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
             new_content = erase_outputs_of_code_cells(new_content)
             do_execute_notebook = True
 
-        created_files = []
         if do_execute_notebook:
             print("Executing the notebook", len(new_content))
             current_dir = os.getcwd()
@@ -325,31 +329,25 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
 
             not_executed_notebook = new_content
 
+            # read existing files + creation dates recursively
+            file_info = get_file_info()
+
             # Execute the notebook
             try:
                 new_content, error_message = execute_notebook(new_content)
                 restore_environment(saved_environment)
-                if error_message is None:
-                    # scan for files the notebook created
-                    list_of_files_text = prompt_function(f"""
-Extract a list of filenames including path from the following jupyter notebook. 
-The path should be relative from the repository root, not from the notebooks's postion. 
-The position of the notebook is {filename}.
-Return the list as a JSON list and nothing else.
 
-Notebook:
-{not_executed_notebook}
-            """)
-                    list_of_files = text_to_json(list_of_files_text)
-                    print("------------------------")
-                    for file in list_of_files:
-                        print("File created by notebook:", file, os.path.exists(file))
-                        if os.path.exists(file):
-                            created_files.append(file)
-                            with open(file, 'rb') as f:
-                                file_content2 = f.read()
-                                Config.git_utilities.write_file_in_branch(repository, branch_name, f"{file}", file_content2, f"Adding {path_without_filename}/{file} created by notebook")
-                    print("------------------------")
+                # scan for files the notebook created
+                list_of_files = get_modified_files(file_info)
+                print("------------------------")
+                for file in list_of_files:
+                    print("File created by notebook:", file, os.path.exists(file))
+                    if os.path.exists(file):
+                        created_files[file] = f"Adding {path_without_filename}/{file} created by notebook"
+                        with open(file, 'rb') as f:
+                            file_content2 = f.read()
+                            Config.git_utilities.write_file_in_branch(repository, branch_name, f"{file}", file_content2, created_files[file])
+                print("------------------------")
 
             except Exception as e:
                 raise ValueError(f"Error during notebook execution: {e}")
@@ -359,7 +357,6 @@ Notebook:
 
             print("Executed notebook", len(new_content))
 
-        created_files.append(filename)
 
         new_content = redact_text(new_content)
         if not an_error_happened:
@@ -367,8 +364,9 @@ Notebook:
         print(f"An error happened. Retrying... {attempt+1}/{number_of_attempts}")
 
     Config.git_utilities.write_file_in_branch(repository, branch_name, filename, new_content + "\n", redact_text(commit_message))
+    created_files[filename] = redact_text(commit_message)
 
-    return commit_message + "\n\nCreated files:\n* " + "\n* ".join(created_files)
+    return created_files
 
 
 def solve_github_issue(repository, issue, llm_model, prompt_function, base_branch=None):
@@ -394,7 +392,8 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     Log().log(f"-> solve_github_issue({repository}, {issue})")
 
     from ._utilities import split_content_and_summary, text_to_json, modify_discussion, \
-        remove_ansi_escape_sequences, clean_output, redact_text, Config
+        remove_ansi_escape_sequences, clean_output, redact_text, Config, file_list_from_commit_message_dict, \
+        ensure_images_shown
     from github.GithubException import GithubException
     from gitlab.exceptions import GitlabCreateError
     import traceback
@@ -408,6 +407,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
 
     modifications = prompt_function(f"""
 Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files need to be modified, renamed or deleted to solve the issue.
+In case the task is to analyse data, create synthetic data, or draw a plot, consider creating a notebook for this.
 
 ## Github Issue #{issue} Discussion
 
@@ -428,7 +428,6 @@ Response format:
 - For downloads: {{"action": "download", "source_url": "...", "target_filename": "..."}}
 - For renames: {{"action": "rename", "old_filename": "...", "new_filename": "..."}}
 - For copies: {{"action": "copy", "old_filename": "...", "new_filename": "..."}}
-- For executions: {{"action": "execute", "filename": "..."}}
 - For deletions: {{"action": "delete", "filename": "..."}}
 Respond with the actions as JSON list.
 """)
@@ -451,7 +450,7 @@ Respond with the actions as JSON list.
     print("sorted instructions", instructions)
 
     errors = []
-    commit_messages = []
+    commit_messages = {}
     for instruction in instructions:
         action = instruction.get('action')
 
@@ -465,28 +464,30 @@ Respond with the actions as JSON list.
         try:
             if action == 'create' or action == 'modify':
                 filename = instruction['filename'].strip("/")
-                message = filename + ":" + create_or_modify_file(repository, issue, filename, branch_name, discussion,
-                                                                 prompt_function)
-                commit_messages.append(message)
+
+                created_files = create_or_modify_file(repository, issue, filename, branch_name, discussion,
+                                                                      prompt_function)
+                for filename, commit_message in created_files.items():
+                    commit_messages[filename] = commit_message
             elif action == 'download':
                 source_url = instruction['source_url']
                 target_filename = instruction['target_filename'].strip("/")
                 Config.git_utilities.download_to_repository(repository, branch_name, source_url, target_filename)
-                commit_messages.append(f"Downloaded {source_url}, saved as {target_filename}.")
+                commit_messages[target_filename] = f"Downloaded {source_url}, saved as {target_filename}."
             elif action == 'rename':
                 old_filename = instruction['old_filename'].strip("/")
                 new_filename = instruction['new_filename'].strip("/")
                 Config.git_utilities.rename_file_in_repository(repository, branch_name, old_filename, new_filename)
-                commit_messages.append(f"Renamed {old_filename} to {new_filename}.")
+                commit_messages[new_filename] = f"Renamed {old_filename} to {new_filename}."
             elif action == 'delete':
                 filename = instruction['filename'].strip("/")
                 Config.git_utilities.delete_file_from_repository(repository, branch_name, filename)
-                commit_messages.append(f"Deleted {filename}.")
+                commit_messages[filename] = f"Deleted {filename}."
             elif action == 'copy':
                 old_filename = instruction['old_filename'].strip("/")
                 new_filename = instruction['new_filename'].strip("/")
                 Config.git_utilities.copy_file_in_repository(repository, branch_name, old_filename, new_filename)
-                commit_messages.append(f"Copied {old_filename} to {new_filename}.")
+                commit_messages[new_filename] = f"Copied {old_filename} to {new_filename}."
         except Exception as e:
             traces = "    " + remove_ansi_escape_sequences(traceback.format_exc()).replace("\n", "\n    ")
             summary = f"""<details>
@@ -507,30 +508,25 @@ Respond with the actions as JSON list.
     diffs_prompt = Config.git_utilities.get_diff_of_branches(repository, branch_name, base_branch=base_branch)
 
     # summarize the changes
-    commit_messages_prompt = "* " + "\n* ".join(commit_messages)
+    commit_messages_prompt = "* " + "\n* ".join([f"{k}: {v}" for k,v in commit_messages.items()])
+
+    file_list = file_list_from_commit_message_dict(repository, branch_name, commit_messages)
+    file_list_text = ""
+    for md_link in file_list:
+        if md_link.startswith("!"):
+            file_list_text = file_list_text + "* " + md_link[1:] + " <explanation>\n\n" + md_link + "\n\n"
+        else:
+            file_list_text = file_list_text + "* " + md_link[1:] + " <explanation>\n\n"
 
     from ._utilities import Config
     remark = setup_ai_remark() + "\n\n"
-
-    if Config.running_in_github_ci:
-        url_template = f"""{Config.git_server_url}{repository}/blob/{branch_name}/
-For image urls, append "?raw = true" by the end of the url to display the image directly. """
-    elif Config.running_in_gitlab_ci:
-        url_template = f"""{Config.git_server_url}{repository}/-/blob/{branch_name}/
-For image urls, use "/raw/" instead of "/blob/". """
-
-    link_files_task = f"""
-If there are image files created, use the markdown syntax ![](url) to display them.
-If there other new files created, add markdown links to them. 
-For file and image urls, prefix them with the repository name and the branch name: {url_template}
-Again, you MUST use the ![]() markdown syntax for image files.
-"""
 
     if branch_name != base_branch:
 
         pull_request_summary = prompt_function(f"""
 {SYSTEM_PROMPT}
-Given a list of commit messages and a git diff, summarize the changes you made in the files.
+Given a Github issue description, a list of commit messages, a git diff and a list of mark-down links, summarize the changes you made in the files.
+Add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file. Keep the list as it is otherwise.
 You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
 
 ## Github Issue #{issue} Discussion
@@ -547,16 +543,23 @@ The following changes were made in the files:
 
 {diffs_prompt}
 
+## List of links
+
+{file_list_text}
+
 ## Your task
 
-Summarize the changes above to a one paragraph line Github pull-request message. 
-{link_files_task}
+Summarize the changes above to a one paragraph which will be Github pull-request message. 
+Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file. Keep the list as it is otherwise.
 
 Afterwards, summarize the summary in a single line, which will become the title of the pull-request.
-Do not add headline or any other formatting. Just respond with the paragraph and the title in a new line below.
+Do not add headlines or any other formatting. Just respond with the paragraph, the list of markdown links with explanations and the title in a new line below.
 """)
 
         pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
+
+        pull_request_description = ensure_images_shown(pull_request_description, file_list)
+        pull_request_description = pull_request_description.replace("\n* ![", "\n![")
 
         full_report = remark + clean_output(repository, pull_request_description) + error_messages
 
@@ -574,19 +577,31 @@ Do not add headline or any other formatting. Just respond with the paragraph and
     else:
         modification_summary = prompt_function(f"""
 {SYSTEM_PROMPT}
-Given a list of commit messages, summarize the changes you made.
+Given a Github issue description, a list of commit messages, and a list of mark-down links, summarize the changes you made in the files.
+Add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
+You modified the repository {repository} to solve the issue #{issue}, which is also summarized below.
+
+## Github Issue #{issue} Discussion
+
+{discussion}
 
 ## Commit messages
 You committed these changes to these files
 
 {commit_messages_prompt}
 
+## List of links
+
+{file_list_text}
+
 ## Your task
 Summarize the changes above to a one paragraph.
-{link_files_task}
+Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
 
 Do not add headline or any other formatting. Just respond with the paragraphe below.
 """)
+
+        modification_summary = ensure_images_shown(modification_summary, file_list)
 
         Config.git_utilities.add_comment_to_issue(repository, issue, remark + redact_text(clean_output(repository, modification_summary)) + redact_text(error_messages))
 
