@@ -398,7 +398,8 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     Log().log(f"-> solve_github_issue({repository}, {issue})")
 
     from ._utilities import split_content_and_summary, text_to_json, modify_discussion, \
-        remove_ansi_escape_sequences, clean_output, redact_text, Config, file_list_from_commit_message_dict
+        remove_ansi_escape_sequences, clean_output, redact_text, Config, file_list_from_commit_message_dict, \
+        ensure_images_shown
     from github.GithubException import GithubException
     from gitlab.exceptions import GitlabCreateError
     import traceback
@@ -563,6 +564,8 @@ Do not add headlines or any other formatting. Just respond with the paragraph, t
 
         pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
 
+        pull_request_description = ensure_images_shown(pull_request_description, file_list)
+
         full_report = remark + clean_output(repository, pull_request_description) + error_messages
 
         try:
@@ -602,6 +605,8 @@ Below add the list of markdown links but replace <explanation> with a single sen
 
 Do not add headline or any other formatting. Just respond with the paragraphe below.
 """)
+
+        modification_summary = ensure_images_shown(modification_summary, file_list)
 
         Config.git_utilities.add_comment_to_issue(repository, issue, remark + redact_text(clean_output(repository, modification_summary)) + redact_text(error_messages))
 

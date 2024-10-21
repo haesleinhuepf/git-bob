@@ -507,3 +507,16 @@ def file_list_from_commit_message_dict(repository, branch_name, commit_messages)
 
         list_of_links.append(f"{prefix}[{k}]({url_template}{k}{suffix})")
     return list_of_links
+
+
+def ensure_images_shown(markdown, list_of_markdown_image_links):
+    """
+    If [bla](bla.png) in markdown, but not ![bla](bla.png), add the ! in front.
+    """
+
+    for i in list_of_markdown_image_links:
+        if i[0] == "!":
+            if i[1:] in markdown and i not in markdown:
+                markdown = markdown.replace(i[1:], i)
+    return markdown
+

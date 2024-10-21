@@ -181,3 +181,20 @@ def test_file_list_from_commit_message_dict_gitlab():
     assert "![new_image.png](https://gitlab.com/haesleinhuepf/git-bob/-/raw/test/new_image.png)" in result
     assert "[text_file.txt](https://gitlab.com/haesleinhuepf/git-bob/-/blob/test/text_file.txt)" in result
     assert "![playground/plot.jpg](https://gitlab.com/haesleinhuepf/git-bob/-/raw/test/playground/plot.jpg)" in result
+
+
+def test_ensure_images_shown():
+    from git_bob._utilities import ensure_images_shown
+
+    test = """
+    * [bla](bla.png)
+    * [blu](blu.txt)
+    """
+    liste = ["![bla](bla.png)", "[blu](blu.txt)"]
+
+    reference = """
+    * ![bla](bla.png)
+    * [blu](blu.txt)
+    """
+
+    assert reference == ensure_images_shown(test, liste)
