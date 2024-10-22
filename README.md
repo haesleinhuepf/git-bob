@@ -113,12 +113,22 @@ Here's the recommended workflow for using git-bob:
 
 ## Use-case examples
 
-* [Bio-image Analysis Support](https://github.com/haesleinhuepf/git-bob-playground/issues/13)
-* [Question-answering to specific Python libraries](https://github.com/haesleinhuepf/stackview/issues/79)
-* [Basic data analysis and plotting](https://github.com/NFDI4BIOIMAGE/training/issues/250)
+* Question answering 
+  * [About specific Python libraries](https://github.com/haesleinhuepf/stackview/issues/79)
+  * [Visualizing how Fourier-Transform works](https://github.com/haesleinhuepf/git-bob-playground/issues/22)
+  * [The capital of France](https://github.com/haesleinhuepf/git-bob-playground/issues/24)
+* Bio-image Analysis
+  * [Nuclei segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/13)
+  * [Cell segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/42)
 * [Documenting source code](https://github.com/haesleinhuepf/git-bob/pull/29)
 * [Assisting scientific manuscript writing](https://github.com/haesleinhuepf/git-bob-manuscript/pull/9)
-* [Plotting a circle of triangles (in gitlab)](https://gitlab.com/haesleinhuepf/git-bob-gitlab-playground/-/issues/8)
+* Statistics
+  * [Filtering data and counting records](https://github.com/NFDI4BIOIMAGE/training/issues/299)
+  * [Summarizing data and plotting](https://github.com/NFDI4BIOIMAGE/training/issues/250)
+* Plotting
+  * [Violing plots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/44)
+  * [UMAPs with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/41)
+  * [Plotting a circle of triangles (in gitlab)](https://gitlab.com/haesleinhuepf/git-bob-gitlab-playground/-/issues/8)
 
 ## Installation for development
 
