@@ -769,23 +769,3 @@ def get_default_branch_name(repository):
     """Determine name of default branch"""
     repo = get_repository_handle(repository)
     return repo.default_branch
-
-def add_hello_world_to_playground(branch_name: str, repository: str):
-    """
-    Add a 'hello world' text file to the playground directory.
-
-    Parameters
-    ----------
-    branch_name : str
-        The name of the branch where the file will be added.
-    repository : str
-        The full name of the GitLab project (e.g., "username/repo-name").
-
-    Returns
-    -------
-    str
-        Confirmation of file creation.
-    """
-    file_path = "playground/hello_world.txt"
-    file_content = "hello world"
-    return write_file_in_branch(repository, branch_name, file_path, file_content, "Add hello world to playground")
