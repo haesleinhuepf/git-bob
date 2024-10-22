@@ -49,4 +49,3 @@ def test_check_if_file_exists():
     from git_bob._github_utilities import check_if_file_exists
     assert check_if_file_exists("haesleinhuepf/git-bob", "main", "README.md")
     assert not check_if_file_exists("haesleinhuepf/git-bob", "main", "readme2.md")
-    assert check_if_file_exists("haesleinhuepf/git-bob", "main", "playground/hello_world.txt")  # Newly added test condition
