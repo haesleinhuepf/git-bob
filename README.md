@@ -35,19 +35,19 @@ There is a detailed [tutorial](https://github.com/haesleinhuepf/git-bob/blob/mai
 * Copy the [git-bob](https://github.com/haesleinhuepf/git-bob/blob/main/.github/workflows/git-bob.yml) GitHub workflow in folder `.github/workflows/` to your repository.
   * Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.11.0`.
   * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These were tested:
-* `claude-3-5-sonnet-20240620`
-* `gpt-4o-2024-08-06` (recommended if you work with large files, < 16k tokens)
-* `github_models:gpt-4o`
-* `github_models:meta-llama-3.1-405b-instruct`
-* `gemini-1.5-pro-002`
-* configure a GitHub secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` or `GH_MODELS_API_KEY` or `GOOGLE_API_KEY` or `KISSKI_API_KEY` or `BLABBLADOR_API_KEY` with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
+    * `claude-3-5-sonnet-20240620`
+    * `gpt-4o-2024-08-06` (recommended if you work with large files, < 16k tokens)
+    * `github_models:gpt-4o`
+    * `github_models:meta-llama-3.1-405b-instruct`
+    * `gemini-1.5-pro-002`
+  * configure a GitHub secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` or `GH_MODELS_API_KEY` or `GOOGLE_API_KEY` or `KISSKI_API_KEY` or `BLABBLADOR_API_KEY` with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
   * [OpenAI (gpt)](https://openai.com/blog/openai-api)
   * [Anthropic (claude)](https://www.anthropic.com/api)
   * [GitHub Models Marketplace](https://github.com/marketplace/models)
   * [Google AI](https://ai.google.dev/gemini-api/docs/api-key)
   * [KISSKI](https://services.kisski.de/services/en/service/?service=2-02-llm-service.json)
   * [BLABLADOR](https://login.helmholtz.de/oauth2-as/oauth2-authz-web-entry)
-* configure GitHub actions to run the workflow on issues and pull requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
+  * configure GitHub actions to run the workflow on issues and pull requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
 
 When using it in your repository, you can also set a custom system message, for example for:
 * [General Data Science / Python Programming](https://github.com/haesleinhuepf/git-bob-playground/blob/bf08b3526980e011f632c13f29ae65372aafa5c7/.github/workflows/git-bob.yml#L75)
