@@ -31,8 +31,8 @@ Do not use this technology if you are not aware of the costs and consequences.
 
 ## Installation as GitHub action
 
-There is a detailed [tutorial](docs/installation-tutorial.md) on how to install git-bob as GitHub action to your repository. In very short, to use git-bob in your GitHub repository, you need to 
-* Copy the [git-bob](.github/workflows/git-bob.yml) GitHub workflow in folder `.github/workflows/` to your repository.
+There is a detailed [tutorial](https://github.com/haesleinhuepf/git-bob/blob/main/docs/installation-tutorial.md) on how to install git-bob as GitHub action to your repository. In very short, to use git-bob in your GitHub repository, you need to 
+* Copy the [git-bob](https://github.com/haesleinhuepf/git-bob/blob/main/.github/workflows/git-bob.yml) GitHub workflow in folder `.github/workflows/` to your repository.
   * Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.11.0`.
   * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These were tested:
 * `claude-3-5-sonnet-20240620`
@@ -62,7 +62,7 @@ Furthermore, to guide discussions, you may want to setup issue templates, e.g.
 
 ## Installation as gitlab pipeline
 
-Since version 0.10.1 git-bob has experimental support for [gitlab](https://gitlab.com). You find detailed instructions how to install it [here](docs/installation-tutorial-gitlab.md).
+Since version 0.10.1 git-bob has experimental support for [gitlab](https://gitlab.com). You find detailed instructions how to install it [here](https://github.com/haesleinhuepf/git-bob/blob/main/docs/installation-tutorial-gitlab.md).
 
 ## Usage: Trigger words
 
@@ -188,7 +188,7 @@ Available actions:
 At the moment, these limitations can be observed:
 * `git-bob` was tested for Python projects mostly. It seems to be able to process Java and C++ as well.
 * It can only execute code in Jupyter Notebooks. 
-* It sometimes hallucinates, especially in code reviews. E.g. it [claimed](https://github.com/haesleinhuepf/git-bob/pull/70) to have tested code, which is certainly not true.
+* It sometimes hallucinates, especially in code reviews. E.g. it [claimed](https://github.com/haesleinhuepf/git-bob/pull/70) to have tested code, which was certainly not true.
 * It cannot solve issues where changing long files is required, as the output of the LLMs is limited by a maximum number of tokens (e.g. 16k for `gpt-4o-2024-08-06`). When using OpenAI's models it combines output of multiple requests to a maximum file length about 64k tokens. It may then miss some spaces or a line break where responses were stitched. 
   When using GitHub models, the maximum file length is 4k tokens. When using Anthropic's Claude, the maximum file length is 8k tokens.
 * When changing multiple files, it may introduce conflicts between the files, as it does not know about the changed contents of the other files.
