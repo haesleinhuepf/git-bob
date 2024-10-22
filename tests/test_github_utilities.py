@@ -35,6 +35,7 @@ def test_list_repository_files():
     assert "LICENSE" in files
     assert "src/git_bob/__init__.py" in files
     assert "playground/python_basics.ipynb" in files
+    assert "playground/hello_world.txt" in files  # Newly added test condition
 
 def test_get_repository_file_contents():
     from git_bob._github_utilities import get_repository_file_contents
@@ -49,3 +50,4 @@ def test_check_if_file_exists():
     from git_bob._github_utilities import check_if_file_exists
     assert check_if_file_exists("haesleinhuepf/git-bob", "main", "README.md")
     assert not check_if_file_exists("haesleinhuepf/git-bob", "main", "readme2.md")
+    assert check_if_file_exists("haesleinhuepf/git-bob", "main", "playground/hello_world.txt")  # Newly added test condition
