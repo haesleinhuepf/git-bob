@@ -234,7 +234,7 @@ def get_repository_file_contents(repository:str, branch_name, file_paths: list):
     str
         The content of the file as a string.
     """
-    Log().log(f"-> get_repository_file_contents({repository}, {file_paths}, {branch_name})")
+    Log().log(f"-> get_repository_file_contents({repository}, {branch_name}, {file_paths})")
     project = get_repository_handle(repository)
 
     file_contents = {}

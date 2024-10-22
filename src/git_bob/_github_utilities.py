@@ -305,7 +305,7 @@ def get_repository_file_contents(repository: str, branch_name, file_paths: list)
     dict
         A dictionary where keys are file paths and values are the contents of the files.
     """
-    Log().log(f"-> get_repository_file_contents({repository}, {file_paths})")
+    Log().log(f"-> get_repository_file_contents({repository}, {branch_name}, {file_paths})")
 
     # Dictionary to store file contents
     file_contents = {}
