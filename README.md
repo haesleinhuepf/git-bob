@@ -113,6 +113,9 @@ Here's the recommended workflow for using git-bob:
 
 ## Use-case examples
 
+A huge variety of use-cases for git-bob are thinkable. Here are some examples. Many serve purely demonstrative purposes. 
+Some were parts of real scientific data analysis projects.
+
 * Question answering 
   * [About specific Python libraries](https://github.com/haesleinhuepf/stackview/issues/79)
   * [Visualizing how Fourier-Transform works](https://github.com/haesleinhuepf/git-bob-playground/issues/22)
@@ -126,11 +129,13 @@ Here's the recommended workflow for using git-bob:
   * [Assisting scientific manuscript writing](https://github.com/haesleinhuepf/git-bob-manuscript/pull/9)
 * Statistics
   * [Filtering data and counting records](https://github.com/NFDI4BIOIMAGE/training/issues/299)
+  * [Selecting ranges of columns](https://github.com/haesleinhuepf/git-bob-playground/issues/47)
   * [Summarizing data and plotting](https://github.com/NFDI4BIOIMAGE/training/issues/250)
 * Plotting
   * [Violing plots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/44)
   * [UMAPs with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/41)
   * [Plotting a circle of triangles (in gitlab)](https://gitlab.com/haesleinhuepf/git-bob-gitlab-playground/-/issues/8)
+  * [Pairplots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/46)
 
 ## Installation for development
 
