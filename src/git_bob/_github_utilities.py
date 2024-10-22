@@ -887,34 +887,3 @@ def get_default_branch_name(repository):
     """Determine name of default branch"""
     repo = get_repository_handle(repository)
     return repo.get_branch(repo.default_branch).name
-
-def add_hello_world_file(repository, branch_name, file_path="playground/hello.txt"):
-    """
-    Add a "hello world" text file to the specified path in a GitHub repository.
-
-    Parameters
-    ----------
-    repository : str
-        The full name of the GitHub repository (e.g., "username/repo-name").
-    branch_name : str
-        The name of the branch to add the file to.
-    file_path : str, optional
-        The path where the file should be created. Default is "playground/hello.txt".
-    """
-    content = "hello world"
-    commit_message = "Add hello world text file"
-
-    # Authenticate with GitHub
-    repo = get_repository_handle(repository)
-
-    # Ensure that the folder exists
-    path_name = str(os.path.dirname(file_path))
-    if len(path_name) > 0:
-        os.makedirs(path_name, exist_ok=True)
-
-    # Create the file in the specified branch
-    repo.create_file(file_path, commit_message, content, branch=branch_name)
-
-    # Save the file locally
-    with open(file_path, "w") as f:
-        f.write(content)
