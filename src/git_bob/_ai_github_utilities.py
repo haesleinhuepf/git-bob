@@ -403,7 +403,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue))
     print("Discussion:", discussion)
 
-    all_files = "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository))
+    all_files = "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=base_branch))
 
     modifications = prompt_function(f"""
 Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files need to be modified, renamed or deleted to solve the issue.

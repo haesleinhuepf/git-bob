@@ -246,7 +246,7 @@ Body:
     return content
 
 
-def list_repository_files(repository: str) -> list:
+def list_repository_files(repository: str, branch_name: str = "main") -> list:
     """
     List all files in a given GitHub repository.
 
@@ -257,6 +257,8 @@ def list_repository_files(repository: str) -> list:
     ----------
     repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
+    branch_name : str, optional
+        The name of the branch or tag (default is 'main').
 
     Returns
     -------
@@ -269,7 +271,7 @@ def list_repository_files(repository: str) -> list:
     repo = get_repository_handle(repository)
 
     # Get all contents of the repository
-    contents = repo.get_contents("")
+    contents = repo.get_contents("", ref=branch_name)
 
     # List to store all file paths
     all_files = []
@@ -296,7 +298,7 @@ def get_repository_file_contents(repository: str, branch_name, file_paths: list)
     repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
     branch_name : str, optional
-        The name of the branch or tag (default is 'main').
+        The name of the branch or tag.
     file_paths : list
         A list of file paths within the repository to retrieve the contents of.
 
