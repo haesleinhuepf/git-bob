@@ -118,11 +118,13 @@ def command_line_interface():
     Log().log("Using language model: _" + Config.llm_name[1:])
 
     text = text.replace(f"{agent_name}, ", f"{agent_name} ")
+    text = text.replace(f"{agent_name} please ", f"{agent_name} ")
     
     # aliases for comment action
     text = text.replace(f"{agent_name} respond", f"{agent_name} comment")
     text = text.replace(f"{agent_name} review", f"{agent_name} comment")
     text = text.replace(f"{agent_name} think about", f"{agent_name} comment")
+    text = text.replace(f"{agent_name} answer", f"{agent_name} comment")
 
     # aliases for solve action
     text = text.replace(f"{agent_name} implement", f"{agent_name} solve")

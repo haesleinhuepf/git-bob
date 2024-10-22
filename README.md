@@ -1,12 +1,13 @@
 # git-bob
 
 git-bob uses AI to solve GitHub issues and review pull requests. It runs inside the GitHub CI, no need to install anything on your computer.
-Read more in the [preprint](https://doi.org/10.5281/zenodo.13928832).
+Read more in the [preprint](https://doi.org/10.5281/zenodo.13928832). 
 
-![demo_fix_typos.png](docs/images/banner.png)
+![banner](https://github.com/haesleinhuepf/git-bob/raw/main/docs/images/banner2.png)
 
 Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api) or [OpenAI's chatGPT](https://openai.com/blog/openai-api) or [Google's Gemini](https://blog.google/technology/ai/google-gemini-ai/) to understand the text and 
-[pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull requests.
+[pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull requests. As its discussions are conserved, you can document how things were done using AI and 
+others can learn how to prompt for the things you did. For example, the pair-plot discussion above is [available online](https://github.com/haesleinhuepf/git-bob-playground/issues/48).
 
 ## Disclaimer
 
@@ -59,12 +60,30 @@ Furthermore, to guide discussions, you may want to setup issue templates, e.g.
 
 Since version 0.10.1 git-bob has experimental support for [gitlab](https://gitlab.com). You find detailed instructions how to install it [here](docs/installation-tutorial-gitlab.md).
 
-## Usage
+## Usage: Trigger words
 
-To trigger git-bob, you need to comment on an issue or pull request with the following command:
+To trigger git-bob, you need to comment on an issue or pull request with the `comment` trigger word (or aliases `think about`, `review`, `respond`):
 
 ```
 git-bob comment
+```
+
+After some back-and-forth discussion, you can also use the `solve` trigger word (or aliases `implement`, `apply`) make git-bob solve an issue and send a pull-request. 
+This trigger can also be used to modify code in pull requests.
+
+```
+git-bob solve
+```
+
+You can ask git-bob to implement a solution for testing, without sending a pull-request, using the `try` trigger:
+```
+git-bob try
+```
+
+If you have multiple API-Key for different LLMs configured, you can specify the LLM in the command using the `ask <LLM-Name> to` trigger command:
+
+```
+git-bob ask claude-3-5-sonnet-20240620 to solve this issue.
 ```
 
 If the issue is complex and should be split into sub-issues, you can use the following command:
@@ -73,29 +92,16 @@ If the issue is complex and should be split into sub-issues, you can use the fol
 git-bob split
 ```
 
-You can ask git-bob to implement a solution, e.g. as Jupyter notebook and run it like this:
-```
-git-bob try
-```
-
-You can also use the following command to trigger git-bob solving an issue.
-It will then try to solve the issue and send a pull request.
-This action can also be used to modify code in pull requests.
-
-```
-git-bob solve
-```
-
-If you have multiple API-Key for different LLMs configured, you can specify the LLM in the command, e.g.:
-
-```
-git-bob ask claude-3-5-sonnet-20240620 to solve this issue.
-```
-
 If you have two GitHub secrets `TWINE_USERNAME` and `TWINE_PASSWORD` configured, you can also use the following command to publish a new version of your library to PyPI:
 
 ```
 git-bob deploy
+```
+
+All trigger words can be combined with `please` and/or `,`, which will make no difference to calling git-bob without these words:
+
+```
+git-bob, please ask gemini-1.5-pro-002 to solve this issue.
 ```
 
 ## Recommended Workflow
@@ -135,7 +141,7 @@ Some were parts of real scientific data analysis projects.
   * [Violing plots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/44)
   * [UMAPs with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/41)
   * [Plotting a circle of triangles (in gitlab)](https://gitlab.com/haesleinhuepf/git-bob-gitlab-playground/-/issues/8)
-  * [Pairplots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/46)
+  * [Pairplots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/48)
 
 ## Installation for development
 
