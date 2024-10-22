@@ -120,8 +120,10 @@ Here's the recommended workflow for using git-bob:
 * Bio-image Analysis
   * [Nuclei segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/13)
   * [Cell segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/42)
-* [Documenting source code](https://github.com/haesleinhuepf/git-bob/pull/29)
-* [Assisting scientific manuscript writing](https://github.com/haesleinhuepf/git-bob-manuscript/pull/9)
+* Data & Code Management
+  * [Research Data Management & Folder Structures](https://github.com/haesleinhuepf/git-bob-playground/issues/45)
+  * [Documenting source code](https://github.com/haesleinhuepf/git-bob/pull/29)
+  * [Assisting scientific manuscript writing](https://github.com/haesleinhuepf/git-bob-manuscript/pull/9)
 * Statistics
   * [Filtering data and counting records](https://github.com/NFDI4BIOIMAGE/training/issues/299)
   * [Summarizing data and plotting](https://github.com/NFDI4BIOIMAGE/training/issues/250)
