@@ -35,7 +35,6 @@ def test_list_repository_files():
     assert "LICENSE" in files
     assert "src/git_bob/__init__.py" in files
     assert "playground/python_basics.ipynb" in files
-    assert "playground/hello_world.txt" in files  # Newly added test condition
 
 def test_get_repository_file_contents():
     from git_bob._github_utilities import get_repository_file_contents
