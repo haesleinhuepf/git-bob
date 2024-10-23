@@ -6,7 +6,7 @@ Functions:
 - prompt_chatgpt: Sends a message to the ChatGPT language model and returns the text response.
 """
 
-def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
+def prompt_claude(message: str, model="claude-3-5-sonnet-20240620", image=None):
     """
     A prompt helper function that sends a message to anthropic
     and returns only the text response.
@@ -14,10 +14,49 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
     Example models: claude-3-5-sonnet-20240620 or claude-3-opus-20240229
     """
     from anthropic import Anthropic
+    import base64
+    import numpy as np
+
+    def encode_image(image_array):
+        """
+        Encode a numpy image array to base64 string.
+
+        Parameters
+        ----------
+        image_array : numpy.ndarray
+            A numpy array representing the image.
+
+        Returns
+        -------
+        str
+            Base64 encoded string of the image.
+        """
+        if isinstance(image_array, np.ndarray):
+            return base64.b64encode(image_array.tobytes()).decode('utf-8')
 
     # convert message in the right format if necessary
-    if isinstance(message, str):
-        message = [{"role": "user", "content": message}]
+    if image is None:
+        if isinstance(message, str):
+            message = [{"role": "user", "content": message}]
+    else:
+        encoded_image = encode_image(image)
+        message = [{
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": message
+                },
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "image/jpeg",  # or image/png
+                        "data": encoded_image
+                    }
+                }
+            ]
+        }]
 
     # setup connection to the LLM
     client = Anthropic()
