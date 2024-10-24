@@ -186,7 +186,7 @@ Description:
 
     return content
 
-def list_repository_files(repository: str):
+def list_repository_files(repository: str, branch_name: str = "main") -> list:
     """
     List all files in the specified GitLab repository branch.
 
@@ -194,20 +194,22 @@ def list_repository_files(repository: str):
     ----------
     repository : str
         The full name of the GitLab project (e.g., "username/repo-name").
+    branch_name : str, optional
+        The name of the branch or tag (default is 'main').
 
     Returns
     -------
     list
         A list of file paths in the repository.
     """
-    Log().log(f"-> list_repository_files({repository})")
+    Log().log(f"-> list_repository_files({repository}, {branch_name})")
     repo = get_repository_handle(repository)
     files = []
     path_stack = ['']
 
     while path_stack:
         path = path_stack.pop()
-        tree = repo.repository_tree(path=path)
+        tree = repo.repository_tree(path=path, ref=branch_name)
         for item in tree:
             if item['type'] == 'blob':
                 files.append(item['path'])
@@ -234,7 +236,7 @@ def get_repository_file_contents(repository:str, branch_name, file_paths: list):
     str
         The content of the file as a string.
     """
-    Log().log(f"-> get_repository_file_contents({repository}, {file_paths}, {branch_name})")
+    Log().log(f"-> get_repository_file_contents({repository}, {branch_name}, {file_paths})")
     project = get_repository_handle(repository)
 
     file_contents = {}
