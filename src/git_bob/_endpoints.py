@@ -138,15 +138,23 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
     return result
 
 
-def prompt_gemini(request, model="gemini-1.5-flash-001"):
+def prompt_gemini(request, model="gemini-1.5-flash-001", image=None):
     """Send a prompt to Google Gemini and return the response"""
     from google import generativeai as genai
     import os
+    from ._utilities import image_to_url
+    import base64
+    
     genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
-
     client = genai.GenerativeModel(model)
-    result = client.generate_content(request)
-    return result.text
+    
+    if image is not None:
+        image_url = image_to_url(image)
+        response = client.generate_content([request, genai.types.Image.from_url("data:image/png;base64," + image_url)])
+    else:
+        response = client.generate_content(request)
+        
+    return response.text
 
 
 def prompt_azure(message: str, model="gpt-4o", image=None):
