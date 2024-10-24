@@ -242,7 +242,7 @@ def image_to_url(image):
     buffered = io.BytesIO()
     image.save(buffered, format="PNG")
     img_str = base64.b64encode(buffered.getvalue()).decode()
-    return f"data:image/png;base64,{img_str}"
+    return {img_str}
 
 
 def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):

@@ -6,7 +6,7 @@ Functions:
 - prompt_chatgpt: Sends a message to the ChatGPT language model and returns the text response.
 """
 
-def prompt_claude(message: str, model="claude-3-5-sonnet-20240620", image=None):
+def prompt_claude(message: str, model="claude-3-5-sonnet-20241022", image=None):
     """
     A prompt helper function that sends a message to anthropic
     and returns only the text response.
@@ -14,6 +14,7 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20240620", image=None):
     Example models: claude-3-5-sonnet-20240620 or claude-3-opus-20240229
     """
     from anthropic import Anthropic
+    from ._utilities import image_to_url
     import base64
     import numpy as np
 
@@ -39,7 +40,7 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20240620", image=None):
         if isinstance(message, str):
             message = [{"role": "user", "content": message}]
     else:
-        encoded_image = encode_image(image)
+        encoded_image = image_to_url(image)
         message = [{
             "role": "user",
             "content": [
@@ -51,7 +52,7 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20240620", image=None):
                     "type": "image",
                     "source": {
                         "type": "base64",
-                        "media_type": "image/jpeg",  # or image/png
+                        "media_type": "image/png",
                         "data": encoded_image
                     }
                 }
@@ -62,7 +63,7 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20240620", image=None):
     client = Anthropic()
 
     message = client.messages.create(
-        max_tokens=8192 if model == "claude-3-5-20240620" else 4096,
+        max_tokens=8192 if "claude-3-5" in model else 4096,
         messages=message,
         model=model,
         extra_headers={"anthropic-beta": "max-tokens-3-5-sonnet-2024-07-15"} if model == "claude-3-5-20240620" else None,
@@ -91,7 +92,7 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
                     "text": message,
                 },{
                     "type": "image_url",
-                    "image_url": {"url": image_url}
+                    "image_url": {"url": "data:image/png;base64," + image_url}
                 }]}]
     original_message = message
 
@@ -177,7 +178,7 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
             message = [UserMessage(
                     content=[
                         TextContentItem(text=message),
-                        ImageContentItem(image_url={"url": image_url}),
+                        ImageContentItem(image_url={"url": "data:image/png;base64," + image_url}),
                     ],
                 )]
 
@@ -200,7 +201,7 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
             message = [{"role": "user", "content": [{
                 "type": "image_url",
                 "image_url": {
-                    "url": image_url
+                    "url": "data:image/png;base64," + image_url
                 }
             }]}]
 
