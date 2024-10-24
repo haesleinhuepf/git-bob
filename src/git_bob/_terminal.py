@@ -107,12 +107,11 @@ def command_line_interface():
         
         # Apply model alias if it exists
         if new_llm_name in model_aliases:
-            Config.llm_name = model_aliases[new_llm_name]
-        else:
-            for key in prompt_handlers:
-                if key in new_llm_name:
-                    Config.llm_name = new_llm_name
-                    break
+            new_llm_name  = model_aliases[new_llm_name]
+        for key in prompt_handlers:
+            if key in new_llm_name:
+                Config.llm_name = new_llm_name
+                break
 
         text = text.replace(f"{agent_name} ask {new_llm_name} to ", f"{agent_name} ")
         # example:
