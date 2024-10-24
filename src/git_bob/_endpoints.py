@@ -37,8 +37,7 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20241022", image=None):
 
     # convert message in the right format if necessary
     if image is None:
-        if isinstance(message, str):
-            message = [{"role": "user", "content": message}]
+        message = [{"role": "user", "content": message}]
     else:
         encoded_image = image_to_url(image)
         message = [{
