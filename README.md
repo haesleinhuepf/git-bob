@@ -199,6 +199,7 @@ At the moment, these limitations can be observed:
   This might make sense when being executed locally only. In the GitHub-CI this might be impossible.
 * Recently tested `claude-3-5-sonnet-20240620`, `gpt-4o-2024-08-06`, `github_models:gpt-4o`, `github_models:meta-llama-3.1-405b-instruct` and `gemini-1.5-pro-002` produced useful results.
 * `git-bob` is not allowed to modify workflow files, because it also uses GitHub workflows.
+* As git-bob is installed as part of git-hub workflows, its [download statistics](https://pypistats.org/packages/git-bob) might be misleading. There are as many people downloading it as the numer of downloads suggest.
 
 ## Similar projects
 
