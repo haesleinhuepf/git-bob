@@ -35,7 +35,7 @@ There is a detailed [tutorial](https://github.com/haesleinhuepf/git-bob/blob/mai
 * Copy the [git-bob](https://github.com/haesleinhuepf/git-bob/blob/main/.github/workflows/git-bob.yml) GitHub workflow in folder `.github/workflows/` to your repository.
   * Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.11.0`.
   * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These were tested:
-    * `claude-3-5-sonnet-20240620`
+    * `claude-3-5-sonnet-20241022`
     * `gpt-4o-2024-08-06` (recommended if you work with large files, < 16k tokens)
     * `github_models:gpt-4o`
     * `github_models:meta-llama-3.1-405b-instruct`
@@ -87,7 +87,7 @@ git-bob try
 If you have multiple API-Key for different LLMs configured, you can specify the LLM in the command using the `ask <LLM-Name> to` trigger command:
 
 ```
-git-bob ask claude-3-5-sonnet-20240620 to solve this issue.
+git-bob ask claude-3-5-sonnet-20241022 to solve this issue.
 ```
 
 If the issue is complex and should be split into sub-issues, you can use the following command:
@@ -158,7 +158,7 @@ cd git-bob
 
 You can also install git-bob locally and run it from the terminal. 
 In this case, create a [GitHub token](https://github.com/settings/tokens) and store it in an environment variable named `GITHUB_API_KEY`. 
-Also create an environment variable `GIT_BOB_LLM_NAME` with the name of the LLM you want to use, e.g. "gpt-4o-2024-05-13" or "claude-3-5-sonnet-20240620" or "github_models:gpt-4o".
+Also create an environment variable `GIT_BOB_LLM_NAME` with the name of the LLM you want to use, e.g. "gpt-4o-2024-05-13" or "claude-3-5-sonnet-20241022" or "github_models:gpt-4o".
 Then you can install git-bob using pip:
 
 ```bash
@@ -197,7 +197,7 @@ At the moment, these limitations can be observed:
   If others send a pull request, a repository member must allow the action to run manually.
 * `git-bob` is incompatible with locally running open-source/-weight LLMs. 
   This might make sense when being executed locally only. In the GitHub-CI this might be impossible.
-* Recently tested `claude-3-5-sonnet-20240620`, `gpt-4o-2024-08-06`, `github_models:gpt-4o`, `github_models:meta-llama-3.1-405b-instruct` and `gemini-1.5-pro-002` produced useful results.
+* Recently tested `claude-3-5-sonnet-20241022`, `gpt-4o-2024-08-06`, `github_models:gpt-4o`, `github_models:meta-llama-3.1-405b-instruct` and `gemini-1.5-pro-002` produced useful results.
 * `git-bob` is not allowed to modify workflow files, because it also uses GitHub workflows.
 
 ## Similar projects
