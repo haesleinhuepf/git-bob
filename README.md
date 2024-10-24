@@ -36,7 +36,7 @@ There is a detailed [tutorial](https://github.com/haesleinhuepf/git-bob/blob/mai
   * Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.11.0`.
   * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These were tested:
     * `claude-3-5-sonnet-20241022`
-    * `gpt-4o-2024-08-06` (recommended if you work with large files, < 16k tokens)
+    * `gpt-4o-2024-08-06`
     * `github_models:gpt-4o`
     * `github_models:meta-llama-3.1-405b-instruct`
     * `gemini-1.5-pro-002`
