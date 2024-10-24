@@ -149,8 +149,7 @@ def prompt_gemini(request, model="gemini-1.5-flash-001", image=None):
     client = genai.GenerativeModel(model)
     
     if image is not None:
-        image_url = image_to_url(image)
-        response = client.generate_content([request, genai.types.Image.from_url("data:image/png;base64," + image_url)])
+        response = client.generate_content([image, request])
     else:
         response = client.generate_content(request)
         
