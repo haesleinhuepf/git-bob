@@ -516,7 +516,7 @@ Respond with the actions as JSON list.
         if md_link.startswith("!"):
             file_list_text = file_list_text + "* " + md_link[1:] + " <explanation>\n\n" + md_link + "\n\n"
         else:
-            file_list_text = file_list_text + "* " + md_link[1:] + " <explanation>\n\n"
+            file_list_text = file_list_text + "* " + md_link + " <explanation>\n\n"
 
     from ._utilities import Config
     remark = setup_ai_remark() + "\n\n"
