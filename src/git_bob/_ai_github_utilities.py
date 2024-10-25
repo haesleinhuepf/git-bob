@@ -53,7 +53,7 @@ def comment_on_issue(repository, issue, prompt_function):
 
     ai_remark = setup_ai_remark()
 
-    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue))
+    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), prompt_visionlm=prompt_function)
     print("Discussion:", discussion)
 
     all_files = "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository))
@@ -134,7 +134,7 @@ def review_pull_request(repository, issue, prompt_function):
 
     ai_remark = setup_ai_remark()
 
-    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue))
+    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), prompt_visionlm=prompt_function)
     print("Discussion:", discussion)
 
     file_changes = Config.git_utilities.get_diff_of_pull_request(repository, issue)
@@ -400,10 +400,10 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
 
     repo = Config.git_utilities.get_repository_handle(repository)
 
-    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue))
+    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), prompt_visionlm=prompt_function)
     print("Discussion:", discussion)
 
-    all_files = "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository))
+    all_files = "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=base_branch))
 
     modifications = prompt_function(f"""
 Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files need to be modified, renamed or deleted to solve the issue.

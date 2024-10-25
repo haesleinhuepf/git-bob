@@ -6,7 +6,7 @@ Functions:
 - prompt_chatgpt: Sends a message to the ChatGPT language model and returns the text response.
 """
 
-def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
+def prompt_claude(message: str, model="claude-3-5-sonnet-20241022", image=None):
     """
     A prompt helper function that sends a message to anthropic
     and returns only the text response.
@@ -14,16 +14,55 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20240620"):
     Example models: claude-3-5-sonnet-20240620 or claude-3-opus-20240229
     """
     from anthropic import Anthropic
+    from ._utilities import image_to_url
+    import base64
+    import numpy as np
+
+    def encode_image(image_array):
+        """
+        Encode a numpy image array to base64 string.
+
+        Parameters
+        ----------
+        image_array : numpy.ndarray
+            A numpy array representing the image.
+
+        Returns
+        -------
+        str
+            Base64 encoded string of the image.
+        """
+        if isinstance(image_array, np.ndarray):
+            return base64.b64encode(image_array.tobytes()).decode('utf-8')
 
     # convert message in the right format if necessary
-    if isinstance(message, str):
+    if image is None:
         message = [{"role": "user", "content": message}]
+    else:
+        encoded_image = image_to_url(image)
+        message = [{
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": message
+                },
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "image/png",
+                        "data": encoded_image
+                    }
+                }
+            ]
+        }]
 
     # setup connection to the LLM
     client = Anthropic()
 
     message = client.messages.create(
-        max_tokens=8192 if model == "claude-3-5-20240620" else 4096,
+        max_tokens=8192 if "claude-3-5" in model else 4096,
         messages=message,
         model=model,
         extra_headers={"anthropic-beta": "max-tokens-3-5-sonnet-2024-07-15"} if model == "claude-3-5-20240620" else None,
@@ -52,7 +91,7 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
                     "text": message,
                 },{
                     "type": "image_url",
-                    "image_url": {"url": image_url}
+                    "image_url": {"url": "data:image/png;base64," + image_url}
                 }]}]
     original_message = message
 
@@ -99,15 +138,22 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
     return result
 
 
-def prompt_gemini(request, model="gemini-1.5-flash-001"):
+def prompt_gemini(request, model="gemini-1.5-flash-001", image=None):
     """Send a prompt to Google Gemini and return the response"""
     from google import generativeai as genai
     import os
+    from ._utilities import image_to_url
+    import base64
+    
     genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
-
     client = genai.GenerativeModel(model)
-    result = client.generate_content(request)
-    return result.text
+    
+    if image is not None:
+        response = client.generate_content([image, request])
+    else:
+        response = client.generate_content(request)
+        
+    return response.text
 
 
 def prompt_azure(message: str, model="gpt-4o", image=None):
@@ -138,7 +184,7 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
             message = [UserMessage(
                     content=[
                         TextContentItem(text=message),
-                        ImageContentItem(image_url={"url": image_url}),
+                        ImageContentItem(image_url={"url": "data:image/png;base64," + image_url}),
                     ],
                 )]
 
@@ -161,7 +207,7 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
             message = [{"role": "user", "content": [{
                 "type": "image_url",
                 "image_url": {
-                    "url": image_url
+                    "url": "data:image/png;base64," + image_url
                 }
             }]}]
 

@@ -37,6 +37,13 @@ def command_line_interface():
     Log().log(f"I am {agent_name} " + str(__version__))
     Log().log(f"Accessing {Config.git_server_url}")
 
+    # Aliases for model names
+    model_aliases = {
+        "claude": "claude-3-5-sonnet-20241022",
+        "gemini": "gemini-1.5-pro-002",
+        "gpt-4o": "gpt-4o-20240806",
+        "gpt4o": "gpt-4o-20240806"
+    }
 
     prompt_handlers = init_prompt_handlers()
 
@@ -95,15 +102,20 @@ def command_line_interface():
 
     # handle ask-llm task option
     if f"{agent_name} ask" in text:
+        # example:
+        # git-bob ask gpt-4o to solve this issue -> git-bob solve this issue
         print("Dynamic LLM selection")
         new_llm_name = text.split(f"{agent_name} ask")[-1].strip().split(" ")[0]
+        text = text.replace(f"{agent_name} ask {new_llm_name} to ", f"{agent_name} ")
+
+        # Apply model alias if it exists
+        if new_llm_name in model_aliases:
+            new_llm_name  = model_aliases[new_llm_name]
         for key in prompt_handlers:
             if key in new_llm_name:
                 Config.llm_name = new_llm_name
                 break
-        text = text.replace(f"{agent_name} ask {new_llm_name} to ", f"{agent_name} ")
-        # example:
-        # git-bob ask gpt-4o to solve this issue -> git-bob solve this issue
+
 
     prompt = None
     prompt_handlers = init_prompt_handlers() # reinitialize, because configured LLM may have changed

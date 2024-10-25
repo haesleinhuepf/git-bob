@@ -59,7 +59,7 @@ def test_list_repository_files():
     Config.git_server_url = "https://gitlab.com"
 
     from git_bob._gitlab_utilities import list_repository_files
-    files = list(list_repository_files("haesleinhuepf/git-bob"))
+    files = list(list_repository_files("haesleinhuepf/git-bob", branch_name="main"))
 
     assert "README.md" in files
     assert "LICENSE" in files
