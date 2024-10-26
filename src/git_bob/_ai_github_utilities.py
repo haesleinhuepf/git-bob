@@ -4,6 +4,7 @@ import os
 import warnings
 
 from ._logger import Log
+from ._utilities import images_from_url_responses
 
 AGENT_NAME = os.environ.get("GIT_BOB_AGENT_NAME", "git-bob")
 SYSTEM_PROMPT = os.environ.get("SYSTEM_MESSAGE", f"You are an AI-based coding assistant named {AGENT_NAME}. You are an excellent Python programmer and software engineer.")
@@ -227,8 +228,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     dictionary of filename: commit_message for all created files
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
-    from ._utilities import split_content_and_summary, erase_outputs_of_code_cells, \
-        restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, \
+    from ._utilities import split_content_and_summary, erase_outputs_of_code_cells, restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, \
         restore_environment, redact_text, Config, get_file_info, get_modified_files
     import os
 
@@ -604,6 +604,7 @@ Do not add headline or any other formatting. Just respond with the paragraphe be
 
         Config.git_utilities.add_comment_to_issue(repository, issue, remark + redact_text(clean_output(repository, modification_summary)) + redact_text(error_messages))
 
+
 def split_issue_in_sub_issues(repository, issue, prompt_function):
     """
     Split a main issue into sub-issues for each sub-task.
@@ -671,3 +672,28 @@ Do not explain your response or anything else. Just respond the relevant informa
     Config.git_utilities.add_comment_to_issue(repository, issue, ai_remark + comment_text)
 
     return sub_issue_numbers
+
+
+def paint_image(prompt):
+    """
+    Generate an image from a text prompt and save it to disk.
+    
+    Parameters
+    ----------
+    prompt : str
+        Text prompt that describes the image to be generated.
+    
+    Returns
+    -------
+    str
+        The filename of the generated image.
+    """
+    from ._utilities import numpy_to_bytestream
+    images = create(prompt=prompt, num_images=1)
+    # Assuming we are dealing with 2D numpy arrays for single images
+    bytestream = numpy_to_bytestream(images)
+    filename = "output_image.png"
+    with open(filename, "wb") as f:
+        f.write(bytestream)
+    # Code to add 'filename' to the GitHub repository goes here
+    return filename
