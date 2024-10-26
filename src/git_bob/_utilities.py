@@ -550,3 +550,25 @@ def get_modified_files(old_file_info, root_dir='.'):
             m = m[2:]
         result.append(m)
     return result
+
+def images_from_url_responses(response, input_shape=None):
+    """Turns a list of OpenAI's URL responses into numpy images."""
+    from skimage.io import imread
+    from skimage import transform
+    import numpy as np
+    images = [imread(item.url) for item in response.data]
+
+    if input_shape is not None:
+        # make sure the output images have the same size and type as the input image
+        images = [transform.resize(image, input_shape, anti_aliasing=True, preserve_range=True).astype(image.dtype) for image in images]
+
+        if len(input_shape) == 2 and len(images[0].shape) == 3:
+            # we sent a grey-scale image and got RGB images back
+            images = [image[:,:,0] for image in images]
+
+    if len(images) == 1:
+        # If only one image was requested, return a single image
+        return images[0]
+    else:
+        # Otherwise return a list of images as numpy array / image stack
+        return np.asarray(images)
