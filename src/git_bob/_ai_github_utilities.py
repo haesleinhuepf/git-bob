@@ -393,7 +393,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
 
     from ._utilities import split_content_and_summary, text_to_json, modify_discussion, \
         remove_ansi_escape_sequences, clean_output, redact_text, Config, file_list_from_commit_message_dict, \
-        ensure_images_shown
+        ensure_images_shown, is_github_url
     from github.GithubException import GithubException
     from gitlab.exceptions import GitlabCreateError
     import traceback
@@ -471,9 +471,13 @@ Respond with the actions as JSON list.
                     commit_messages[filename] = commit_message
             elif action == 'download':
                 source_url = instruction['source_url']
-                target_filename = instruction['target_filename'].strip("/")
-                Config.git_utilities.download_to_repository(repository, branch_name, source_url, target_filename)
-                commit_messages[target_filename] = f"Downloaded {source_url}, saved as {target_filename}."
+                url_type = is_github_url(source_url)
+                if url_type in ["image", "data"]:
+                    source_url = source_url.replace("/blob/", "/raw/")
+                    target_filename = instruction['target_filename'].strip("/")
+                    Config.git_utilities.download_to_repository(repository, branch_name, source_url, target_filename)
+                    commit_messages[target_filename] = f"Downloaded {source_url}, saved as {target_filename}."
+                # else: otherwise we have it already in the text
             elif action == 'rename':
                 old_filename = instruction['old_filename'].strip("/")
                 new_filename = instruction['new_filename'].strip("/")

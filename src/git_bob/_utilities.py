@@ -201,6 +201,8 @@ def is_github_url(url):
     elif url.endswith('.png') or url.endswith('.jpg') or url.endswith('.jpeg') or url.endswith('.gif') \
             or url.endswith('.webp') or "user-attachments/assets" in url or url.endswith("?raw=true"):
         return 'image'
+    elif url.endswith('.csv') or url.endswith('.xlsx') or url.endswith('.tif') or url.endswith('.zip'):
+        return 'data'
     elif 'blob/' in url:
         return 'file'
     return None
