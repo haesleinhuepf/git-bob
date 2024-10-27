@@ -1,4 +1,3 @@
-plaintext
 anthropic
 openai
 google-generativeai
