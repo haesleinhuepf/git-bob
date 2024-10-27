@@ -98,9 +98,9 @@ Respond to a github issue. Its entire discussion is given and additionally, cont
 
 ## Your task
 
-Respond to the discussion above.
+Respond to the discussion above as if you were a human talking to a human.
 In case code-changes are discussed, make a proposal of how new code could look like.
-Do NOT explain your response or anything else. 
+Do NOT explain your response. Just explain code shortly if you are responding with code. 
 Do not repeat answers that were given already.
 Focus on the most recent discussion.
 Just respond to the discussion.
@@ -108,6 +108,11 @@ Just respond to the discussion.
     comment = redact_text(clean_output(repository, comment))
 
     print("comment:", comment)
+
+    comment = comment.strip("\n").strip().strip("\n")
+
+    if comment.startswith("from ") or comment.startswith("import "):
+        comment = "```python\n" + comment + "\n```"
 
     Config.git_utilities.add_comment_to_issue(repository, issue, f"""        
 {ai_remark}
