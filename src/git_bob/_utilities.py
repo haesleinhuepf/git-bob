@@ -572,3 +572,66 @@ def images_from_url_responses(response, input_shape=None):
         return pil_images[0]
     else:
         return pil_images
+
+
+def make_slides(slides_description_json, filename="issue_slides.odp"):
+    """
+    Create a presentation from a JSON-encoded slide description and save it as an ODP file.
+
+    Parameters
+    ----------
+    slides_description_json : str
+        JSON-encoded string containing details of the slides.
+    filename : str, optional
+        The name of the output file. Default is 'issue_slides.odp'.
+
+    """
+    import json
+    from odf.opendocument import OpenDocumentPresentation
+    from odf.style import Style, MasterPage, PageLayout, PageLayoutProperties
+    from odf.text import P
+    from odf.draw import Page, Frame, TextBox
+
+    # Parse json-encoded slide description
+    slides_data = json.loads(slides_description_json)
+
+    # Function to create presentation based on parsed data
+    presentation = OpenDocumentPresentation()
+
+    # Create and add page layout
+    page_layout = PageLayout(name="MyLayout")
+    presentation.automaticstyles.addElement(page_layout)
+
+    props = PageLayoutProperties(margintop="0cm", marginbottom="0cm", marginleft="0cm", marginright="0cm")
+    page_layout.addElement(props)
+
+    # Create master page
+    master = MasterPage(name="Standard", pagelayoutname="MyLayout")
+    presentation.masterstyles.addElement(master)
+
+    # Create slides
+    for slide_data in slides_data:
+        # Add new slide
+        slide = Page(masterpagename="Standard")
+        presentation.presentation.addElement(slide)
+
+        # Add title
+        title_frame = Frame(width="20cm", height="3cm", x="2cm", y="1cm")
+        slide.addElement(title_frame)
+        title_box = TextBox()
+        title_frame.addElement(title_box)
+        title_box.addElement(P(text=slide_data["title"]))
+
+        # Add content columns
+        num_columns = len(slide_data["content"])
+        column_width = 16 / num_columns
+
+        for i, content in enumerate(slide_data["content"]):
+            x_pos = 2 + i * column_width
+            content_frame = Frame(width=f"{column_width}cm", height="5cm", x=f"{x_pos}cm", y="5cm")
+            slide.addElement(content_frame)
+            content_box = TextBox()
+            content_frame.addElement(content_box)
+            content_box.addElement(P(text=content))
+
+    presentation.save(filename)
