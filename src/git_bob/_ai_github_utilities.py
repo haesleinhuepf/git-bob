@@ -8,6 +8,66 @@ from ._logger import Log
 AGENT_NAME = os.environ.get("GIT_BOB_AGENT_NAME", "git-bob")
 SYSTEM_PROMPT = os.environ.get("SYSTEM_MESSAGE", f"You are an AI-based coding assistant named {AGENT_NAME}. You are an excellent Python programmer and software engineer.")
 
+import json
+from odf.opendocument import OpenDocumentPresentation
+from odf.style import Style, MasterPage, PageLayout, PageLayoutProperties
+from odf.text import P
+from odf.draw import Page, Frame, TextBox
+
+def make_slides(slides_description_json, filename="issue_slides.odp"):
+    """
+    Create a presentation as an ODP file based on JSON-encoded slide descriptions.
+
+    Parameters
+    ----------
+    slides_description_json : str
+        JSON-encoded slide description of lists and dictionaries.
+    filename : str, optional
+        The output filename of the generated ODP file, by default "issue_slides.odp".
+    """
+    # Parse json-encoded slide description
+    slides_data = json.loads(slides_description_json)
+    
+    # Function to create presentation based on parsed data
+    presentation = OpenDocumentPresentation()
+    
+    # Create and add page layout
+    page_layout = PageLayout(name="MyLayout")
+    presentation.automaticstyles.addElement(page_layout)
+    
+    props = PageLayoutProperties(margintop="0cm", marginbottom="0cm", marginleft="0cm", marginright="0cm")
+    page_layout.addElement(props)
+    
+    # Create master page
+    master = MasterPage(name="Standard", pagelayoutname="MyLayout")
+    presentation.masterstyles.addElement(master)
+    
+    # Create slides
+    for slide_data in slides_data:
+        # Add new slide
+        slide = Page(masterpagename="Standard")
+        presentation.presentation.addElement(slide)
+        
+        # Add title
+        title_frame = Frame(width="20cm", height="3cm", x="2cm", y="1cm")
+        slide.addElement(title_frame)
+        title_box = TextBox()
+        title_frame.addElement(title_box)
+        title_box.addElement(P(text=slide_data["title"]))
+        
+        # Add content columns
+        num_columns = len(slide_data["content"])
+        column_width = 16 / num_columns
+        
+        for i, content in enumerate(slide_data["content"]):
+            x_pos = 2 + i * column_width
+            content_frame = Frame(width=f"{column_width}cm", height="5cm", x=f"{x_pos}cm", y="5cm")
+            slide.addElement(content_frame)
+            content_box = TextBox()
+            content_frame.addElement(content_box)
+            content_box.addElement(P(text=content))
+    
+    presentation.save(filename)
 
 def setup_ai_remark():
     """
@@ -502,6 +562,10 @@ Respond with the actions as JSON list.
                 imagen_prompt = prompt_function("From the following discussion, extract a prompt to paint a picture as discussed:\n\n" + discussion + "\n\nNow extract a prompt for painting a picture as discussed:")
                 commit_messages[filename] = paint_picture(repository, branch_name, prompt=imagen_prompt, output_filename=filename)
 
+            elif action == 'make_slides':  # Adding a block for make_slides action
+                slides_description = instruction['slides_description_json']
+                make_slides(slides_description)
+
         except Exception as e:
             traces = "    " + remove_ansi_escape_sequences(traceback.format_exc()).replace("\n", "\n    ")
             summary = f"""<details>
@@ -722,5 +786,3 @@ def paint_picture(repository, branch_name, prompt, output_filename="image.png", 
     Config.git_utilities.write_file_in_branch(repository, branch_name, output_filename, img_byte_arr, commit_message=commit_message)
 
     return commit_message
-
-
