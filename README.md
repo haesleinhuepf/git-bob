@@ -147,6 +147,7 @@ Some were parts of real scientific data analysis projects.
   * [UMAPs with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/41)
   * [Plotting a circle of triangles (in gitlab)](https://gitlab.com/haesleinhuepf/git-bob-gitlab-playground/-/issues/8)
   * [Pairplots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/48)
+  * [Word clouds](https://github.com/haesleinhuepf/git-bob-playground/issues/76)
 
 ## Installation for development
 
