@@ -9,65 +9,6 @@ AGENT_NAME = os.environ.get("GIT_BOB_AGENT_NAME", "git-bob")
 SYSTEM_PROMPT = os.environ.get("SYSTEM_MESSAGE", f"You are an AI-based coding assistant named {AGENT_NAME}. You are an excellent Python programmer and software engineer.")
 
 import json
-from odf.opendocument import OpenDocumentPresentation
-from odf.style import Style, MasterPage, PageLayout, PageLayoutProperties
-from odf.text import P
-from odf.draw import Page, Frame, TextBox
-
-def make_slides(slides_description_json, filename="issue_slides.odp"):
-    """
-    Create a presentation as an ODP file based on JSON-encoded slide descriptions.
-
-    Parameters
-    ----------
-    slides_description_json : str
-        JSON-encoded slide description of lists and dictionaries.
-    filename : str, optional
-        The output filename of the generated ODP file, by default "issue_slides.odp".
-    """
-    # Parse json-encoded slide description
-    slides_data = json.loads(slides_description_json)
-    
-    # Function to create presentation based on parsed data
-    presentation = OpenDocumentPresentation()
-    
-    # Create and add page layout
-    page_layout = PageLayout(name="MyLayout")
-    presentation.automaticstyles.addElement(page_layout)
-    
-    props = PageLayoutProperties(margintop="0cm", marginbottom="0cm", marginleft="0cm", marginright="0cm")
-    page_layout.addElement(props)
-    
-    # Create master page
-    master = MasterPage(name="Standard", pagelayoutname="MyLayout")
-    presentation.masterstyles.addElement(master)
-    
-    # Create slides
-    for slide_data in slides_data:
-        # Add new slide
-        slide = Page(masterpagename="Standard")
-        presentation.presentation.addElement(slide)
-        
-        # Add title
-        title_frame = Frame(width="20cm", height="3cm", x="2cm", y="1cm")
-        slide.addElement(title_frame)
-        title_box = TextBox()
-        title_frame.addElement(title_box)
-        title_box.addElement(P(text=slide_data["title"]))
-        
-        # Add content columns
-        num_columns = len(slide_data["content"])
-        column_width = 16 / num_columns
-        
-        for i, content in enumerate(slide_data["content"]):
-            x_pos = 2 + i * column_width
-            content_frame = Frame(width=f"{column_width}cm", height="5cm", x=f"{x_pos}cm", y="5cm")
-            slide.addElement(content_frame)
-            content_box = TextBox()
-            content_frame.addElement(content_box)
-            content_box.addElement(P(text=content))
-    
-    presentation.save(filename)
 
 def setup_ai_remark():
     """
@@ -307,6 +248,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
             format_specific_instructions = " When writing new functions, use numpy-style docstrings."
         elif filename.endswith('.ipynb'):
             format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors. Return the notebook in JSON format!"
+        elif filename.endswith('.odp'):
+            format_specific_instructions = "\nDescribe the presentation as a JSON array of slides, each with a title and content. The 'content' should be an array of strings, each representing a content block on the slide."
 
         if Config.git_utilities.check_if_file_exists(repository, branch_name, filename):
             file_content = Config.git_utilities.decode_file(Config.git_utilities.get_file_in_repository(repository, branch_name, filename))
@@ -376,6 +319,18 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
             print("Erasing outputs in generated ipynb file")
             new_content = erase_outputs_of_code_cells(new_content)
             do_execute_notebook = True
+        elif filename.endswith('.odp'):
+            # Specific handling for ODP files
+            import json
+            from ._utilities import make_slides
+
+            slides_description_json = new_content
+            make_slides(slides_description_json, filename)  # Use previously defined function to create ODP
+
+            # Load created ODP into a binary format
+            with open(filename, 'rb') as f:
+                new_content = f.read()
+            os.remove(filename)  # Remove temporary file
 
         if do_execute_notebook:
             print("Executing the notebook", len(new_content))
@@ -494,6 +449,7 @@ Response format:
 - For copies: {{"action": "copy", "old_filename": "...", "new_filename": "..."}}
 - For deletions: {{"action": "delete", "filename": "..."}}
 - For paintings: {{"action": "paint", "filename": "..."}}
+- For presentations: {{"action": "make_slides", "slides_description_json": "..."}}
 Respond with the actions as JSON list.
 """)
 
@@ -531,7 +487,7 @@ Respond with the actions as JSON list.
                 filename = instruction['filename'].strip("/")
 
                 created_files = create_or_modify_file(repository, issue, filename, branch_name, discussion,
-                                                                      prompt_function)
+                                                      prompt_function)
                 for filename, commit_message in created_files.items():
                     commit_messages[filename] = commit_message
             elif action == 'download':
@@ -586,7 +542,7 @@ Respond with the actions as JSON list.
     diffs_prompt = Config.git_utilities.get_diff_of_branches(repository, branch_name, base_branch=base_branch)
 
     # summarize the changes
-    commit_messages_prompt = "* " + "\n* ".join([f"{k}: {v}" for k,v in commit_messages.items()])
+    commit_messages_prompt = "* " + "\n* ".join([f"{k}: {v}" for k, v in commit_messages.items()])
 
     file_list = file_list_from_commit_message_dict(repository, branch_name, commit_messages)
     file_list_text = ""
@@ -643,10 +599,10 @@ Do not add headlines or any other formatting. Just respond with the paragraph, t
 
         try:
             Config.git_utilities.send_pull_request(repository,
-                          source_branch=branch_name,
-                          target_branch=base_branch,
-                          title=redact_text(pull_request_title),
-                          description=redact_text(full_report) + f"\n\ncloses #{issue}")
+                                                   source_branch=branch_name,
+                                                   target_branch=base_branch,
+                                                   title=redact_text(pull_request_title),
+                                                   description=redact_text(full_report) + f"\n\ncloses #{issue}")
         except GithubException as e:
             Config.git_utilities.add_comment_to_issue(repository, issue, f"{remark}Error creating pull-request: {e}{error_messages}")
         except GitlabCreateError as e:
@@ -699,7 +655,7 @@ def split_issue_in_sub_issues(repository, issue, prompt_function):
     from ._github_utilities import create_issue
 
     discussion = Config.git_utilities.get_conversation_on_issue(repository, issue)
-    ai_remark = setup_ai_remark()+ "\n"
+    ai_remark = setup_ai_remark() + "\n"
 
     # Implement the prompt to parse the discussion
     sub_tasks_json = prompt_function(f"""
@@ -735,7 +691,7 @@ Extract relevant information for the sub-task "{title}".
 Write the information down and make a proposal of how to solve the sub-task.
 Do not explain your response or anything else. Just respond the relevant information for the sub-task and a potential solution.
 """)
-        body = body.replace(AGENT_NAME, AGENT_NAME[:3]+ "_" + AGENT_NAME[4:]) # prevent endless loops
+        body = body.replace(AGENT_NAME, AGENT_NAME[:3] + "_" + AGENT_NAME[4:])  # prevent endless loops
 
         issue_number = create_issue(repository, title, ai_remark + body)
         sub_issue_numbers.append(issue_number)
@@ -750,6 +706,7 @@ Do not explain your response or anything else. Just respond the relevant informa
     Config.git_utilities.add_comment_to_issue(repository, issue, ai_remark + comment_text)
 
     return sub_issue_numbers
+
 
 def paint_picture(repository, branch_name, prompt, output_filename="image.png", model="dall-e-3", image_width=1024, image_height=1024, style='vivid', quality='standard'):
     """Generate an image using DALL-E3 based on a prompt and save it to the repository using PIL."""
