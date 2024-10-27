@@ -400,13 +400,30 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     from github.GithubException import GithubException
     from gitlab.exceptions import GitlabCreateError
     import traceback
+    from PIL import Image
+    from openai import OpenAI
+    from ._utilities import images_from_url_responses
 
-    def paint_image(prompt, output_path="image.png"):
+    def paint_image(prompt, output_path="image.png", model="dall-e-3", image_width=1024, image_height=1024, style='vivid', quality='standard'):
         """Generate an image based on a prompt and save it to disk using PIL."""
-        from ._create import create
-        from PIL import Image
+        client = OpenAI()
 
-        image = create(prompt=prompt, model="dall-e-3")
+        size_str = f"{image_width}x{image_height}"
+
+        kwargs = {}
+        if model == "dall-e-3":
+            kwargs['style'] = style
+            kwargs['quality'] = quality
+
+        response = client.images.generate(
+            prompt=prompt,
+            n=1,
+            model=model,
+            size=size_str,
+            **kwargs
+        )
+
+        image = images_from_url_responses(response)
         if isinstance(image, Image.Image):
             image.save(output_path)
 
