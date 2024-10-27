@@ -232,9 +232,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     dictionary of filename: commit_message for all created files
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
-    from ._utilities import split_content_and_summary, erase_outputs_of_code_cells, \
-        restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, \
-        restore_environment, redact_text, Config, get_file_info, get_modified_files
+    from ._utilities import split_content_and_summary, erase_outputs_of_code_cells, restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, restore_environment, redact_text, Config, get_file_info, get_modified_files
     import os
 
     created_files = {}
@@ -402,6 +400,15 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     from github.GithubException import GithubException
     from gitlab.exceptions import GitlabCreateError
     import traceback
+
+    def paint_image(prompt, output_path="image.png"):
+        """Generate an image based on a prompt and save it to disk using PIL."""
+        from ._create import create
+        from PIL import Image
+
+        image = create(prompt=prompt, model="dall-e-3")
+        if isinstance(image, Image.Image):
+            image.save(output_path)
 
     repo = Config.git_utilities.get_repository_handle(repository)
 
@@ -612,6 +619,7 @@ Do not add headline or any other formatting. Just respond with the paragraphe be
         modification_summary = ensure_images_shown(modification_summary, file_list)
 
         Config.git_utilities.add_comment_to_issue(repository, issue, remark + redact_text(clean_output(repository, modification_summary)) + redact_text(error_messages))
+
 
 def split_issue_in_sub_issues(repository, issue, prompt_function):
     """
