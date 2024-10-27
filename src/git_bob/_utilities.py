@@ -554,3 +554,22 @@ def get_modified_files(old_file_info, root_dir='.'):
             m = m[2:]
         result.append(m)
     return result
+
+
+def images_from_url_responses(response, input_shape=None):
+    """Turns a list of OpenAI's URL responses into PIL images."""
+    from skimage.io import imread
+    from skimage import transform
+    from PIL import Image
+
+    images = [imread(item.url) for item in response.data]
+
+    if input_shape is not None:
+        images = [transform.resize(image, input_shape, anti_aliasing=True, preserve_range=True).astype(image.dtype) for image in images]
+        
+    pil_images = [Image.fromarray(image) for image in images]
+
+    if len(pil_images) == 1:
+        return pil_images[0]
+    else:
+        return pil_images
