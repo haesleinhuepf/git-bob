@@ -232,9 +232,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     dictionary of filename: commit_message for all created files
     """
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
-    from ._utilities import split_content_and_summary, erase_outputs_of_code_cells, \
-        restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, \
-        restore_environment, redact_text, Config, get_file_info, get_modified_files
+    from ._utilities import split_content_and_summary, erase_outputs_of_code_cells, restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, restore_environment, redact_text, Config, get_file_info, get_modified_files
     import os
 
     created_files = {}
@@ -423,8 +421,9 @@ In case the task is to analyse data, create synthetic data, or draw a plot, cons
 {all_files}
 
 ## Your task
-Decide which of these files need to be modified, created, downloaded, renamed, copied or deleted to solve #{issue} ? 
+Decide which of these files need to be modified, created, downloaded, renamed, copied, deleted or painted to solve #{issue} ? 
 Downloads are necessary, if there is a url in the discussion and the linked file is needed in the proposed code.
+Paintings should only be done if the user explicitly asks to "paint" a picture or "draw" a comic.
 If the user asks for executing a notebook, consider this as modification.
 Keep the list of actions minimal.
 Response format:
@@ -434,6 +433,7 @@ Response format:
 - For renames: {{"action": "rename", "old_filename": "...", "new_filename": "..."}}
 - For copies: {{"action": "copy", "old_filename": "...", "new_filename": "..."}}
 - For deletions: {{"action": "delete", "filename": "..."}}
+- For paintings: {{"action": "paint", "filename": "..."}}
 Respond with the actions as JSON list.
 """)
 
@@ -497,6 +497,11 @@ Respond with the actions as JSON list.
                 new_filename = instruction['new_filename'].strip("/")
                 Config.git_utilities.copy_file_in_repository(repository, branch_name, old_filename, new_filename)
                 commit_messages[new_filename] = f"Copied {old_filename} to {new_filename}."
+            elif action == "paint":
+                filename = instruction['filename'].strip("/")
+                imagen_prompt = prompt_function("From the following discussion, extract a prompt to paint a picture as discussed:\n\n" + discussion + "\n\nNow extract a prompt for painting a picture as discussed:")
+                commit_messages[filename] = paint_picture(repository, branch_name, prompt=imagen_prompt, output_filename=filename)
+
         except Exception as e:
             traces = "    " + remove_ansi_escape_sequences(traceback.format_exc()).replace("\n", "\n    ")
             summary = f"""<details>
@@ -613,6 +618,7 @@ Do not add headline or any other formatting. Just respond with the paragraphe be
 
         Config.git_utilities.add_comment_to_issue(repository, issue, remark + redact_text(clean_output(repository, modification_summary)) + redact_text(error_messages))
 
+
 def split_issue_in_sub_issues(repository, issue, prompt_function):
     """
     Split a main issue into sub-issues for each sub-task.
@@ -680,3 +686,41 @@ Do not explain your response or anything else. Just respond the relevant informa
     Config.git_utilities.add_comment_to_issue(repository, issue, ai_remark + comment_text)
 
     return sub_issue_numbers
+
+def paint_picture(repository, branch_name, prompt, output_filename="image.png", model="dall-e-3", image_width=1024, image_height=1024, style='vivid', quality='standard'):
+    """Generate an image using DALL-E3 based on a prompt and save it to the repository using PIL."""
+    Log().log(f"-> paint_image({repository}, {branch_name}, ..., {output_filename}, {model}, ...)")
+    from openai import OpenAI
+    import io
+    from ._utilities import images_from_url_responses, Config
+    client = OpenAI()
+
+    size_str = f"{image_width}x{image_height}"
+
+    kwargs = {}
+    if model == "dall-e-3":
+        kwargs['style'] = style
+        kwargs['quality'] = quality
+
+    response = client.images.generate(
+        prompt=prompt,
+        n=1,
+        model=model,
+        size=size_str,
+        **kwargs
+    )
+
+    image = images_from_url_responses(response)
+
+    # convert to bytes
+    img_byte_arr = io.BytesIO()
+    image.save(img_byte_arr, format='PNG')
+    img_byte_arr = img_byte_arr.getvalue()
+
+    # commit
+    commit_message = "Painted image"
+    Config.git_utilities.write_file_in_branch(repository, branch_name, output_filename, img_byte_arr, commit_message=commit_message)
+
+    return commit_message
+
+
