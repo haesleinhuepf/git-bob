@@ -201,6 +201,8 @@ def is_github_url(url):
     elif url.endswith('.png') or url.endswith('.jpg') or url.endswith('.jpeg') or url.endswith('.gif') \
             or url.endswith('.webp') or "user-attachments/assets" in url or url.endswith("?raw=true"):
         return 'image'
+    elif url.endswith('.csv') or url.endswith('.xlsx') or url.endswith('.tif') or url.endswith('.zip'):
+        return 'data'
     elif 'blob/' in url:
         return 'file'
     return None
@@ -266,6 +268,8 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
             url = url[:-1]
             
         url_type = is_github_url(url)
+        print("URL:", url)
+        print("Type:", type)
 
         if "### File {url} content" in discussion:
             continue

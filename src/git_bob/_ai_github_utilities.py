@@ -98,9 +98,9 @@ Respond to a github issue. Its entire discussion is given and additionally, cont
 
 ## Your task
 
-Respond to the discussion above.
+Respond to the discussion above as if you were a human talking to a human.
 In case code-changes are discussed, make a proposal of how new code could look like.
-Do NOT explain your response or anything else. 
+Do NOT explain your response. Just explain code shortly if you are responding with code. 
 Do not repeat answers that were given already.
 Focus on the most recent discussion.
 Just respond to the discussion.
@@ -108,6 +108,11 @@ Just respond to the discussion.
     comment = redact_text(clean_output(repository, comment))
 
     print("comment:", comment)
+
+    comment = comment.strip("\n").strip().strip("\n")
+
+    if comment.startswith("from ") or comment.startswith("import "):
+        comment = "```python\n" + comment + "\n```"
 
     Config.git_utilities.add_comment_to_issue(repository, issue, f"""        
 {ai_remark}
@@ -393,7 +398,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
 
     from ._utilities import split_content_and_summary, text_to_json, modify_discussion, \
         remove_ansi_escape_sequences, clean_output, redact_text, Config, file_list_from_commit_message_dict, \
-        ensure_images_shown
+        ensure_images_shown, is_github_url
     from github.GithubException import GithubException
     from gitlab.exceptions import GitlabCreateError
     import traceback
@@ -471,9 +476,13 @@ Respond with the actions as JSON list.
                     commit_messages[filename] = commit_message
             elif action == 'download':
                 source_url = instruction['source_url']
-                target_filename = instruction['target_filename'].strip("/")
-                Config.git_utilities.download_to_repository(repository, branch_name, source_url, target_filename)
-                commit_messages[target_filename] = f"Downloaded {source_url}, saved as {target_filename}."
+                url_type = is_github_url(source_url)
+                if url_type in ["image", "data"]:
+                    source_url = source_url.replace("/blob/", "/raw/")
+                    target_filename = instruction['target_filename'].strip("/")
+                    Config.git_utilities.download_to_repository(repository, branch_name, source_url, target_filename)
+                    commit_messages[target_filename] = f"Downloaded {source_url}, saved as {target_filename}."
+                # else: otherwise we have it already in the text
             elif action == 'rename':
                 old_filename = instruction['old_filename'].strip("/")
                 new_filename = instruction['new_filename'].strip("/")
