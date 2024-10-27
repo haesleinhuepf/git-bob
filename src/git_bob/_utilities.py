@@ -561,13 +561,12 @@ def images_from_url_responses(response, input_shape=None):
     from skimage.io import imread
     from skimage import transform
     from PIL import Image
+    # Removed unnecessary conversion to numpy arrays
 
-    images = [imread(item.url) for item in response.data]
+    pil_images = [Image.fromarray(imread(item.url)) for item in response.data]
 
     if input_shape is not None:
-        images = [transform.resize(image, input_shape, anti_aliasing=True, preserve_range=True).astype(image.dtype) for image in images]
-        
-    pil_images = [Image.fromarray(image) for image in images]
+        pil_images = [img.resize(input_shape) for img in pil_images]
 
     if len(pil_images) == 1:
         return pil_images[0]
