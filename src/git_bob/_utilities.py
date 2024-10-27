@@ -435,7 +435,7 @@ def clean_output(repository, text):
 
     # if there are strangers tagged, remove those tags
     temp = text.split("```")
-    for i in range(0, len(temp), 2):
+    for i in 0, len(temp), 2:
         temp[i] = temp[i].replace("@", "@ ")
     text = "```".join(temp)
     contributors = Config.git_utilities.get_contributors(repository)
