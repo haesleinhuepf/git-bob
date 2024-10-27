@@ -1,4 +1,3 @@
-
 def test_remove_outer_markdown():
     from git_bob._utilities import remove_outer_markdown
     assert remove_outer_markdown("""```python
@@ -222,3 +221,24 @@ def test_get_modified_files():
 
     assert len(files) == 3
 
+
+def test_make_slides():
+    """Test the make_slides function from the utilities module."""
+    import json
+    from git_bob._utilities import make_slides
+
+    # Mock JSON slide description
+    slides_description_json = json.dumps([
+        {"title": "First Slide", "content": ["Content A1", "Content A2"]},
+        {"title": "Second Slide", "content": ["Content B1", "Content B2"]}
+    ])
+
+    # Call the function and check if file is created
+    output_filename = "test_slides.odp"
+    make_slides(slides_description_json, filename=output_filename)
+    
+    import os
+    assert os.path.exists(output_filename)
+
+    # Clean up the created file
+    os.remove(output_filename)
