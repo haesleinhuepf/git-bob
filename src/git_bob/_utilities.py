@@ -266,6 +266,8 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
             url = url[:-1]
             
         url_type = is_github_url(url)
+        print("URL:", url)
+        print("Type:", type)
 
         if "### File {url} content" in discussion:
             continue
