@@ -1,3 +1,4 @@
+plaintext
 anthropic
 openai
 google-generativeai
@@ -18,3 +19,4 @@ urllib3==1.26.15
 requests-toolbelt==0.10.1
 twine
 python-gitlab
+odfpy
