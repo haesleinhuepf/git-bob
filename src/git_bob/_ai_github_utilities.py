@@ -247,6 +247,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
             format_specific_instructions = " When writing new functions, use numpy-style docstrings."
         elif filename.endswith('.ipynb'):
             format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors. Return the notebook in JSON format!"
+        elif filename.endswith('.pptx'):
+            format_specific_instructions = " The file should be a presentation with slides, formatted as a JSON list containing dictionaries with a 'title' and a 'content' list with strings."
 
         if Config.git_utilities.check_if_file_exists(repository, branch_name, filename):
             file_content = Config.git_utilities.decode_file(Config.git_utilities.get_file_in_repository(repository, branch_name, filename))
@@ -316,6 +318,11 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
             print("Erasing outputs in generated ipynb file")
             new_content = erase_outputs_of_code_cells(new_content)
             do_execute_notebook = True
+        elif filename.endswith('.pptx'):
+            from ._utilities import make_slides
+            make_slides(new_content, filename)
+            with open(filename, 'rb') as f:
+                new_content = f.read()
 
         if do_execute_notebook:
             print("Executing the notebook", len(new_content))
@@ -722,5 +729,3 @@ def paint_picture(repository, branch_name, prompt, output_filename="image.png", 
     Config.git_utilities.write_file_in_branch(repository, branch_name, output_filename, img_byte_arr, commit_message=commit_message)
 
     return commit_message
-
-
