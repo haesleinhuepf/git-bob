@@ -246,7 +246,7 @@ Body:
     return content
 
 
-def list_repository_files(repository: str, branch_name: str = "main") -> list:
+def list_repository_files(repository: str, branch_name: str = None) -> list:
     """
     List all files in a given GitHub repository.
 
@@ -266,6 +266,8 @@ def list_repository_files(repository: str, branch_name: str = "main") -> list:
         A list of strings, where each string is the path of a file in the repository.
     """
     Log().log(f"-> list_repository_files({repository})")
+    if branch_name is None:
+        branch_name = get_default_branch_name(repository)
 
     # Initialize Github client
     repo = get_repository_handle(repository)
@@ -377,7 +379,7 @@ def write_file_in_branch(repository, branch_name, file_path, new_content, commit
     return f"File {file_path} successfully created in repository {repository} branch {branch_name}."
 
 
-def create_branch(repository, parent_branch="main"):
+def create_branch(repository, parent_branch=None):
     """
     Creates a new branch in a given repository, derived from an optionally specified parent_branch and returns the name of the new branch.
 
@@ -394,6 +396,9 @@ def create_branch(repository, parent_branch="main"):
         The name of the newly created branch.
     """
     Log().log(f"-> create_branch({repository}, {parent_branch})")
+    if parent_branch is None:
+        parent_branch = get_default_branch_name(repository)
+
 
     import random
     import string
@@ -668,7 +673,7 @@ def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
         issue_obj.create_reaction(reaction)
 
 
-def get_diff_of_branches(repository, compare_branch, base_branch="main"):
+def get_diff_of_branches(repository, compare_branch, base_branch=None):
     """
     Get the diff between two branches in a GitHub repository.
     Parameters
@@ -684,6 +689,9 @@ def get_diff_of_branches(repository, compare_branch, base_branch="main"):
     str
         The diff between the specified branches as a string.
     """
+    if base_branch is None:
+        base_branch = get_default_branch_name(repository)
+
     # Get the repository
     repo = get_repository_handle(repository)
 
