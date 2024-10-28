@@ -382,7 +382,7 @@ def append_result(a, b):
         return a
 
     possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy",
-                           "```jython", "```md", "```markdown",
+                           "```jython", "```md", "```markdown", "```plaintext",
                            "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "<FILE>", "```"]
 
     for beginning in possible_beginnings:
