@@ -186,7 +186,7 @@ Description:
 
     return content
 
-def list_repository_files(repository: str, branch_name: str = "main") -> list:
+def list_repository_files(repository: str, branch_name: str = None) -> list:
     """
     List all files in the specified GitLab repository branch.
 
@@ -202,6 +202,9 @@ def list_repository_files(repository: str, branch_name: str = "main") -> list:
     list
         A list of file paths in the repository.
     """
+    if branch_name is None:
+        branch_name = get_default_branch_name(repository)
+
     Log().log(f"-> list_repository_files({repository}, {branch_name})")
     repo = get_repository_handle(repository)
     files = []
@@ -237,6 +240,10 @@ def get_repository_file_contents(repository:str, branch_name, file_paths: list):
         The content of the file as a string.
     """
     Log().log(f"-> get_repository_file_contents({repository}, {branch_name}, {file_paths})")
+
+    if branch_name is None:
+        branch_name = get_default_branch_name(repository)
+
     project = get_repository_handle(repository)
 
     file_contents = {}
@@ -323,7 +330,7 @@ def write_file_in_branch(repository, branch_name, file_path, new_content, commit
     return f"File {file_path} successfully created in repository {repository} branch {branch_name}."
 
 
-def create_branch(repository, parent_branch="main"):
+def create_branch(repository, parent_branch=None):
     """
     Create a new branch in a GitLab repository.
 
@@ -338,6 +345,9 @@ def create_branch(repository, parent_branch="main"):
     -------
     None
     """
+    if parent_branch is None:
+        parent_branch = get_default_branch_name(repository)
+
     Log().log(f"-> create_branch({repository}, {parent_branch})")
     import random
     import string
@@ -599,7 +609,7 @@ def add_reaction_to_last_comment_in_issue(repository, issue, reaction="+1"):
     except gitlab.exceptions.GitlabCreateError:
         pass # already exists
 
-def get_diff_of_branches(repository, compare_branch, base_branch="main"):
+def get_diff_of_branches(repository, compare_branch, base_branch=None):
     """
     Get the diff between two branches in a GitLab repository.
 
@@ -617,6 +627,10 @@ def get_diff_of_branches(repository, compare_branch, base_branch="main"):
     str
         The diff as a string.
     """
+
+    if base_branch is None:
+        base_branch = get_default_branch_name(repository)
+
     Log().log(f"-> get_diff_of_branches({repository}, {compare_branch}, {base_branch})")
     project = get_repository_handle(repository)
     compare = project.repository_compare(from_=base_branch, to=compare_branch)
