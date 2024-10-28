@@ -572,3 +572,51 @@ def images_from_url_responses(response, input_shape=None):
         return pil_images[0]
     else:
         return pil_images
+
+
+def make_slides(slides_description_json, filename="issue_slides.pptx"):
+    """
+    Create a PowerPoint slide deck from a JSON description of slides.
+
+    Parameters
+    ----------
+    slides_description_json : str
+        A JSON string representing the slides. Each slide is expected to be a dictionary with
+        a 'title' key and a 'content' key, where 'content' is a list of strings.
+    filename : str, optional
+        The name of the file to save the presentation to. Defaults to 'issue_slides.pptx'.
+
+    """
+    import json
+    from pptx import Presentation
+    from pptx.util import Inches
+    
+    # Parse json-encoded slide description
+    slides_data = json.loads(slides_description_json)
+
+    # Create a presentation
+    presentation = Presentation()
+
+    # Iterate through slide data to create slides
+    for slide_data in slides_data:
+        # Add a slide with title and content layout
+        slide_layout = presentation.slide_layouts[5] # Using a blank layout
+        slide = presentation.slides.add_slide(slide_layout)
+
+        # Add title
+        title_box = slide.shapes.title
+        title_box.text = slide_data['title']
+
+        # Calculate width for content columns
+        num_columns = len(slide_data['content'])
+        content_width = Inches(5.5) / num_columns  # Maximum width is 5.5 inches
+
+        for i, content in enumerate(slide_data['content']):
+            left = Inches(1 + i * content_width)
+            height = Inches(1.5)
+            content_box = slide.shapes.add_textbox(left=left, top=Inches(2), width=content_width, height=height)
+            text_frame = content_box.text_frame
+            text_frame.text = content
+
+    # Save presentation
+    presentation.save(filename)
