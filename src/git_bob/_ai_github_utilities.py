@@ -163,6 +163,7 @@ Check if the discussion reflects what was changed in the files.
 ## Your task
 
 Review this pull-request and contribute to the discussion. 
+Respond as if you were a human talking to a human.
 
 Do NOT explain your response or anything else. 
 Just respond to the discussion.
@@ -564,6 +565,7 @@ The following changes were made in the files:
 ## Your task
 
 Summarize the changes above to a one paragraph which will be Github pull-request message. 
+Write the message as if you were a human talking to a human.
 Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file. Keep the list as it is otherwise.
 
 Afterwards, summarize the summary in a single line, which will become the title of the pull-request.
