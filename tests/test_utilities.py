@@ -231,3 +231,7 @@ def test_make_slides():
     ]'''
     make_slides(slides_description, "test_slides.pptx")
     assert os.path.exists("test_slides.pptx")
+
+    from pptx import Presentation
+    presentation = Presentation("test_slides.pptx")
+    assert len(presentation.slides) == 2

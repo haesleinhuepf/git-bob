@@ -49,3 +49,10 @@ def test_check_if_file_exists():
     from git_bob._github_utilities import check_if_file_exists
     assert check_if_file_exists("haesleinhuepf/git-bob", "main", "README.md")
     assert not check_if_file_exists("haesleinhuepf/git-bob", "main", "readme2.md")
+
+def test_list_repository_files_filtered():
+    from git_bob._github_utilities import list_repository_files
+    files = list_repository_files("haesleinhuepf/git-bob", "main", file_patterns=[".png", ".jpg", ".jpeg", ".gif"])
+    assert "docs/images/banner2.png" in files
+    assert "docs/troubleshooting.md" not in files
+

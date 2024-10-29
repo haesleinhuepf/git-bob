@@ -590,17 +590,18 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
     import json
     from pptx import Presentation
     from pptx.util import Inches
-    
+    from pathlib import Path
+
     # Parse json-encoded slide description
     slides_data = json.loads(slides_description_json)
 
     # Create a presentation
-    presentation = Presentation()
+    presentation = Presentation(Path(__file__).parent / "data" / "blank_template.pptx")
 
     # Iterate through slide data to create slides
     for slide_data in slides_data:
         # Add a slide with title and content layout
-        slide_layout = presentation.slide_layouts[5] # Using a blank layout
+        slide_layout = presentation.slide_layouts[1] # Using a blank layout
         slide = presentation.slides.add_slide(slide_layout)
 
         # Add title
@@ -614,9 +615,13 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
         for i, content in enumerate(slide_data['content']):
             left = Inches(1 + i * content_width)
             height = Inches(1.5)
-            content_box = slide.shapes.add_textbox(left=left, top=Inches(2), width=content_width, height=height)
-            text_frame = content_box.text_frame
-            text_frame.text = content
+            if content.endswith(".png"):
+                image_path = content
+                content_box = slide.shapes.add_picture(image_path, left=left, top=Inches(2), width=content_width, height=height)
+            else:
+                content_box = slide.shapes.add_textbox(left=left, top=Inches(2), width=content_width, height=height)
+                text_frame = content_box.text_frame
+                text_frame.text = content
 
     # Save presentation
     presentation.save(filename)

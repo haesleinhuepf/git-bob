@@ -235,6 +235,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     from ._utilities import split_content_and_summary, erase_outputs_of_code_cells, restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, restore_environment, redact_text, Config, get_file_info, get_modified_files
     import os
 
+    image_file_endings = [".png", ".jpg", ".jpeg", ".gif"]
+
     created_files = {}
     for attempt in range(number_of_attempts):
         an_error_happened = False
@@ -243,15 +245,28 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         original_ipynb_file_content = None
 
         format_specific_instructions = ""
-        if filename.endswith('.py'):
+        if any([filename.endswith(f) for f in image_file_endings]):
+            print(f"Cannot create or modify image files like {filename}.")
+            return created_files
+        elif filename.endswith('.py'):
             format_specific_instructions = " When writing new functions, use numpy-style docstrings."
         elif filename.endswith('.ipynb'):
             format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors. Return the notebook in JSON format!"
         elif filename.endswith('.pptx'):
-            format_specific_instructions = " The file should be a presentation with slides, formatted as a JSON list containing dictionaries with a 'title' and a 'content' list with strings."
+            format_specific_instructions = """
+The file should be a presentation with slides, formatted as a JSON list containing dictionaries with a 'title' and a 'content' list with strings. 
+The content strings can be multi-line text, and also be file-paths of .jpg, .gif or .png files. If it's an image, it MUST only be the file-path and no additional text.
+Choose from these existing files and only use them if they fit well to the content:\n* """ + \
+                "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=branch_name, file_patterns=image_file_endings)) + "\n\n"
 
+        file_content = None
         if Config.git_utilities.check_if_file_exists(repository, branch_name, filename):
-            file_content = Config.git_utilities.decode_file(Config.git_utilities.get_file_in_repository(repository, branch_name, filename))
+            try:
+                file_content = Config.git_utilities.decode_file(Config.git_utilities.get_file_in_repository(repository, branch_name, filename))
+            except UnicodeDecodeError:
+                pass # happens when attempting to modify binary files
+
+        if file_content is not None:
             print(filename, "will be overwritten")
             if filename.endswith('.ipynb'):
                 print("Removing outputs from ipynb file")
