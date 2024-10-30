@@ -305,7 +305,7 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
                 additional_content[url] = file_contents
             elif url_type == 'image':
                 image = load_image_from_url(url)
-                image_content = prompt_visionlm(VISION_SYSTEM_MESSAGE + "\n\nDescribe this image.", image=url)
+                image_content = prompt_visionlm(VISION_SYSTEM_MESSAGE + "\n\nDescribe this image.", image=image)
                 additional_content[url] = image_content
         except Exception as e:
             print(f"Error while processing URL {url}: {e}")
