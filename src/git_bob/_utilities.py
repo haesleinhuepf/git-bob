@@ -9,6 +9,9 @@ import os
 
 VISION_SYSTEM_MESSAGE = os.environ.get("VISION_SYSTEM_MESSAGE", "You are a AI-based vison system. You described images professionally and clearly.")
 
+IMAGE_FILE_ENDINGS = [".jpg", ".png", ".gif", ".jpeg"]
+
+
 def remove_outer_markdown(text):
     """
     Remove outer markdown syntax from the given text.
@@ -198,7 +201,7 @@ def is_github_url(url):
         return 'issue'
     elif '/pull/' in url:
         return 'pull_request'
-    elif url.endswith('.png') or url.endswith('.jpg') or url.endswith('.jpeg') or url.endswith('.gif') \
+    elif any([url.endswith(f) for f in IMAGE_FILE_ENDINGS]) \
             or url.endswith('.webp') or "user-attachments/assets" in url or url.endswith("?raw=true"):
         return 'image'
     elif url.endswith('.csv') or url.endswith('.xlsx') or url.endswith('.tif') or url.endswith('.zip'):
@@ -502,7 +505,7 @@ def file_list_from_commit_message_dict(repository, branch_name, commit_messages)
 
         suffix = ""
         prefix = ""
-        if k.endswith(".png") or k.endswith(".jpg") or k.endswith(".gif"):
+        if any([k.endswith(f) for f in IMAGE_FILE_ENDINGS]):
             prefix = "!"
             if "https://github.com/" in Config.git_server_url:
                 suffix = "?raw=true"
@@ -599,6 +602,14 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
     # Create a presentation
     presentation = Presentation(Path(__file__).parent / "data" / "blank_template.pptx")
 
+    # determine slide size
+    slide_width = presentation.slide_width
+    slide_height = presentation.slide_height
+
+    # Convert EMU to inches (1 inch = 914400 EMUs)
+    width_inch = slide_width / 914400
+    height_inch = slide_height / 914400
+
     # Iterate through slide data to create slides
     for slide_data in slides_data:
         # Add a slide with title and content layout
@@ -611,17 +622,21 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
 
         # Calculate width for content columns
         num_columns = len(slide_data['content'])
-        content_width = Inches(12.0) / num_columns  # Maximum width is 5.5 inches
+        content_width = Inches(width_inch - 2) / num_columns  # Maximum width is 5.5 inches
+        height = Inches(height_inch)
 
         # remove all placeholders except the title
         for shape in slide.placeholders:
             if shape != title_box:
-                shape.text = ""
+                #shape.text = ""
+                slide.shapes._spTree.remove(shape._element)
 
         for i, content in enumerate(slide_data['content']):
-            left = Inches(1 + i * content_width)
-            height = Inches(5.5)
-            if content.endswith(".png"):
+            left = Inches(1) + i * content_width
+
+            print("Left", left)
+
+            if any([content.endswith(f) for f in IMAGE_FILE_ENDINGS]):
                 image_path = content
 
                 # load image using PIL and determine width/height ratio
@@ -634,6 +649,8 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
                 content_box = slide.shapes.add_textbox(left=left, top=Inches(2), width=content_width, height=height)
                 text_frame = content_box.text_frame
                 text_frame.text = content
+                text_frame.word_wrap = True
+
                 for paragraph in text_frame.paragraphs:
                     for run in paragraph.runs:
                         # Set the font size for each run in each paragraph
