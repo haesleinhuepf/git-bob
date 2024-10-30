@@ -255,7 +255,9 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         elif filename.endswith('.pptx'):
             format_specific_instructions = """
 The file should be a presentation with slides, formatted as a JSON list containing dictionaries with a 'title' and a 'content' list with up to 2 strings. 
-These strings can be text+text or text+image. The strings can be multi-line text, and also be file-paths of .jpg, .gif or .png files. If it's an image, it MUST only be the file-path and no additional text.
+These strings can be text+text or text+image. The strings can be multi-line text, and also be file-paths of .jpg, .gif or .png files. 
+If it's an image, it MUST only be the file-path and no additional text.
+If it's text, make sure the text is short enough that it fits on a slide. Consider using bullet-points instead of long sentences.
 Choose from these existing files and only use them if they fit well to the content:\n* """ + \
                 "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=branch_name, file_patterns=image_file_endings)) + "\n\n"
 

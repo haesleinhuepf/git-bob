@@ -610,6 +610,9 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
     width_inch = slide_width / 914400
     height_inch = slide_height / 914400
 
+    top = Inches(2)
+    bottom = Inches(1)
+
     # Iterate through slide data to create slides
     for slide_data in slides_data:
         # Add a slide with title and content layout
@@ -622,17 +625,19 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
 
         # Calculate width for content columns
         num_columns = len(slide_data['content'])
-        content_width = Inches(width_inch - 2) / num_columns  # Maximum width is 5.5 inches
-        height = Inches(height_inch)
 
         # remove all placeholders except the title
         for shape in slide.placeholders:
             if shape != title_box:
                 #shape.text = ""
+                top = shape.top
+                bottom = height_inch - top
                 slide.shapes._spTree.remove(shape._element)
 
         for i, content in enumerate(slide_data['content']):
-            left = Inches(1) + i * content_width
+            content_width = (Inches(width_inch) - top) / num_columns
+            content_height = (Inches(height_inch) - top) - bottom
+            left = Inches(1) + i * (content_width + Inches(0.1))
 
             print("Left", left)
 
@@ -644,9 +649,12 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
                 width, height = image.size
                 aspect_ratio = width / height
 
-                content_box = slide.shapes.add_picture(image_path, left=left, top=Inches(2), width=content_width, height=content_width / aspect_ratio)
+                if content_width / aspect_ratio > content_height - bottom:
+                    content_width = (content_height - bottom) / aspect_ratio
+
+                content_box = slide.shapes.add_picture(image_path, left=left, top=top, width=content_width, height=content_width / aspect_ratio)
             else:
-                content_box = slide.shapes.add_textbox(left=left, top=Inches(2), width=content_width, height=height)
+                content_box = slide.shapes.add_textbox(left=left, top=top, width=content_width, height=content_height)
                 text_frame = content_box.text_frame
                 text_frame.text = content
                 text_frame.word_wrap = True
