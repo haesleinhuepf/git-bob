@@ -589,8 +589,9 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
     """
     import json
     from pptx import Presentation
-    from pptx.util import Inches
+    from pptx.util import Inches, Pt
     from pathlib import Path
+    from PIL import Image
 
     # Parse json-encoded slide description
     slides_data = json.loads(slides_description_json)
@@ -610,18 +611,34 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
 
         # Calculate width for content columns
         num_columns = len(slide_data['content'])
-        content_width = Inches(5.5) / num_columns  # Maximum width is 5.5 inches
+        content_width = Inches(12.0) / num_columns  # Maximum width is 5.5 inches
+
+        # remove all placeholders except the title
+        for shape in slide.placeholders:
+            if shape != title_box:
+                shape.text = ""
 
         for i, content in enumerate(slide_data['content']):
             left = Inches(1 + i * content_width)
-            height = Inches(1.5)
+            height = Inches(5.5)
             if content.endswith(".png"):
                 image_path = content
-                content_box = slide.shapes.add_picture(image_path, left=left, top=Inches(2), width=content_width, height=height)
+
+                # load image using PIL and determine width/height ratio
+                image = Image.open(image_path)
+                width, height = image.size
+                aspect_ratio = width / height
+
+                content_box = slide.shapes.add_picture(image_path, left=left, top=Inches(2), width=content_width, height=content_width / aspect_ratio)
             else:
                 content_box = slide.shapes.add_textbox(left=left, top=Inches(2), width=content_width, height=height)
                 text_frame = content_box.text_frame
                 text_frame.text = content
+                for paragraph in text_frame.paragraphs:
+                    for run in paragraph.runs:
+                        # Set the font size for each run in each paragraph
+                        run.font.size = Pt(24)  # Set font size to 24 points
+
 
     # Save presentation
     presentation.save(filename)

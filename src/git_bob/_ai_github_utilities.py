@@ -254,8 +254,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
             format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors. Return the notebook in JSON format!"
         elif filename.endswith('.pptx'):
             format_specific_instructions = """
-The file should be a presentation with slides, formatted as a JSON list containing dictionaries with a 'title' and a 'content' list with strings. 
-The content strings can be multi-line text, and also be file-paths of .jpg, .gif or .png files. If it's an image, it MUST only be the file-path and no additional text.
+The file should be a presentation with slides, formatted as a JSON list containing dictionaries with a 'title' and a 'content' list with up to 2 strings. 
+These strings can be text+text or text+image. The strings can be multi-line text, and also be file-paths of .jpg, .gif or .png files. If it's an image, it MUST only be the file-path and no additional text.
 Choose from these existing files and only use them if they fit well to the content:\n* """ + \
                 "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=branch_name, file_patterns=image_file_endings)) + "\n\n"
 
@@ -382,13 +382,13 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
 
             print("Executed notebook", len(new_content))
 
-
-        new_content = redact_text(new_content)
+        if isinstance(new_content, str):
+            new_content = redact_text(new_content) + "\n"
         if not an_error_happened:
             break
         print(f"An error happened. Retrying... {attempt+1}/{number_of_attempts}")
 
-    Config.git_utilities.write_file_in_branch(repository, branch_name, filename, new_content + "\n", redact_text(commit_message))
+    Config.git_utilities.write_file_in_branch(repository, branch_name, filename, new_content, redact_text(commit_message))
     created_files[filename] = redact_text(commit_message)
 
     return created_files
