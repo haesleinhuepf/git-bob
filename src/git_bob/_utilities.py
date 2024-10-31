@@ -595,12 +595,19 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
     from pptx.util import Inches, Pt
     from pathlib import Path
     from PIL import Image
+    import os
+
+    print("SLIDES_JSON:", slides_description_json)
 
     # Parse json-encoded slide description
     slides_data = json.loads(slides_description_json)
 
+    file_location = "slide_template.pptx"
+    if not os.path.exists(file_location):
+        file_location = Path(__file__).parent / "data" / "slide_template.pptx"
+
     # Create a presentation
-    presentation = Presentation(Path(__file__).parent / "data" / "blank_template.pptx")
+    presentation = Presentation(file_location)
 
     # determine slide size
     slide_width = presentation.slide_width
