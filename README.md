@@ -153,7 +153,7 @@ Some were parts of real scientific data analysis projects.
   * [Making slides for Research Data Management training](https://github.com/haesleinhuepf/git-bob-playground/issues/96)
   * [Visualizing how Fourier-Transform works](https://github.com/haesleinhuepf/git-bob-playground/issues/22)
   * [Making Jupyter Notebooks for training](https://github.com/haesleinhuepf/git-bob-playground/issues/92)
-  * [Making slides about text](https://github.com/haesleinhuepf/git-bob-playground/issues/94)
+  * [Making slides about text](https://github.com/haesleinhuepf/git-bob-playground/issues/98)
 * Fun
   * [Playing Tic-Tac-Toe](https://github.com/haesleinhuepf/git-bob-playground/issues/91)
   * [Story Telling for kids](https://github.com/haesleinhuepf/git-bob-playground/issues/82)
