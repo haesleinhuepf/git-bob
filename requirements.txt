@@ -14,8 +14,8 @@ requests
 ipykernel
 setuptools
 wheel
-urllib3==1.26.15
-requests-toolbelt==0.10.1
+urllib3
+requests-toolbelt
 twine
 python-gitlab
 python-pptx
