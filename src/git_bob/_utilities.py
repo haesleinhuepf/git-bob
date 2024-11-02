@@ -176,6 +176,9 @@ def restore_outputs_of_code_cells(new_content, original_ipynb_file_content):
 def text_to_json(text):
     """Converts a string, e.g. a response from an LLM, to a valid JSON object."""
     import json
+
+    text = re.sub(r'[\x00-\x1f\x7f]', '', text)
+
     if "[" in text:
         text = "[" +  text.split("[")[1]
     if "]" in text:
