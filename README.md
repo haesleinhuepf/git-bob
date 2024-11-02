@@ -157,6 +157,7 @@ Some were parts of real scientific data analysis projects.
 * Fun
   * [Playing Tic-Tac-Toe](https://github.com/haesleinhuepf/git-bob-playground/issues/91)
   * [Story Telling for kids](https://github.com/haesleinhuepf/git-bob-playground/issues/82)
+  * [PowerPoint Karaoke](https://github.com/haesleinhuepf/git-bob-playground/issues/99)
 
 ## Installation for development
 
