@@ -128,11 +128,11 @@ Some were parts of real scientific data analysis projects.
 
 * Question answering 
   * [About specific Python libraries](https://github.com/haesleinhuepf/stackview/issues/79)
-  * [Visualizing how Fourier-Transform works](https://github.com/haesleinhuepf/git-bob-playground/issues/22)
   * [The capital of France](https://github.com/haesleinhuepf/git-bob-playground/issues/24)
 * Bio-image Analysis
   * [Nuclei segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/13)
   * [Cell segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/42)
+  * [Resizing images](https://github.com/NFDI4BIOIMAGE/training/issues/356)
 * Data & Code Management
   * [Research Data Management & Folder Structures](https://github.com/haesleinhuepf/git-bob-playground/issues/45)
   * [Documenting source code](https://github.com/haesleinhuepf/git-bob/pull/29)
@@ -148,6 +148,15 @@ Some were parts of real scientific data analysis projects.
   * [Plotting a circle of triangles (in gitlab)](https://gitlab.com/haesleinhuepf/git-bob-gitlab-playground/-/issues/8)
   * [Pairplots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/48)
   * [Word clouds](https://github.com/haesleinhuepf/git-bob-playground/issues/76)
+* Science Communication
+  * [Making slides for Deep Learning training](https://github.com/haesleinhuepf/git-bob-playground/issues/97)
+  * [Making slides for Research Data Management training](https://github.com/haesleinhuepf/git-bob-playground/issues/96)
+  * [Visualizing how Fourier-Transform works](https://github.com/haesleinhuepf/git-bob-playground/issues/22)
+  * [Making Jupyter Notebooks for training](https://github.com/haesleinhuepf/git-bob-playground/issues/92)
+  * [Making slides about text](https://github.com/haesleinhuepf/git-bob-playground/issues/94)
+* Fun
+  * [Playing Tic-Tac-Toe](https://github.com/haesleinhuepf/git-bob-playground/issues/91)
+  * [Story Telling for kids](https://github.com/haesleinhuepf/git-bob-playground/issues/82)
 
 ## Installation for development
 
