@@ -441,6 +441,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
 
     modifications = prompt_function(f"""
 Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files need to be modified, renamed or deleted to solve the issue.
+When asked to make slides or create a presentation, assume this task is a file creation.
 In case the task is to analyse data, create synthetic data, or draw a plot, consider creating a notebook for this.
 
 ## Github Issue #{issue} Discussion
