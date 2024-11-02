@@ -258,11 +258,14 @@ The file should be a presentation with slides, formatted as a JSON list containi
 These strings can be text+text or text+image. The strings can be multi-line text, and also be file-paths of .jpg, .gif or .png files. 
 If it's an image, it MUST only be the file-path and no additional text.
 If it's text, make sure the text is short enough that it fits on a slide. Also put enough information on a slide so that it doesn't appear empty. Two to four sentences per slide are nice. For more detailed information consider using bullet-points instead of long sentences. Four to six bullet points per slide are great.
+The first slide contains only the author name as single string in the list of contents.
 Choose from these existing files and only use them if they fit well to the content:\n* """ + \
                 "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=branch_name, file_patterns=image_file_endings)) + "\n\n" + \
                 """
-Example 1: {"title":"headline", "content":["placeholder text A", "placeholder text A"]}
-Example 2: {"title":"topic", "content":["placeholder text", "placeholder_image.png"]}
+Example 1: {"title":"Slide topic", "content":["Author name"]}
+Example 3: {"title":"headline", "content":["placeholder text A", "placeholder text A"]}
+Example 4: {"title":"topic", "content":["placeholder text", "placeholder_image.png"]}
+Example 5: {"title":"topic", "content":["longer text with multiple lines\ndetailed information"]}
 """
 
         file_content = None

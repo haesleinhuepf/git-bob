@@ -614,9 +614,9 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
     bottom = Inches(1)
 
     # Iterate through slide data to create slides
-    for slide_data in slides_data:
+    for i, slide_data in enumerate(slides_data):
         # Add a slide with title and content layout
-        slide_layout = presentation.slide_layouts[1] # Using a blank layout
+        slide_layout = presentation.slide_layouts[0 if i == 0 else 1] # choose first or second layout
         slide = presentation.slides.add_slide(slide_layout)
 
         # Add title
