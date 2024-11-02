@@ -1,4 +1,3 @@
-
 def test_remove_outer_markdown():
     from git_bob._utilities import remove_outer_markdown
     assert remove_outer_markdown("""```python
@@ -222,3 +221,17 @@ def test_get_modified_files():
 
     assert len(files) == 3
 
+
+def test_make_slides():
+    from git_bob._utilities import make_slides
+    import os
+    slides_description = '''[
+        {"title": "Slide 1", "content": ["Point A", "Point B"]},
+        {"title": "Slide 2", "content": ["Point C", "Point D"]}
+    ]'''
+    make_slides(slides_description, "test_slides.pptx")
+    assert os.path.exists("test_slides.pptx")
+
+    from pptx import Presentation
+    presentation = Presentation("test_slides.pptx")
+    assert len(presentation.slides) == 2

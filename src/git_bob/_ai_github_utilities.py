@@ -236,6 +236,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     from ._utilities import split_content_and_summary, erase_outputs_of_code_cells, restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, restore_environment, redact_text, Config, get_file_info, get_modified_files
     import os
 
+    image_file_endings = [".png", ".jpg", ".jpeg", ".gif"]
+
     created_files = {}
     for attempt in range(number_of_attempts):
         an_error_happened = False
@@ -244,13 +246,37 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         original_ipynb_file_content = None
 
         format_specific_instructions = ""
-        if filename.endswith('.py'):
+        if any([filename.endswith(f) for f in image_file_endings]):
+            print(f"Cannot create or modify image files like {filename}.")
+            return created_files
+        elif filename.endswith('.py'):
             format_specific_instructions = " When writing new functions, use numpy-style docstrings."
         elif filename.endswith('.ipynb'):
             format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors. Return the notebook in JSON format!"
+        elif filename.endswith('.pptx'):
+            format_specific_instructions = """
+The file should be a presentation with slides, formatted as a JSON list containing dictionaries with a 'title' and a 'content' list with up to 2 strings.
+These strings can be text+text or text+image. The strings can be multi-line text, and also be file-paths of .jpg, .gif or .png files. 
+If it's an image, it MUST only be the file-path and no additional text.
+If it's text, make sure the text is short enough that it fits on a slide. Also put enough information on a slide so that it doesn't appear empty. Two to four sentences per slide are nice. For more detailed information consider using bullet-points instead of long sentences. Four to six bullet points per slide are great.
+The first slide contains only the author name as single string in the list of contents.
+Choose from these existing files and only use them if they fit well to the content:\n* """ + \
+                "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=branch_name, file_patterns=image_file_endings)) + "\n\n" + \
+                """
+Example 1: {"title":"Slide topic", "content":["Author name"]}
+Example 3: {"title":"headline", "content":["placeholder text A", "placeholder text A"]}
+Example 4: {"title":"topic", "content":["placeholder text", "placeholder_image.png"]}
+Example 5: {"title":"topic", "content":["longer text with multiple lines\ndetailed information"]}
+"""
 
+        file_content = None
         if Config.git_utilities.check_if_file_exists(repository, branch_name, filename):
-            file_content = Config.git_utilities.decode_file(Config.git_utilities.get_file_in_repository(repository, branch_name, filename))
+            try:
+                file_content = Config.git_utilities.decode_file(Config.git_utilities.get_file_in_repository(repository, branch_name, filename))
+            except UnicodeDecodeError:
+                pass # happens when attempting to modify binary files
+
+        if file_content is not None:
             print(filename, "will be overwritten")
             if filename.endswith('.ipynb'):
                 print("Removing outputs from ipynb file")
@@ -317,6 +343,11 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
             print("Erasing outputs in generated ipynb file")
             new_content = erase_outputs_of_code_cells(new_content)
             do_execute_notebook = True
+        elif filename.endswith('.pptx'):
+            from ._utilities import make_slides
+            make_slides(new_content, filename)
+            with open(filename, 'rb') as f:
+                new_content = f.read()
 
         if do_execute_notebook:
             print("Executing the notebook", len(new_content))
@@ -361,13 +392,13 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
 
             print("Executed notebook", len(new_content))
 
-
-        new_content = redact_text(new_content)
+        if isinstance(new_content, str):
+            new_content = redact_text(new_content) + "\n"
         if not an_error_happened:
             break
         print(f"An error happened. Retrying... {attempt+1}/{number_of_attempts}")
 
-    Config.git_utilities.write_file_in_branch(repository, branch_name, filename, new_content + "\n", redact_text(commit_message))
+    Config.git_utilities.write_file_in_branch(repository, branch_name, filename, new_content, redact_text(commit_message))
     created_files[filename] = redact_text(commit_message)
 
     return created_files
@@ -411,6 +442,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
 
     modifications = prompt_function(f"""
 Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files need to be modified, renamed or deleted to solve the issue.
+When asked to make slides or create a presentation, assume this task is a file creation.
 In case the task is to analyse data, create synthetic data, or draw a plot, consider creating a notebook for this.
 
 ## Github Issue #{issue} Discussion
@@ -724,5 +756,3 @@ def paint_picture(repository, branch_name, prompt, output_filename="image.png", 
     Config.git_utilities.write_file_in_branch(repository, branch_name, output_filename, img_byte_arr, commit_message=commit_message)
 
     return commit_message
-
-

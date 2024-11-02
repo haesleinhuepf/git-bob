@@ -186,7 +186,7 @@ Description:
 
     return content
 
-def list_repository_files(repository: str, branch_name: str = None) -> list:
+def list_repository_files(repository: str, branch_name: str = None, file_patterns:str = None) -> list:
     """
     List all files in the specified GitLab repository branch.
 
@@ -196,6 +196,8 @@ def list_repository_files(repository: str, branch_name: str = None) -> list:
         The full name of the GitLab project (e.g., "username/repo-name").
     branch_name : str, optional
         The name of the branch or tag (default is 'main').
+    file_patterns : list, optional
+        A list of file patterns to filter the files by.
 
     Returns
     -------
@@ -215,7 +217,8 @@ def list_repository_files(repository: str, branch_name: str = None) -> list:
         tree = repo.repository_tree(path=path, ref=branch_name)
         for item in tree:
             if item['type'] == 'blob':
-                files.append(item['path'])
+                if file_patterns is None or any([f in item['path'].path for f in file_patterns]):
+                    files.append(item['path'])
             elif item['type'] == 'tree':
                 path_stack.append(item['path'])
     return files

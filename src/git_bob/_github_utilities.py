@@ -246,7 +246,7 @@ Body:
     return content
 
 
-def list_repository_files(repository: str, branch_name: str = None) -> list:
+def list_repository_files(repository: str, branch_name: str = None, file_patterns:list = None) -> list:
     """
     List all files in a given GitHub repository.
 
@@ -259,6 +259,8 @@ def list_repository_files(repository: str, branch_name: str = None) -> list:
         The full name of the GitHub repository (e.g., "username/repo-name").
     branch_name : str, optional
         The name of the branch or tag (default is 'main').
+    file_patterns : list, optional
+        A list of file patterns to filter the files by.
 
     Returns
     -------
@@ -283,10 +285,11 @@ def list_repository_files(repository: str, branch_name: str = None) -> list:
         file_content = contents.pop(0)
         if file_content.type == "dir":
             # If it's a directory, get its contents and add them to the list
-            contents.extend(repo.get_contents(file_content.path))
+            contents.extend(repo.get_contents(file_content.path, ref=branch_name))
         else:
             # If it's a file, add its path to the list
-            all_files.append(file_content.path)
+            if file_patterns is None or any([f in file_content.path for f in file_patterns]):
+                all_files.append(file_content.path)
 
     return all_files
 
