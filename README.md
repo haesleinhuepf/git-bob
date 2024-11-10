@@ -140,6 +140,7 @@ Some were parts of real scientific data analysis projects.
   * [Assisting scientific manuscript writing](https://github.com/haesleinhuepf/git-bob-manuscript/pull/9)
   * [Configuring a Jupyter Book](https://github.com/NFDI4BIOIMAGE/training/issues/381)
   * [Deleting files](https://github.com/haesleinhuepf/git-bob/issues/412)
+  * [Converting tables to key-value pairs](https://github.com/haesleinhuepf/git-bob-playground/issues/103)
 * Statistics
   * [Filtering data and counting records](https://github.com/NFDI4BIOIMAGE/training/issues/299)
   * [Selecting ranges of columns](https://github.com/haesleinhuepf/git-bob-playground/issues/47)
