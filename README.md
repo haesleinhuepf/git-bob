@@ -141,6 +141,7 @@ Some were parts of real scientific data analysis projects.
   * [Configuring a Jupyter Book](https://github.com/NFDI4BIOIMAGE/training/issues/381)
   * [Deleting files](https://github.com/haesleinhuepf/git-bob/issues/412)
   * [Converting tables to key-value pairs](https://github.com/haesleinhuepf/git-bob-playground/issues/103)
+  * [Exporting Google Scholar profile as bibtex](https://github.com/haesleinhuepf/git-bob-playground/issues/114)
 * Statistics
   * [Filtering data and counting records](https://github.com/NFDI4BIOIMAGE/training/issues/299)
   * [Selecting ranges of columns](https://github.com/haesleinhuepf/git-bob-playground/issues/47)
