@@ -129,6 +129,8 @@ Some were parts of real scientific data analysis projects.
 * Question answering 
   * [About specific Python libraries](https://github.com/haesleinhuepf/stackview/issues/79)
   * [The capital of France](https://github.com/haesleinhuepf/git-bob-playground/issues/24)
+* Translation
+  * [Translating text in Jupyter notebooks in other Languages](https://github.com/haesleinhuepf/git-bob-playground/issues/118) 
 * Bio-image Analysis
   * [Nuclei segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/13)
   * [Cell segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/42)
