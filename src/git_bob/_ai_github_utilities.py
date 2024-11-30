@@ -53,6 +53,10 @@ def comment_on_issue(repository, issue, prompt_function):
 
     ai_remark = setup_ai_remark()
 
+    if Config.pull_request is not None:
+        file_changes = "\n## Changed files\n\n" + Config.git_utilities.get_diff_of_pull_request(repository, issue) + "\n\n"
+        print("file_changes:", file_changes)
+
     discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), prompt_visionlm=prompt_function)
     print("Discussion:", discussion)
 
@@ -65,7 +69,7 @@ Decide what to do to respond to a github issue. The entire issue discussion is g
 ## Discussion of the issue #{issue}
 
 {discussion}
-
+{file_changes}
 ## All files in the repository
 
 {all_files}
@@ -91,7 +95,7 @@ Respond to a github issue. Its entire discussion is given and additionally, cont
 ## Discussion
 
 {discussion}
-
+{file_changes}
 ## Relevant files
 
 {relevant_files_contents}
