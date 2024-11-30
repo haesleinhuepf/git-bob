@@ -145,7 +145,7 @@ def command_line_interface():
 
     # determine task to do
     if Config.running_in_github_ci or Config.running_in_gitlab_ci:
-        if not (f"{agent_name} comment" in text or f"{agent_name} solve" in text or f"{agent_name} try" in text or f"{agent_name} split" in text or f"{agent_name} deploy" in text):
+        if not (f"{agent_name} comment" in text or f"{agent_name} review" in text or f"{agent_name} solve" in text or f"{agent_name} try" in text or f"{agent_name} split" in text or f"{agent_name} deploy" in text):
             print("They didn't speak to me. I show myself out:", text)
             sys.exit(0)
         ai_remark = setup_ai_remark()
