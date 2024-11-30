@@ -282,4 +282,4 @@ def prompt_mistral(message: str, model="mistral-large-2411", image=None):
     )
 
     # Print the content of the response
-    print(chat_response.choices[0].message.content)
+    return chat_response.choices[0].message.content
