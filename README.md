@@ -74,10 +74,10 @@ To trigger git-bob, you need to comment on an issue or pull request with the `co
 git-bob comment
 ```
 
-If you want to ask git-bob for a review of a pull-request, you can use the `review` trigger word:
+If you want to ask git-bob for a review of a pull-request, you can use the `review` trigger word. Also make sure mention explictly what you want to be reviewed.
 
 ```
-git-bob review
+git-bob review this PR. Check code quality and comments.
 ```
 
 After some back-and-forth discussion, you can also use the `solve` trigger word (or aliases `implement`, `apply`) make git-bob solve an issue and send a pull-request. 
