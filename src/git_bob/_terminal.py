@@ -135,7 +135,7 @@ def command_line_interface():
     
     # aliases for comment action
     text = text.replace(f"{agent_name} respond", f"{agent_name} comment")
-    text = text.replace(f"{agent_name} review", f"{agent_name} comment")
+    #text = text.replace(f"{agent_name} review", f"{agent_name} comment")
     text = text.replace(f"{agent_name} think about", f"{agent_name} comment")
     text = text.replace(f"{agent_name} answer", f"{agent_name} comment")
 
@@ -145,7 +145,7 @@ def command_line_interface():
 
     # determine task to do
     if Config.running_in_github_ci or Config.running_in_gitlab_ci:
-        if not (f"{agent_name} comment" in text or f"{agent_name} solve" in text or f"{agent_name} try" in text or f"{agent_name} split" in text or f"{agent_name} deploy" in text):
+        if not (f"{agent_name} comment" in text or f"{agent_name} review" in text or f"{agent_name} solve" in text or f"{agent_name} try" in text or f"{agent_name} split" in text or f"{agent_name} deploy" in text):
             print("They didn't speak to me. I show myself out:", text)
             sys.exit(0)
         ai_remark = setup_ai_remark()
@@ -174,18 +174,18 @@ def command_line_interface():
     if Config.running_in_github_ci:
         repo = Config.git_utilities.get_repository_handle(repository)
         try:
-            pull_request = repo.get_pull(issue)
-            base_branch = pull_request.head.ref
+            Config.pull_request = repo.get_pull(issue)
+            base_branch = Config.pull_request.head.ref
             print("Issue is a a PR - switching to the branch", base_branch)
             run_cli("git fetch --all", verbose=True)
             run_cli(f"git checkout -b {base_branch} origin/{base_branch}", verbose=True)
 
             # Extract source (head) and target (base) branches
-            #base_branch = pull_request.head.ref
-            #target_branch = pull_request.base.ref
+            #base_branch = Config.pull_request.head.ref
+            #target_branch = Config.pull_request.base.ref
         except UnknownObjectException:
             print("Issue is a not a PR")
-            pull_request = None
+            Config.pull_request = None
             base_branch = repo.default_branch
     elif Config.running_in_gitlab_ci:
         base_branch = Config.git_utilities.get_default_branch_name(repository)
@@ -193,11 +193,10 @@ def command_line_interface():
         base_branch = "main"
 
     # execute the task
-    if f"{agent_name} comment" in text:
-        if pull_request is not None:
-            review_pull_request(repository, issue, prompt)
-        else:
-            comment_on_issue(repository, issue, prompt)
+    if f"{agent_name} review" in text and Config.pull_request is not None:
+        review_pull_request(repository, issue, prompt)
+    elif f"{agent_name} comment" in text or  f"{agent_name} review" in text: # fallback to comment
+        comment_on_issue(repository, issue, prompt)
     elif f"{agent_name} split" in text:
         split_issue_in_sub_issues(repository, issue, prompt)
     elif f"{agent_name} solve" in text or f"{agent_name} try" in text:

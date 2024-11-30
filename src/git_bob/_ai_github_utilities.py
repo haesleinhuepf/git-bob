@@ -53,6 +53,14 @@ def comment_on_issue(repository, issue, prompt_function):
 
     ai_remark = setup_ai_remark()
 
+    if Config.pull_request is not None:
+        file_changes = "\n## Changed files\n\n" + Config.git_utilities.get_diff_of_pull_request(repository, issue) + "\n\n"
+        print("file_changes:", file_changes)
+        conversation_type = "pull-request"
+    else:
+        file_changes = ""
+        conversation_type = "issue"
+
     discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), prompt_visionlm=prompt_function)
     print("Discussion:", discussion)
 
@@ -60,12 +68,12 @@ def comment_on_issue(repository, issue, prompt_function):
 
     relevant_files = prompt_function(f"""
 {SYSTEM_PROMPT}
-Decide what to do to respond to a github issue. The entire issue discussion is given and a list of all files in the repository.
+Decide what to do to respond to a github {conversation_type}. The entire discussion is given and a list of all files in the repository.
 
 ## Discussion of the issue #{issue}
 
 {discussion}
-
+{file_changes}
 ## All files in the repository
 
 {all_files}
@@ -86,12 +94,12 @@ Respond with the filenames as JSON list.
 
     comment = prompt_function(f"""
 {SYSTEM_PROMPT}
-Respond to a github issue. Its entire discussion is given and additionally, content of some relevant files.
+Respond to a github {conversation_type}. Its entire discussion is given and additionally, content of some relevant files.
 
 ## Discussion
 
 {discussion}
-
+{file_changes}
 ## Relevant files
 
 {relevant_files_contents}
@@ -162,7 +170,7 @@ Check if the discussion reflects what was changed in the files.
 
 ## Your task
 
-Review this pull-request and contribute to the discussion. 
+Review this pull-request and contribute to the discussion as if you were a human talking to a human. 
 Respond as if you were a human talking to a human.
 
 Do NOT explain your response or anything else. 
@@ -642,7 +650,7 @@ You committed these changes to these files
 {file_list_text}
 
 ## Your task
-Summarize the changes above to a one paragraph.
+Summarize the changes above to a one paragraph. Write your response as if you were a human talking to a human.
 Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
 
 Do not add headline or any other formatting. Just respond with the paragraphe below.
