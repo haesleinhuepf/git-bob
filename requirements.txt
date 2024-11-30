@@ -19,3 +19,4 @@ requests-toolbelt
 twine
 python-gitlab
 python-pptx
+mistralai

@@ -225,3 +225,62 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
         )
 
     return response.choices[0].message.content
+
+
+def prompt_mistral(message: str, model="mistral-large-2411", image=None):
+    """A prompt helper function that sends a message to Mistral.
+    If an image is provided, it will use the Pixtral model."""
+    import os
+    from mistralai import Mistral
+    from ._utilities import image_to_url
+
+    if model is None:
+        if image is None:
+            model = "mistral-large-2411"
+        else:
+            model = "pixtral-12b-2409"
+    if "pixtral" not in model and image is not None:
+        model = "pixtral-12b-2409"
+
+    # Getting the base64 string
+    base64_image = image_to_url(image)
+
+    # Retrieve the API key from environment variables
+    api_key = os.environ["MISTRAL_API_KEY"]
+
+    # Initialize the Mistral client
+    client = Mistral(api_key=api_key)
+
+    # Define the messages for the chat
+    if image is None:
+        messages = [
+            {
+                "role": "user",
+                "content": message
+            }
+        ]
+    else:
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": message
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": f"data:image/png;base64,{base64_image}"
+                    }
+                ]
+            }
+        ]
+
+    # Get the chat response
+    chat_response = client.chat.complete(
+        model=model,
+        messages=messages
+    )
+
+    # Print the content of the response
+    print(chat_response.choices[0].message.content)
