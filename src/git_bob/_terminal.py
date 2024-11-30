@@ -127,7 +127,7 @@ def command_line_interface():
 
     if prompt is None:
         llm_name = Config.llm_name[1:]
-        raise NotImplementedError(f"Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs (setting:_{llm_name}).")
+        raise NotImplementedError(f"Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs (llm_name:_{llm_name}).")
     Log().log("Using language model: _" + Config.llm_name[1:])
 
     text = text.replace(f"{agent_name}, ", f"{agent_name} ")
@@ -242,5 +242,5 @@ def init_prompt_handlers():
         "mistral":        PromptHandler(api_key=os.environ.get("MISTRAL_API_KEY"),
                                         prompt_function=partial(prompt_mistral, model=Config.llm_name)),
         "pixtral":        PromptHandler(api_key=os.environ.get("MISTRAL_API_KEY"),
-                                 prompt_function=partial(prompt_mistral, model=Config.llm_name)),
+                                        prompt_function=partial(prompt_mistral, model=Config.llm_name)),
     }
