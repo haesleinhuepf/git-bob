@@ -153,6 +153,9 @@ Some were parts of real scientific data analysis projects.
   * [Converting tables to key-value pairs](https://github.com/haesleinhuepf/git-bob-playground/issues/103)
   * [Exporting Google Scholar profile as bibtex](https://github.com/haesleinhuepf/git-bob-playground/issues/114)
   * [Deciding for file formats: JSON versus YAML](https://github.com/haesleinhuepf/git-bob-playground/issues/117)
+  * [Generating Galaxy workflows](https://github.com/haesleinhuepf/git-bob-playground/issues/123)
+* Graphical User Interfaces
+  * [Interactive drawing on an ipcanvas](https://github.com/haesleinhuepf/git-bob-playground/issues/121) 
 * Statistics
   * [Filtering data and counting records](https://github.com/NFDI4BIOIMAGE/training/issues/299)
   * [Selecting ranges of columns](https://github.com/haesleinhuepf/git-bob-playground/issues/47)
