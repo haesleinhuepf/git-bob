@@ -58,6 +58,7 @@ def comment_on_issue(repository, issue, prompt_function):
         print("file_changes:", file_changes)
         conversation_type = "pull-request"
     else:
+        file_changes = ""
         conversation_type = "issue"
 
     discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), prompt_visionlm=prompt_function)
