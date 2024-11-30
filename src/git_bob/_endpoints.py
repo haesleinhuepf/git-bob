@@ -242,9 +242,6 @@ def prompt_mistral(message: str, model="mistral-large-2411", image=None):
     if "pixtral" not in model and image is not None:
         model = "pixtral-12b-2409"
 
-    # Getting the base64 string
-    base64_image = image_to_url(image)
-
     # Retrieve the API key from environment variables
     api_key = os.environ["MISTRAL_API_KEY"]
 
@@ -260,6 +257,8 @@ def prompt_mistral(message: str, model="mistral-large-2411", image=None):
             }
         ]
     else:
+        # Getting the base64 string
+        base64_image = image_to_url(image)
         messages = [
             {
                 "role": "user",
