@@ -42,7 +42,8 @@ def command_line_interface():
         "claude": "claude-3-5-sonnet-20241022",
         "gemini": "gemini-1.5-pro-002",
         "gpt-4o": "gpt-4o-20240806",
-        "gpt4o": "gpt-4o-20240806"
+        "gpt4o": "gpt-4o-20240806",
+        "mistral": "mistral-large-2411"
     }
 
     prompt_handlers = init_prompt_handlers()
@@ -126,7 +127,7 @@ def command_line_interface():
 
     if prompt is None:
         llm_name = Config.llm_name[1:]
-        raise NotImplementedError(f"Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs (setting:_{llm_name}).")
+        raise NotImplementedError(f"Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs (llm_name:_{llm_name}).")
     Log().log("Using language model: _" + Config.llm_name[1:])
 
     text = text.replace(f"{agent_name}, ", f"{agent_name} ")
@@ -223,7 +224,7 @@ def init_prompt_handlers():
     import os
     from functools import partial
     from ._utilities import Config
-    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure
+    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure, prompt_mistral
 
     return {
         "github_models:": PromptHandler(api_key=os.environ.get("GH_MODELS_API_KEY"),
@@ -237,5 +238,9 @@ def init_prompt_handlers():
         "gpt":            PromptHandler(api_key=os.environ.get("OPENAI_API_KEY"),
                                         prompt_function=partial(prompt_chatgpt, model=Config.llm_name)),
         "gemini":         PromptHandler(api_key=os.environ.get("GOOGLE_API_KEY"),
-                                        prompt_function=partial(prompt_gemini, model=Config.llm_name))
+                                        prompt_function=partial(prompt_gemini, model=Config.llm_name)),
+        "mistral":        PromptHandler(api_key=os.environ.get("MISTRAL_API_KEY"),
+                                        prompt_function=partial(prompt_mistral, model=Config.llm_name)),
+        "pixtral":        PromptHandler(api_key=os.environ.get("MISTRAL_API_KEY"),
+                                        prompt_function=partial(prompt_mistral, model=Config.llm_name)),
     }
