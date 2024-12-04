@@ -154,6 +154,7 @@ Some were parts of real scientific data analysis projects.
   * [Exporting Google Scholar profile as bibtex](https://github.com/haesleinhuepf/git-bob-playground/issues/114)
   * [Deciding for file formats: JSON versus YAML](https://github.com/haesleinhuepf/git-bob-playground/issues/117)
   * [Generating Galaxy workflows](https://github.com/haesleinhuepf/git-bob-playground/issues/123)
+  * [Count citations of given DOIs](https://github.com/haesleinhuepf/git-bob-playground/issues/141)
 * Graphical User Interfaces
   * [Interactive drawing on an ipcanvas](https://github.com/haesleinhuepf/git-bob-playground/issues/121) 
 * Statistics
