@@ -143,6 +143,8 @@ Some were parts of real scientific data analysis projects.
   * [Nuclei segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/13)
   * [Cell segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/42)
   * [Resizing images](https://github.com/NFDI4BIOIMAGE/training/issues/356)
+* Programming
+  * [Caching](https://github.com/NFDI4BIOIMAGE/SlideInsight/issues/28)
 * Data & Code Management
   * [Research Data Management & Folder Structures](https://github.com/haesleinhuepf/git-bob-playground/issues/45)
   * [Documenting source code](https://github.com/haesleinhuepf/git-bob/pull/29)
