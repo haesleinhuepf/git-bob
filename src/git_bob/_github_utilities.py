@@ -622,7 +622,8 @@ def get_diff_of_pull_request(repository, pull_request):
         # Return the content of the website
         return response.text
     else:
-        return None
+        print("Error:", response.status_code, response.text)
+        return ""
 
 
 def add_reaction_to_issue(repository, issue, reaction="+1"):
