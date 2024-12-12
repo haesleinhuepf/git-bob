@@ -243,3 +243,40 @@ def init_prompt_handlers():
         "pixtral":        PromptHandler(api_key=os.environ.get("MISTRAL_API_KEY"),
                                         prompt_function=partial(prompt_mistral, model=Config.llm_name)),
     }
+
+def remote_interface():
+    """
+    Advanced remote interaction interface for handling GitHub repositories.
+
+    Extracts the repository and issue number from command-line arguments, creates a temporary
+    directory, clones the repository, and invokes the command line interface for further actions.
+    """
+    import os
+    import sys
+    import tempfile
+
+    from ._utilities import run_cli
+
+    # Extract repository and issue number from sys.argv
+    task = sys.argv[1] if len(sys.argv) > 1 else None
+    repository = sys.argv[2] if len(sys.argv) > 2 else None
+    issue_number = sys.argv[3] if len(sys.argv) > 3 else None
+
+    if task not in ["comment-on-issue", "solve-issue", "try-issue", "split-issue"]:
+        print("Invalid task. Must be comment-on-issue, solve-issue, try-issue or split-issue Exiting.")
+        sys.exit(1)
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        os.chdir(tmpdirname) # Switch to temporary directory
+
+        # Execute git clone command
+        run_cli(f"git clone https://github.com/{repository}", verbose=True)
+
+        # Extract the repository name from the full repository path
+        repo_name = repository.rsplit('/', 1)[1].replace('.git', '')
+
+        # Switch to the cloned repository directory
+        os.chdir(tmpdirname + "/" + repo_name)
+
+        # Call the command line interface function
+        command_line_interface()
