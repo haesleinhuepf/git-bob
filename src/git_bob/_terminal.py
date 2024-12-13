@@ -14,6 +14,7 @@ def command_line_interface():
     from ._logger import Log
     from github.GithubException import UnknownObjectException
     from ._utilities import run_cli
+    from aider.models import Model
 
     print("Hello")
 
@@ -117,6 +118,9 @@ def command_line_interface():
                 Config.llm_name = new_llm_name
                 break
 
+    if Config.llm_name.startswith("aider:"):
+        Config.llm_name = Config.llm_name[6:]
+        Config.aider_model = Model(Config.llm_name)
 
     prompt = None
     prompt_handlers = init_prompt_handlers() # reinitialize, because configured LLM may have changed
