@@ -58,6 +58,7 @@ class Config:
     git_server_url = "https://github.com/"
     git_utilities = None
     is_pull_request = None
+    aider_model = None
 
 
 class ErrorReporting:

@@ -440,6 +440,8 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     from github.GithubException import GithubException
     from gitlab.exceptions import GitlabCreateError
     import traceback
+    from aider.coders import Coder
+    from aider.io import InputOutput
 
     repo = Config.git_utilities.get_repository_handle(repository)
 
@@ -496,83 +498,115 @@ Respond with the actions as JSON list.
     instructions = sorted(instructions, key=lambda x: x.get('action') != 'download')
     print("sorted instructions", instructions)
 
-    errors = []
-    commit_messages = {}
-    for instruction in instructions:
-        action = instruction.get('action')
+    if Config.aider_model is not None:
+        file_list_text = ""
+        commit_messages_prompt = ""
 
-        for filename_key in ["filename", "new_filename", "old_filename", "target_filename"]:
-            if filename_key in instruction.keys():
+        filenames = []
+        for instruction in instructions:
+            for filename_key in ["filename", "new_filename", "old_filename", "target_filename"]:
                 filename = instruction[filename_key]
-                if ".github" in filename or ".gitlab" in filename:
-                    errors.append(f"Error processing {filename}: Modifying workflow files is not allowed.")
-                    continue
+                filenames.append(filename)
 
-        try:
-            if action == 'create' or action == 'modify':
-                filename = instruction['filename'].strip("/")
+        io = InputOutput(yes=False)
 
-                created_files = create_or_modify_file(repository, issue, filename, branch_name, discussion,
-                                                                      prompt_function)
-                for filename, commit_message in created_files.items():
-                    commit_messages[filename] = commit_message
-            elif action == 'download':
-                source_url = instruction['source_url']
-                url_type = is_github_url(source_url)
-                if url_type in ["image", "data"]:
-                    source_url = source_url.replace("/blob/", "/raw/")
-                    target_filename = instruction['target_filename'].strip("/")
-                    Config.git_utilities.download_to_repository(repository, branch_name, source_url, target_filename)
-                    commit_messages[target_filename] = f"Downloaded {source_url}, saved as {target_filename}."
-                # else: otherwise we have it already in the text
-            elif action == 'rename':
-                old_filename = instruction['old_filename'].strip("/")
-                new_filename = instruction['new_filename'].strip("/")
-                Config.git_utilities.rename_file_in_repository(repository, branch_name, old_filename, new_filename)
-                commit_messages[new_filename] = f"Renamed {old_filename} to {new_filename}."
-            elif action == 'delete':
-                filename = instruction['filename'].strip("/")
-                Config.git_utilities.delete_file_from_repository(repository, branch_name, filename)
-                commit_messages[filename] = f"Deleted {filename}."
-            elif action == 'copy':
-                old_filename = instruction['old_filename'].strip("/")
-                new_filename = instruction['new_filename'].strip("/")
-                Config.git_utilities.copy_file_in_repository(repository, branch_name, old_filename, new_filename)
-                commit_messages[new_filename] = f"Copied {old_filename} to {new_filename}."
-            elif action == "paint":
-                filename = instruction['filename'].strip("/")
-                imagen_prompt = prompt_function("From the following discussion, extract a prompt to paint a picture as discussed:\n\n" + discussion + "\n\nNow extract a prompt for painting a picture as discussed:")
-                commit_messages[filename] = paint_picture(repository, branch_name, prompt=imagen_prompt, output_filename=filename)
+        coder = Coder.create(main_model=Config.aider_model, io=io, edit_format="code", fnames=filenames)
 
-        except Exception as e:
-            traces = "    " + remove_ansi_escape_sequences(traceback.format_exc()).replace("\n", "\n    ")
-            summary = f"""<details>
-    <summary>Error during {instruction}: {e}</summary>
+        file_list_text = "* " + "\n* ".join(filenames)
+
+        task_prompt = f"""
+{SYSTEM_PROMPT}
+Given a github issue discussion (#{issue}) modify the files content or create the files to solve the issue.
+
+## Github Issue #{issue} Discussion
+
+{discussion}
+
+## Your task
+Solve the described github issue. Focus on the most recent discussion. Keep your modifications absolutely minimal.
+"""
+
+        commit_messages_prompt = coder.run(task_prompt)
+
+    else:
+
+        errors = []
+        commit_messages = {}
+        for instruction in instructions:
+            action = instruction.get('action')
+
+            for filename_key in ["filename", "new_filename", "old_filename", "target_filename"]:
+                if filename_key in instruction.keys():
+                    filename = instruction[filename_key]
+                    if ".github" in filename or ".gitlab" in filename:
+                        errors.append(f"Error processing {filename}: Modifying workflow files is not allowed.")
+                        continue
+
+            try:
+                if action == 'create' or action == 'modify':
+                    filename = instruction['filename'].strip("/")
+
+                    created_files = create_or_modify_file(repository, issue, filename, branch_name, discussion,
+                                                                          prompt_function)
+                    for filename, commit_message in created_files.items():
+                        commit_messages[filename] = commit_message
+                elif action == 'download':
+                    source_url = instruction['source_url']
+                    url_type = is_github_url(source_url)
+                    if url_type in ["image", "data"]:
+                        source_url = source_url.replace("/blob/", "/raw/")
+                        target_filename = instruction['target_filename'].strip("/")
+                        Config.git_utilities.download_to_repository(repository, branch_name, source_url, target_filename)
+                        commit_messages[target_filename] = f"Downloaded {source_url}, saved as {target_filename}."
+                    # else: otherwise we have it already in the text
+                elif action == 'rename':
+                    old_filename = instruction['old_filename'].strip("/")
+                    new_filename = instruction['new_filename'].strip("/")
+                    Config.git_utilities.rename_file_in_repository(repository, branch_name, old_filename, new_filename)
+                    commit_messages[new_filename] = f"Renamed {old_filename} to {new_filename}."
+                elif action == 'delete':
+                    filename = instruction['filename'].strip("/")
+                    Config.git_utilities.delete_file_from_repository(repository, branch_name, filename)
+                    commit_messages[filename] = f"Deleted {filename}."
+                elif action == 'copy':
+                    old_filename = instruction['old_filename'].strip("/")
+                    new_filename = instruction['new_filename'].strip("/")
+                    Config.git_utilities.copy_file_in_repository(repository, branch_name, old_filename, new_filename)
+                    commit_messages[new_filename] = f"Copied {old_filename} to {new_filename}."
+                elif action == "paint":
+                    filename = instruction['filename'].strip("/")
+                    imagen_prompt = prompt_function("From the following discussion, extract a prompt to paint a picture as discussed:\n\n" + discussion + "\n\nNow extract a prompt for painting a picture as discussed:")
+                    commit_messages[filename] = paint_picture(repository, branch_name, prompt=imagen_prompt, output_filename=filename)
+
+            except Exception as e:
+                traces = "    " + remove_ansi_escape_sequences(traceback.format_exc()).replace("\n", "\n    ")
+                summary = f"""<details>
+<summary>Error during {instruction}: {e}</summary>
     <pre>{traces}</pre>
 </details>
             """
-            errors.append(summary)
+                errors.append(summary)
 
-    error_messages = ""
-    if len(errors) > 0:
-        error_messages = "\n\nDuring solving this task, the following errors occurred:\n\n* " + "\n* ".join(
-            errors) + "\n"
+        error_messages = ""
+        if len(errors) > 0:
+            error_messages = "\n\nDuring solving this task, the following errors occurred:\n\n* " + "\n* ".join(
+                errors) + "\n"
 
-    print(error_messages)
+        print(error_messages)
+
+        # summarize the changes
+        commit_messages_prompt = "* " + "\n* ".join([f"{k}: {v}" for k,v in commit_messages.items()])
+
+        file_list = file_list_from_commit_message_dict(repository, branch_name, commit_messages)
+        file_list_text = ""
+        for md_link in file_list:
+            if md_link.startswith("!"):
+                file_list_text = file_list_text + "* " + md_link[1:] + " <explanation>\n\n" + md_link + "\n\n"
+            else:
+                file_list_text = file_list_text + "* " + md_link + " <explanation>\n\n"
 
     # get a diff of all changes
     diffs_prompt = Config.git_utilities.get_diff_of_branches(repository, branch_name, base_branch=base_branch)
-
-    # summarize the changes
-    commit_messages_prompt = "* " + "\n* ".join([f"{k}: {v}" for k,v in commit_messages.items()])
-
-    file_list = file_list_from_commit_message_dict(repository, branch_name, commit_messages)
-    file_list_text = ""
-    for md_link in file_list:
-        if md_link.startswith("!"):
-            file_list_text = file_list_text + "* " + md_link[1:] + " <explanation>\n\n" + md_link + "\n\n"
-        else:
-            file_list_text = file_list_text + "* " + md_link + " <explanation>\n\n"
 
     from ._utilities import Config
     remark = setup_ai_remark() + "\n\n"

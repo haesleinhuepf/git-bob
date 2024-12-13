@@ -20,3 +20,5 @@ twine
 python-gitlab
 python-pptx
 mistralai
+aider-chat
+
