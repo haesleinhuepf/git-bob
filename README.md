@@ -182,7 +182,7 @@ Some were parts of real scientific data analysis projects.
   * [Story Telling for kids](https://github.com/haesleinhuepf/git-bob-playground/issues/82)
   * [PowerPoint Karaoke](https://github.com/haesleinhuepf/git-bob-playground/issues/99)
   * [Solving Advent of Code 2024 puzzles](https://github.com/haesleinhuepf/git-bob-advent-of-code)
-  * [Solving the halting Problem](https://github.com/haesleinhuepf/git-bob-playground/issues/156) [[2nd attempt](https://github.com/haesleinhuepf/git-bob-playground/issues/157)]
+  * [Solving the Halting Problem](https://github.com/haesleinhuepf/git-bob-playground/issues/156) [[2nd attempt](https://github.com/haesleinhuepf/git-bob-playground/issues/157)]
 * Things that did't work well
   * [How to use aider from python](https://github.com/haesleinhuepf/git-bob/issues/437#issuecomment-2539865080)
   * [How to use the atproto API](https://github.com/haesleinhuepf/git-bob-playground/issues/136)
