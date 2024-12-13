@@ -601,10 +601,13 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
     from pathlib import Path
     from PIL import Image
     import os
+    import re
 
     print("SLIDES_JSON:", slides_description_json)
 
     # Parse json-encoded slide description
+    slides_description_json = re.sub(r'[\x00-\x1f\x7f]', '', slides_description_json)
+
     slides_data = json.loads(slides_description_json)
 
     file_location = "slide_template.pptx"
