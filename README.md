@@ -145,12 +145,14 @@ Some were parts of real scientific data analysis projects.
   * [Resizing images](https://github.com/NFDI4BIOIMAGE/training/issues/356)
 * Programming
   * [Caching](https://github.com/NFDI4BIOIMAGE/SlideInsight/issues/28)
+* Continuous Integration and Deployment
+  * [Configuring Github workflows](https://github.com/haesleinhuepf/git-bob-playground/issues/146)
+  * [Configuring a Jupyter Book](https://github.com/NFDI4BIOIMAGE/training/issues/381)
 * Data & Code Management
   * [Research Data Management & Folder Structures](https://github.com/haesleinhuepf/git-bob-playground/issues/45)
   * [Documenting source code](https://github.com/haesleinhuepf/git-bob/pull/29)
   * [Determining licenses of dependencies](https://github.com/haesleinhuepf/git-bob-playground/issues/101)
   * [Assisting scientific manuscript writing](https://github.com/haesleinhuepf/git-bob-manuscript/pull/9)
-  * [Configuring a Jupyter Book](https://github.com/NFDI4BIOIMAGE/training/issues/381)
   * [Deleting files](https://github.com/haesleinhuepf/git-bob/issues/412)
   * [Converting tables to key-value pairs](https://github.com/haesleinhuepf/git-bob-playground/issues/103)
   * [Exporting Google Scholar profile as bibtex](https://github.com/haesleinhuepf/git-bob-playground/issues/114)
@@ -179,6 +181,9 @@ Some were parts of real scientific data analysis projects.
   * [Playing Tic-Tac-Toe](https://github.com/haesleinhuepf/git-bob-playground/issues/91)
   * [Story Telling for kids](https://github.com/haesleinhuepf/git-bob-playground/issues/82)
   * [PowerPoint Karaoke](https://github.com/haesleinhuepf/git-bob-playground/issues/99)
+* Things that did't work well
+  * [How to use aider from python](https://github.com/haesleinhuepf/git-bob/issues/437#issuecomment-2539865080)
+  * [How to use the atproto API](https://github.com/haesleinhuepf/git-bob-playground/issues/136)
 
 ## Installation for development
 
