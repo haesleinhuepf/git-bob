@@ -145,6 +145,7 @@ Some were parts of real scientific data analysis projects.
   * [Resizing images](https://github.com/NFDI4BIOIMAGE/training/issues/356)
 * Programming
   * [Caching](https://github.com/NFDI4BIOIMAGE/SlideInsight/issues/28)
+  * [Fixing bugs in notebooks](https://github.com/haesleinhuepf/git-bob-playground/issues/174)
 * Continuous Integration and Deployment
   * [Configuring Github workflows](https://github.com/haesleinhuepf/git-bob-playground/issues/146)
   * [Configuring a Jupyter Book](https://github.com/NFDI4BIOIMAGE/training/issues/381)
@@ -165,6 +166,7 @@ Some were parts of real scientific data analysis projects.
   * [Filtering data and counting records](https://github.com/NFDI4BIOIMAGE/training/issues/299)
   * [Selecting ranges of columns](https://github.com/haesleinhuepf/git-bob-playground/issues/47)
   * [Summarizing data and plotting](https://github.com/NFDI4BIOIMAGE/training/issues/250)
+  * [Writing text about well-known statistical methods](https://github.com/haesleinhuepf/git-bob-playground/issues/161)
 * Plotting
   * [Violing plots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/44)
   * [UMAPs with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/41)

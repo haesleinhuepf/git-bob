@@ -217,6 +217,52 @@ In case filenames, variables and code-snippetes are mentioned, keep them in the 
     return summary
 
 
+def fix_error_in_notebook(new_content, error_message, prompt_function):
+    """
+    Attempt to fix an error in a Jupyter notebook.
+
+    Parameters
+    ----------
+    new_content : str
+        The content of the notebook.
+    error_message : str
+        The error message.
+
+    Returns
+    -------
+    str
+        The fixed content of the notebook.
+    str
+        A summary of the changes made.
+    """
+    Log().log(f"-> fix_error_in_notebook(..., ...)")
+    from ._utilities import erase_outputs_of_code_cells
+    from ._utilities import split_content_and_summary
+
+    notebook_without_output = erase_outputs_of_code_cells(new_content)
+
+    prompt = f"""
+    {SYSTEM_PROMPT}
+    Given a Jupyter Notebook file content and an error message, modify the file content to solve the error. Return the notebook in JSON format!
+
+    ## Jupyter Notebook file content 
+
+    {new_content}
+    
+    ## Error message
+    
+    {error_message}
+
+    Respond ONLY the content of the file and afterwards a single line summarizing the changes you made (without mentioning the issue).
+    """
+    print("Prompting for bug-fixed file content...")
+    response = prompt_function(prompt)
+
+    new_content, commit_message = split_content_and_summary(response)
+
+    return new_content, commit_message
+
+
 def create_or_modify_file(repository, issue, filename, branch_name, issue_summary, prompt_function, number_of_attempts:int=3):
     """
     Create or modify a file in a GitHub repository.
@@ -386,9 +432,6 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
                 os.makedirs(path_without_filename, exist_ok=True)
                 os.chdir(path_without_filename)
 
-            # store environment variables
-            saved_environment = save_and_clear_environment()
-
             not_executed_notebook = new_content
 
             # read existing files + creation dates recursively
@@ -396,8 +439,29 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
 
             # Execute the notebook
             try:
-                new_content, error_message = execute_notebook(new_content)
-                restore_environment(saved_environment)
+                for num_attempt in range(0, number_of_attempts):
+                    saved_environment = save_and_clear_environment()
+                    new_content, error_message = execute_notebook(new_content)
+                    restore_environment(saved_environment)
+                    if error_message is None:
+                        break
+
+                    if num_attempt == number_of_attempts - 1:
+                        print("Error during final notebook execution", error_message)
+                        break # do not remove files again if this was the last attempt
+
+                    Config.git_utilities.write_file_in_branch(repository, branch_name, filename, new_content,
+                                                             redact_text(commit_message) + "(containing error)")
+                    print("Error during notebook execution, trying again because:", error_message)
+                    list_of_files = get_modified_files(file_info)
+                    print("------------------------")
+                    for file in list_of_files:
+                        print("Remove file created by notebook:", file, os.path.exists(file))
+                        if os.path.exists(file):
+                            os.remove(file)
+                    print("------------------------")
+                    new_content, commit_message = fix_error_in_notebook(new_content, error_message, prompt_function)
+
 
                 # scan for files the notebook created
                 list_of_files = get_modified_files(file_info)

@@ -363,8 +363,10 @@ def write_file_in_branch(repository, branch_name, file_path, new_content, commit
     # Commit the changes
     if check_if_file_exists(repository, branch_name, file_path):
         file = get_file_in_repository(repository, branch_name, file_path)
+        print("update file", file_path, file.sha)
         repo.update_file(file.path, commit_message, new_content, file.sha, branch=branch_name)
     else:
+        print("create file", file_path)
         repo.create_file(file_path, commit_message, new_content, branch=branch_name)
 
     # ensure the folder extists
@@ -450,7 +452,6 @@ def check_if_file_exists(repository, branch_name, file_path):
         return False
 
 
-@lru_cache(maxsize=1)
 def get_file_in_repository(repository, branch_name, file_path):
     """
     Helper function to prevent multiple calls to the GitHub API for the same file.
