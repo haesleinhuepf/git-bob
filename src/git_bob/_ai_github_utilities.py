@@ -243,6 +243,11 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     Log().log(f"-> create_or_modify_file({repository}, {issue}, {filename}, {branch_name})")
     from ._utilities import split_content_and_summary, erase_outputs_of_code_cells, restore_outputs_of_code_cells, execute_notebook, text_to_json, save_and_clear_environment, restore_environment, redact_text, Config, get_file_info, get_modified_files
     import os
+    import docx2markdown
+    from ._utilities import read_text_file, write_text_file, write_binary_file, read_binary_file
+    from datetime import datetime
+
+    current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     image_file_endings = [".png", ".jpg", ".jpeg", ".gif"]
 
@@ -261,6 +266,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
             format_specific_instructions = " When writing new functions, use numpy-style docstrings."
         elif filename.endswith('.ipynb'):
             format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors. Return the notebook in JSON format!"
+        elif filename.endswith('.docx'):
+            format_specific_instructions = " Write the document in simple markdown format."
         elif filename.endswith('.pptx'):
             format_specific_instructions = """
 The file should be a presentation with slides, formatted as a JSON list containing dictionaries with a 'title' and a 'content' list with up to 2 strings.
@@ -290,6 +297,10 @@ Example 5: {"title":"topic", "content":["longer text with multiple lines\ndetail
                 print("Removing outputs from ipynb file")
                 original_ipynb_file_content = file_content
                 file_content = erase_outputs_of_code_cells(file_content)
+            elif filename.endswith('.docx'):
+                docx2markdown.docx_to_markdown(filename, filename + current_datetime + ".md")
+                file_content = read_text_file(filename + current_datetime + ".md")
+
             file_content_instruction = f"""
 Modify the file "{filename}" to solve the issue #{issue}. {format_specific_instructions}
 If the discussion is long, some stuff might be already done. In that case, focus on what was said at the very end in the discussion.
@@ -351,11 +362,19 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
             print("Erasing outputs in generated ipynb file")
             new_content = erase_outputs_of_code_cells(new_content)
             do_execute_notebook = True
+        elif filename.endswith('.docx'):
+            write_text_file(filename + current_datetime + ".md", new_content)
+            docx2markdown.markdown_to_docx(filename + current_datetime + ".md", filename)
+            # workaround to make sure the file can be read by word later
+            docx2markdown.docx_to_markdown(filename, filename + current_datetime + ".md")
+            docx2markdown.markdown_to_docx(filename + current_datetime + ".md", filename)
+            new_content = read_binary_file(filename)
+            # delete temporary markdown file
+            os.remove(filename + current_datetime + ".md")
         elif filename.endswith('.pptx'):
             from ._utilities import make_slides
             make_slides(new_content, filename)
-            with open(filename, 'rb') as f:
-                new_content = f.read()
+            new_content = read_binary_file(filename)
 
         if do_execute_notebook:
             print("Executing the notebook", len(new_content))

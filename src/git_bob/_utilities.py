@@ -256,6 +256,7 @@ def image_to_url(image):
 
 def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
     import re
+    import docx2markdown
     #from ._github_utilities import get_conversation_on_issue, get_diff_of_pull_request, get_file_in_repository
 
     # Regex to find URLs in the discussion
@@ -277,6 +278,9 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
         url_type = is_github_url(url)
         print("URL:", url)
         print("Type:", url_type)
+        from datetime import datetime
+
+        current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         if "### File {url} content" in discussion:
             continue
@@ -306,9 +310,24 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
                 repo = parts[3] + '/' + parts[4]
                 branch_name = parts[6]
                 file_path = '/'.join(parts[7:])
-                file_contents = Config.git_utilities.get_file_in_repository (repo, branch_name, file_path).decoded_content.decode()
+                temp_file_name = current_datetime + "_" + file_path.split('/')[-1]
+
+                url = Config.git_server_url + repo + "/raw/" + branch_name + "/" + file_path
+                download_url(url, temp_file_name)
+                #file_contents = Config.git_utilities.get_file_in_repository (repo, branch_name, file_path).decoded_content.decode()
                 if url.endswith('.ipynb'):
+                    file_contents = read_text_file(temp_file_name)
                     file_contents = erase_outputs_of_code_cells(file_contents)
+                elif url.endswith('.docx'):
+                    docx2markdown.docx_to_markdown(temp_file_name, temp_file_name + ".md")
+                    file_contents = read_text_file(temp_file_name + ".md")
+                    # remove the file
+                    os.remove(temp_file_name + ".md")
+                else:
+                    file_contents = read_text_file(temp_file_name)
+
+                os.remove(temp_file_name)
+
                 additional_content[url] = file_contents
             elif url_type == 'image':
                 image = load_image_from_url(url)
@@ -327,6 +346,35 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
         temp = temp + [f"### File {k} content\n\n```\n{v}\n```\n"]
 
     return discussion + "\n\n" + "\n".join(temp)
+
+
+def download_url(url, output_path):
+    """
+    Downloads a file from the specified URL and saves it to the given output path.
+
+    Args:
+        url (str): The URL of the file to download.
+        output_path (str): The path where the file will be saved.
+
+    Returns:
+        None
+    """
+    print("Downloading ", url, " to ", output_path)
+    import requests
+    import os
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
+
+        # Write the content to the output file in binary mode
+        with open(output_path, 'wb') as file:
+            for chunk in response.iter_content(chunk_size=8192):
+                file.write(chunk)
+
+        print(f"File downloaded successfully and saved to {output_path}")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error occurred while downloading the file: {e}")
 
 
 def execute_notebook(notebook_content, timeout=600, kernel_name='python3'):
@@ -682,3 +730,24 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
 
     # Save presentation
     presentation.save(filename)
+
+
+def read_text_file(filename):
+    """Read the content of a text file."""
+    with open(filename, 'r') as file:
+        return file.read()
+
+def write_text_file(filename, content):
+    """Write content to a text file."""
+    with open(filename, 'w') as file:
+        file.write(content)
+
+def read_binary_file(filename):
+    """Read the content of a binary file."""
+    with open(filename, 'rb') as file:
+        return file.read()
+
+def write_binary_file(filename, content):
+    """Write content to a binary file."""
+    with open(filename, 'wb') as file:
+        file.write(content)
