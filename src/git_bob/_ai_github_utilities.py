@@ -267,7 +267,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         elif filename.endswith('.ipynb'):
             format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors. Return the notebook in JSON format!"
         elif filename.endswith('.docx'):
-            format_specific_instructions = " Write the document in simple markdown format containing links, headings, bullet points, and numbered lists. Make sure the document is well-structured and easy to read."
+            format_specific_instructions = " Write the document in simple markdown format."
         elif filename.endswith('.pptx'):
             format_specific_instructions = """
 The file should be a presentation with slides, formatted as a JSON list containing dictionaries with a 'title' and a 'content' list with up to 2 strings.
