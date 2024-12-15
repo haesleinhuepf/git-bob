@@ -431,9 +431,6 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
                 os.makedirs(path_without_filename, exist_ok=True)
                 os.chdir(path_without_filename)
 
-            # store environment variables
-            saved_environment = save_and_clear_environment()
-
             not_executed_notebook = new_content
 
             # read existing files + creation dates recursively
@@ -442,7 +439,9 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
             # Execute the notebook
             try:
                 for num_attempt in range(0, number_of_attempts):
+                    saved_environment = save_and_clear_environment()
                     new_content, error_message = execute_notebook(new_content)
+                    restore_environment(saved_environment)
                     if error_message is None:
                         break
 
@@ -461,7 +460,7 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
                             os.remove(file)
                     print("------------------------")
                     new_content, commit_message = fix_error_in_notebook(new_content, error_message, prompt_function)
-                restore_environment(saved_environment)
+
 
                 # scan for files the notebook created
                 list_of_files = get_modified_files(file_info)
