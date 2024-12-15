@@ -256,6 +256,7 @@ def image_to_url(image):
 
 def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
     import re
+    import docx2markdown
     #from ._github_utilities import get_conversation_on_issue, get_diff_of_pull_request, get_file_in_repository
 
     # Regex to find URLs in the discussion
@@ -277,6 +278,9 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
         url_type = is_github_url(url)
         print("URL:", url)
         print("Type:", url_type)
+        from datetime import datetime
+
+        current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         if "### File {url} content" in discussion:
             continue
@@ -309,6 +313,12 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
                 file_contents = Config.git_utilities.get_file_in_repository (repo, branch_name, file_path).decoded_content.decode()
                 if url.endswith('.ipynb'):
                     file_contents = erase_outputs_of_code_cells(file_contents)
+                elif url.endswith('.docx'):
+                    docx2markdown.docx_to_markdown(filename, filename + current_datetime + ".md")
+                    file_content = read_text_file(filename + current_datetime + ".md")
+                    # remove the file
+                    os.remove(filename + current_datetime + ".md")
+
                 additional_content[url] = file_contents
             elif url_type == 'image':
                 image = load_image_from_url(url)
