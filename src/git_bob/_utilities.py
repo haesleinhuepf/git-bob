@@ -320,7 +320,7 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
                     file_contents = erase_outputs_of_code_cells(file_contents)
                 elif url.endswith('.docx'):
                     docx2markdown.docx_to_markdown(temp_file_name, temp_file_name + ".md")
-                    file_content = read_text_file(temp_file_name + ".md")
+                    file_contents = read_text_file(temp_file_name + ".md")
                     # remove the file
                     os.remove(temp_file_name + ".md")
                 else:
