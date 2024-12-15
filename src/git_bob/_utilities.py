@@ -307,12 +307,11 @@ def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
                                            Config.git_utilities.get_diff_of_pull_request(repo, pr_number))
             elif url_type == 'file':
                 parts = url.split('/')
-                repo = parts[3] + '/' + parts[4]
-                branch_name = parts[6]
+                #repo = parts[3] + '/' + parts[4]
+                #branch_name = parts[6]
                 file_path = '/'.join(parts[7:])
                 temp_file_name = current_datetime + "_" + file_path.split('/')[-1]
-
-                url = Config.git_server_url + repo + "/raw/" + branch_name + "/" + file_path
+                url = url.replace("/blob/", "/raw/")
                 download_url(url, temp_file_name)
                 #file_contents = Config.git_utilities.get_file_in_repository (repo, branch_name, file_path).decoded_content.decode()
                 if url.endswith('.ipynb'):
