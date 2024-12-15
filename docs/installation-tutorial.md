@@ -15,7 +15,7 @@ pip install -e .
 by this one:
 
 ```
-pip install git-bob==0.12.0
+pip install git-bob==0.16.0
 ```
 
 ## Step 2: Creating an OpenAI API Key
