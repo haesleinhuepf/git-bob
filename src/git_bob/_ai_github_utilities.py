@@ -365,6 +365,9 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
         elif filename.endswith('.docx'):
             write_text_file(filename + current_datetime + ".md", new_content)
             docx2markdown.markdown_to_docx(filename + current_datetime + ".md", filename)
+            # workaround to make sure the file can be read by word later
+            docx2markdown.docx_to_markdown(filename, filename + current_datetime + ".md")
+            docx2markdown.markdown_to_docx(filename + current_datetime + ".md", filename)
             new_content = read_binary_file(filename)
             # delete temporary markdown file
             os.remove(filename + current_datetime + ".md")
