@@ -242,9 +242,9 @@ def fix_error_in_notebook(new_content, error_message, prompt_function):
 
     prompt = f"""
     {SYSTEM_PROMPT}
-    Given a Jupyter Notebook file content (filename {filename}) and an error message, modify the file content to solve the error. Return the notebook in JSON format!
+    Given a Jupyter Notebook file content and an error message, modify the file content to solve the error. Return the notebook in JSON format!
 
-    ## File {filename} content
+    ## Jupyter Notebook file content 
 
     {file_content_instruction}
     
