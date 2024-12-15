@@ -152,6 +152,7 @@ Some were parts of real scientific data analysis projects.
   * [Configuring Github workflows](https://github.com/haesleinhuepf/git-bob-playground/issues/146)
   * [Configuring a Jupyter Book](https://github.com/NFDI4BIOIMAGE/training/issues/381)
 * Data & Code Management
+  * [Write a Data Management Plan (DMP)](https://github.com/haesleinhuepf/git-bob-playground/issues/180)
   * [Research Data Management & Folder Structures](https://github.com/haesleinhuepf/git-bob-playground/issues/45)
   * [Documenting source code](https://github.com/haesleinhuepf/git-bob/pull/29)
   * [Determining licenses of dependencies](https://github.com/haesleinhuepf/git-bob-playground/issues/101)
