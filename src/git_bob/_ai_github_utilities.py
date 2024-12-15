@@ -460,7 +460,7 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
                         if os.path.exists(file):
                             os.remove(file)
                     print("------------------------")
-                    new_content, commit_message = fix_error_in_notebook(new_content, error_message)
+                    new_content, commit_message = fix_error_in_notebook(new_content, error_message, prompt_function)
                 restore_environment(saved_environment)
 
                 # scan for files the notebook created
