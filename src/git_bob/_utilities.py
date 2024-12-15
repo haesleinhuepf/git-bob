@@ -682,3 +682,24 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
 
     # Save presentation
     presentation.save(filename)
+
+
+def read_text_file(filename):
+    """Read the content of a text file."""
+    with open(filename, 'r') as file:
+        return file.read()
+
+def write_text_file(filename, content):
+    """Write content to a text file."""
+    with open(filename, 'w') as file:
+        file.write(content)
+
+def read_binary_file(filename):
+    """Read the content of a binary file."""
+    with open(filename, 'rb') as file:
+        return file.read()
+
+def write_binary_file(filename, content):
+    """Write content to a binary file."""
+    with open(filename, 'wb') as file:
+        file.write(content)
