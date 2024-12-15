@@ -235,7 +235,7 @@ def fix_error_in_notebook(new_content, error_message, prompt_function):
     str
         A summary of the changes made.
     """
-    Log().log(f"-> fix_error_in_notebook({new_content}, {error_message})")
+    Log().log(f"-> fix_error_in_notebook(..., ...)")
     from ._utilities import execute_notebook, erase_outputs_of_code_cells
 
     notebook_without_output = erase_outputs_of_code_cells(new_content)
@@ -246,7 +246,7 @@ def fix_error_in_notebook(new_content, error_message, prompt_function):
 
     ## Jupyter Notebook file content 
 
-    {file_content_instruction}
+    {new_content}
     
     ## Error message
     
