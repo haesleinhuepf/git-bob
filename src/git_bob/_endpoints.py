@@ -167,7 +167,7 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
     endpoint = "https://models.inference.ai.azure.com"
     model = model.replace("github_models:", "")
 
-    if "gpt" not in model:
+    if "gpt" not in model and "o1" not in model:
         from azure.ai.inference import ChatCompletionsClient
         from azure.ai.inference.models import SystemMessage, UserMessage
         from azure.core.credentials import AzureKeyCredential
