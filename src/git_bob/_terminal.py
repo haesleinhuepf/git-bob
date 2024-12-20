@@ -236,6 +236,8 @@ def init_prompt_handlers():
                                         prompt_function=partial(prompt_claude, model=Config.llm_name)),
         "gpt":            PromptHandler(api_key=os.environ.get("OPENAI_API_KEY"),
                                         prompt_function=partial(prompt_chatgpt, model=Config.llm_name)),
+        "o1":            PromptHandler(api_key=os.environ.get("OPENAI_API_KEY"),
+                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name)),
         "gemini":         PromptHandler(api_key=os.environ.get("GOOGLE_API_KEY"),
                                         prompt_function=partial(prompt_gemini, model=Config.llm_name)),
         "mistral":        PromptHandler(api_key=os.environ.get("MISTRAL_API_KEY"),
