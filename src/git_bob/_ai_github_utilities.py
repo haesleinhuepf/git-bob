@@ -324,10 +324,12 @@ The first slide contains only the author name as single string in the list of co
 Choose from these existing files and only use them if they fit well to the content:\n* """ + \
                 "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=branch_name, file_patterns=image_file_endings)) + "\n\n" + \
                 """
-Example 1: {"title":"Slide topic", "content":["Author name"]}
-Example 3: {"title":"headline", "content":["placeholder text A", "placeholder text A"]}
-Example 4: {"title":"topic", "content":["placeholder text", "placeholder_image.png"]}
-Example 5: {"title":"topic", "content":["longer text with multiple lines\ndetailed information"]}
+Examples for slides:
+Example 1: {"title":"Continents and backing", "content":["Author1 name, Author2 name, ..."]}
+Example 2: {"title":"Continents", "content":["The planet is separated into continents", "Each continent consists of countries, which might be further structured into federal districts"]}
+Example 3: {"title":"Backing cake", "content":["When baking cake it is important to pre-heat the oven before putting the cake in.", "Ingredients: \n  * Flour\n  * Sugar\n  * Salt\n  * Eggs"]}
+Example 4: {"title":"Regional food", "content":["Depending on the continent, regional food cultures have developed over the centures.", "These traditions developed because of availability of different ingredients and also depending on other natural resources.", "For example, in antarctical, wine grows relatively badly. That's why there are no traditional wines from Antarctica and wine needs to be imported in case it is an ingredient for a certain food. Hence, no traditional food from Antarctical is made of wine."]}
+Example 5: {"title":"Summary", "content":["In this slide-deck we learned about\n* Continents\n* Backing\n* Regional differences in food culture", "earth.png"]}
 """
 
         file_content = None
