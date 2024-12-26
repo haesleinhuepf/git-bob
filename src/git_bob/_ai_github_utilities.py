@@ -566,7 +566,7 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
     discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), prompt_visionlm=prompt_function)
     print("Discussion:", discussion)
 
-    all_files = "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository))
+    all_files = "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=base_branch))
 
     modifications = prompt_function(f"""
 Given a list of files in the repository {repository} and a github issues description (# {issue}), determine which files need to be modified, renamed or deleted to solve the issue.
@@ -735,7 +735,6 @@ Do not add headlines or any other formatting. Just respond with the paragraph, t
 
 
         pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
-
         pull_request_description = ensure_images_shown(pull_request_description, file_list)
         pull_request_description = pull_request_description.replace("\n* ![", "\n![")
 
@@ -775,7 +774,6 @@ You committed these changes to these files
 Summarize the changes above to a one paragraph. Write your response as if you were a human talking to a human.
 Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
 Do not add headline or any other formatting. Just respond with the paragraphe below.
-
 """)
 
         modification_summary = ensure_images_shown(modification_summary, file_list)
@@ -810,6 +808,7 @@ Return a JSON list with a short title for each sub-task.
 
 ## Discussion
 {discussion}
+
 ## Your task
 Extract and return sub-tasks as a JSON list of sub-task titles.
 """)
