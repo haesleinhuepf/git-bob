@@ -588,6 +588,10 @@ Respond with the actions as JSON list.
     for instruction in instructions:
         action = instruction.get('action')
 
+        # special case: svg files are not painted
+        if action == "paint" and instruction['filename'].endswith(".svg"):
+            action = "create"
+
         for filename_key in ["filename", "new_filename", "old_filename", "target_filename"]:
             if filename_key in instruction.keys():
                 filename = instruction[filename_key]
