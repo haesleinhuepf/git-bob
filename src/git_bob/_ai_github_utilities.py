@@ -317,7 +317,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         elif filename.endswith('.pptx'):
             format_specific_instructions = """
 The file should be a presentation with slides, formatted as a JSON list containing dictionaries with a 'title' and a 'content' list with up to 2 strings.
-These strings can be text+text or text+image. The strings can be multi-line text, and also be file-paths of .jpg, .gif or .png files. 
+These strings can be text+text or text+image. The strings can be multi-line text, and also be file-paths of .jpg, .gif, .png or .svg files. 
 If it's an image, it MUST only be the file-path and no additional text.
 If it's text, make sure the text is short enough that it fits on a slide. Also put enough information on a slide so that it doesn't appear empty. Two to four sentences per slide are nice. For more detailed information consider using bullet-points instead of long sentences. Four to six bullet points per slide are great.
 The first slide contains only the author name as single string in the list of contents.
@@ -331,6 +331,8 @@ Example 3: {"title":"Backing cake", "content":["When baking cake it is important
 Example 4: {"title":"Regional food", "content":["Depending on the continent, regional food cultures have developed over the centures.", "These traditions developed because of availability of different ingredients and also depending on other natural resources.", "For example, in antarctical, wine grows relatively badly. That's why there are no traditional wines from Antarctica and wine needs to be imported in case it is an ingredient for a certain food. Hence, no traditional food from Antarctical is made of wine."]}
 Example 5: {"title":"Summary", "content":["In this slide-deck we learned about\n* Continents\n* Backing\n* Regional differences in food culture", "earth.png"]}
 """
+        elif filename.endswith('.svg'):
+            format_specific_instructions = "The file should be a valid SVG file. Make sure it starts with <?xml version=\"1.0\" encoding=\"UTF-8\"?> and contains an <svg> element with appropriate width, height and viewBox. Use basic SVG elements like rect, circle, path, text etc."
 
         file_content = None
         if Config.git_utilities.check_if_file_exists(repository, branch_name, filename):
@@ -586,6 +588,10 @@ Respond with the actions as JSON list.
     for instruction in instructions:
         action = instruction.get('action')
 
+        # special case: svg files are not painted
+        if action == "paint" and instruction['filename'].endswith(".svg"):
+            action = "create"
+
         for filename_key in ["filename", "new_filename", "old_filename", "target_filename"]:
             if filename_key in instruction.keys():
                 filename = instruction[filename_key]
@@ -698,8 +704,8 @@ Afterwards, summarize the summary in a single line, which will become the title 
 Do not add headlines or any other formatting. Just respond with the paragraph, the list of markdown links with explanations and the title in a new line below.
 """)
 
-        pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
 
+        pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
         pull_request_description = ensure_images_shown(pull_request_description, file_list)
         pull_request_description = pull_request_description.replace("\n* ![", "\n![")
 
@@ -738,7 +744,6 @@ You committed these changes to these files
 ## Your task
 Summarize the changes above to a one paragraph. Write your response as if you were a human talking to a human.
 Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
-
 Do not add headline or any other formatting. Just respond with the paragraphe below.
 """)
 
