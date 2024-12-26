@@ -148,6 +148,8 @@ Some were parts of real scientific data analysis projects.
   * [Fixing bugs in notebooks](https://github.com/haesleinhuepf/git-bob-playground/issues/174)
   * [Summarize code of a file](https://github.com/haesleinhuepf/git-bob-playground/issues/178)
   * [Summarize code in a repository](https://github.com/haesleinhuepf/git-bob/issues/445)
+* Prompting
+  * [Prompting for SVG files](https://github.com/haesleinhuepf/git-bob-playground/issues/184)
 * Continuous Integration and Deployment
   * [Configuring Github workflows](https://github.com/haesleinhuepf/git-bob-playground/issues/146)
   * [Configuring a Jupyter Book](https://github.com/NFDI4BIOIMAGE/training/issues/381)
@@ -189,11 +191,13 @@ Some were parts of real scientific data analysis projects.
   * [PowerPoint Karaoke](https://github.com/haesleinhuepf/git-bob-playground/issues/99)
   * [Solving Advent of Code 2024 puzzles](https://github.com/haesleinhuepf/git-bob-advent-of-code)
   * [Solving the Halting Problem](https://github.com/haesleinhuepf/git-bob-playground/issues/156) [[2nd attempt](https://github.com/haesleinhuepf/git-bob-playground/issues/157)]
+  * [Drawing a Christmas tree as SVG](https://github.com/haesleinhuepf/git-bob-playground/issues/188)
 * Things that did't work well
   * [How to use aider from python](https://github.com/haesleinhuepf/git-bob/issues/437#issuecomment-2539865080)
   * [How to use the atproto API](https://github.com/haesleinhuepf/git-bob-playground/issues/136)
   * [Executing code in a sandbox](https://github.com/haesleinhuepf/git-bob-playground/issues/177)
   * [Summarize code in a repository](https://github.com/haesleinhuepf/git-bob/issues/444)
+  * [Drawing multiple trees in a SVG file](https://github.com/haesleinhuepf/git-bob-playground/issues/187)
 
 ## Installation for development
 
