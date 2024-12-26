@@ -757,6 +757,7 @@ Do not add headlines or any other formatting. Just respond with the paragraph, t
 {SYSTEM_PROMPT}
 Given a Github issue description, a list of commit messages, and a list of mark-down links, summarize the changes you made in the files.
 Add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
+
 ## Github Issue #{issue} Discussion
 {discussion}
 ## Commit messages
