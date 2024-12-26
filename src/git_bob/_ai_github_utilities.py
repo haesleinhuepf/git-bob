@@ -759,16 +759,23 @@ Given a Github issue description, a list of commit messages, and a list of mark-
 Add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
 
 ## Github Issue #{issue} Discussion
+
 {discussion}
+
 ## Commit messages
 You committed these changes to these files
+
 {commit_messages_prompt}
+
 ## List of links
+
 {file_list_text}
+
 ## Your task
 Summarize the changes above to a one paragraph. Write your response as if you were a human talking to a human.
 Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
 Do not add headline or any other formatting. Just respond with the paragraphe below.
+
 """)
 
         modification_summary = ensure_images_shown(modification_summary, file_list)
@@ -779,6 +786,7 @@ Do not add headline or any other formatting. Just respond with the paragraphe be
 def split_issue_in_sub_issues(repository, issue, prompt_function):
     """
     Split a main issue into sub-issues for each sub-task.
+
     Parameters
     ----------
     repository : str
@@ -799,6 +807,7 @@ def split_issue_in_sub_issues(repository, issue, prompt_function):
 You need to extract sub-tasks from a given discussion.
 Hint: Sub-tasks are never about "Create an issue for X", but "X" instead. Also sub-tasks are never about "Propose X", but "X" instead.
 Return a JSON list with a short title for each sub-task.
+
 ## Discussion
 {discussion}
 ## Your task
@@ -814,9 +823,12 @@ Extract and return sub-tasks as a JSON list of sub-task titles.
 {SYSTEM_PROMPT}
 Given description of a list of sub-tasks and extra details given in a discussion, 
 extract relevant information for one of the sub-tasks.
+
 ## Discussion
 {discussion}
+
 {created_sub_tasks}
+
 ## Your task
 Extract relevant information for the sub-task "{title}".
 Write the information down and make a proposal of how to solve the sub-task.
