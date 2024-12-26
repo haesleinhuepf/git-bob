@@ -732,3 +732,143 @@ Below add the list of markdown links but replace <explanation> with a single sen
 Afterwards, summarize the summary in a single line, which will become the title of the pull-request.
 Do not add headlines or any other formatting. Just respond with the paragraph, the list of markdown links with explanations and the title in a new line below.
 """)
+
+
+        pull_request_description, pull_request_title = split_content_and_summary(pull_request_summary)
+
+        pull_request_description = ensure_images_shown(pull_request_description, file_list)
+        pull_request_description = pull_request_description.replace("\n* ![", "\n![")
+
+        full_report = remark + clean_output(repository, pull_request_description) + error_messages
+
+        try:
+            Config.git_utilities.send_pull_request(repository,
+                          source_branch=branch_name,
+                          target_branch=base_branch,
+                          title=redact_text(pull_request_title),
+                          description=redact_text(full_report) + f"\n\ncloses #{issue}")
+        except GithubException as e:
+            Config.git_utilities.add_comment_to_issue(repository, issue, f"{remark}Error creating pull-request: {e}{error_messages}")
+        except GitlabCreateError as e:
+            Config.git_utilities.add_comment_to_issue(repository, issue, f"{remark}Error creating pull-request: {e}{error_messages}")
+
+    else:
+        modification_summary = prompt_function(f"""
+{SYSTEM_PROMPT}
+Given a Github issue description, a list of commit messages, and a list of mark-down links, summarize the changes you made in the files.
+Add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
+## Github Issue #{issue} Discussion
+{discussion}
+## Commit messages
+You committed these changes to these files
+{commit_messages_prompt}
+## List of links
+{file_list_text}
+## Your task
+Summarize the changes above to a one paragraph. Write your response as if you were a human talking to a human.
+Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
+Do not add headline or any other formatting. Just respond with the paragraphe below.
+""")
+
+        modification_summary = ensure_images_shown(modification_summary, file_list)
+
+        Config.git_utilities.add_comment_to_issue(repository, issue, remark + redact_text(clean_output(repository, modification_summary)) + redact_text(error_messages))
+
+
+def split_issue_in_sub_issues(repository, issue, prompt_function):
+    """
+    Split a main issue into sub-issues for each sub-task.
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue : int
+        The main issue number.
+    """
+    Log().log(f"-> split_issue_in_sub_issues({repository}, {issue},...)")
+    from ._utilities import text_to_json, Config
+    from ._github_utilities import create_issue
+
+    discussion = Config.git_utilities.get_conversation_on_issue(repository, issue)
+    ai_remark = setup_ai_remark()+ "\n"
+
+    # Implement the prompt to parse the discussion
+    sub_tasks_json = prompt_function(f"""
+{SYSTEM_PROMPT}
+You need to extract sub-tasks from a given discussion.
+Hint: Sub-tasks are never about "Create an issue for X", but "X" instead. Also sub-tasks are never about "Propose X", but "X" instead.
+Return a JSON list with a short title for each sub-task.
+## Discussion
+{discussion}
+## Your task
+Extract and return sub-tasks as a JSON list of sub-task titles.
+""")
+
+    sub_tasks = text_to_json(sub_tasks_json)
+    created_sub_tasks = ""
+
+    sub_issue_numbers = []
+    for title in sub_tasks:
+        body = prompt_function(f"""
+{SYSTEM_PROMPT}
+Given description of a list of sub-tasks and extra details given in a discussion, 
+extract relevant information for one of the sub-tasks.
+## Discussion
+{discussion}
+{created_sub_tasks}
+## Your task
+Extract relevant information for the sub-task "{title}".
+Write the information down and make a proposal of how to solve the sub-task.
+Do not explain your response or anything else. Just respond the relevant information for the sub-task and a potential solution.
+""")
+        body = body.replace(AGENT_NAME, AGENT_NAME[:3]+ "_" + AGENT_NAME[4:]) # prevent endless loops
+
+        issue_number = create_issue(repository, title, ai_remark + body)
+        sub_issue_numbers.append(issue_number)
+
+        if len(created_sub_tasks) == 0:
+            created_sub_tasks = "## Other sub-tasks\nThe following sub-tasks have already been identified:\n"
+        created_sub_tasks += f"### {title}\n{body}\n\n"
+
+    # Create a comment on the main issue with the list of sub-issues
+    sub_issue_links = "\n".join([f"- #{num}" for num in sub_issue_numbers])
+    comment_text = f"Sub-issues have been created:\n{sub_issue_links}"
+    Config.git_utilities.add_comment_to_issue(repository, issue, ai_remark + comment_text)
+
+    return sub_issue_numbers
+
+def paint_picture(repository, branch_name, prompt, output_filename="image.png", model="dall-e-3", image_width=1024, image_height=1024, style='vivid', quality='standard'):
+    """Generate an image using DALL-E3 based on a prompt and save it to the repository using PIL."""
+    Log().log(f"-> paint_image({repository}, {branch_name}, ..., {output_filename}, {model}, ...)")
+    from openai import OpenAI
+    import io
+    from ._utilities import images_from_url_responses, Config
+    client = OpenAI()
+
+    size_str = f"{image_width}x{image_height}"
+
+    kwargs = {}
+    if model == "dall-e-3":
+        kwargs['style'] = style
+        kwargs['quality'] = quality
+
+    response = client.images.generate(
+        prompt=prompt,
+        n=1,
+        model=model,
+        size=size_str,
+        **kwargs
+    )
+
+    image = images_from_url_responses(response)
+
+    # convert to bytes
+    img_byte_arr = io.BytesIO()
+    image.save(img_byte_arr, format='PNG')
+    img_byte_arr = img_byte_arr.getvalue()
+
+    # commit
+    commit_message = "Painted image"
+    Config.git_utilities.write_file_in_branch(repository, branch_name, output_filename, img_byte_arr, commit_message=commit_message)
+
+    return commit_message
