@@ -9,37 +9,6 @@ AGENT_NAME = os.environ.get("GIT_BOB_AGENT_NAME", "git-bob")
 SYSTEM_PROMPT = os.environ.get("SYSTEM_MESSAGE", f"You are an AI-based coding assistant named {AGENT_NAME}. You are an excellent Python programmer and software engineer.")
 
 
-def draw_vector_graphics(prompt: str, prompt_function: callable) -> str:
-    """Generate SVG vector graphics based on a text prompt using an AI model.
-    
-    Parameters
-    ----------
-    prompt : str
-        High-level description of what should be drawn
-    prompt_function : callable
-        Function that generates SVG content from a prompt
-        
-    Returns
-    -------
-    str
-        Generated SVG file content
-    """
-    detailed_prompt = f"""Please create an SVG graphic that represents: {prompt}
-    
-    The response should:
-    * Be a valid SVG file
-    * Start with <?xml version="1.0" encoding="UTF-8"?>
-    * Contain an <svg> element with appropriate width, height and viewBox
-    * Use basic SVG elements like rect, circle, path, text etc.
-    * Only contain the SVG code, no explanation
-    """
-    
-    # Get the SVG content using the provided prompt function
-    svg_content = prompt_function(detailed_prompt)
-    
-    return svg_content
-
-
 def setup_ai_remark():
     """
     Set up the AI remark for comments.
@@ -363,9 +332,7 @@ Example 4: {"title":"Regional food", "content":["Depending on the continent, reg
 Example 5: {"title":"Summary", "content":["In this slide-deck we learned about\n* Continents\n* Backing\n* Regional differences in food culture", "earth.png"]}
 """
         elif filename.endswith('.svg'):
-            new_content = draw_vector_graphics(issue_summary, prompt_function)
-            Config.git_utilities.write_file_in_branch(repository, branch_name, filename, new_content, "Added SVG file")
-            return {filename: "Added SVG file"}
+            format_specific_instructions = "The file should be a valid SVG file. Make sure it starts with <?xml version=\"1.0\" encoding=\"UTF-8\"?> and contains an <svg> element with appropriate width, height and viewBox. Use basic SVG elements like rect, circle, path, text etc."
 
         file_content = None
         if Config.git_utilities.check_if_file_exists(repository, branch_name, filename):
