@@ -148,6 +148,7 @@ Some were parts of real scientific data analysis projects.
   * [Fixing bugs in notebooks](https://github.com/haesleinhuepf/git-bob-playground/issues/174)
   * [Summarize code of a file](https://github.com/haesleinhuepf/git-bob-playground/issues/178)
   * [Summarize code in a repository](https://github.com/haesleinhuepf/git-bob/issues/445)
+  * [Programming Google Search](https://github.com/haesleinhuepf/git-bob-playground/issues/193)
 * Prompting
   * [Prompting for SVG files](https://github.com/haesleinhuepf/git-bob-playground/issues/184)
 * Continuous Integration and Deployment
@@ -179,12 +180,14 @@ Some were parts of real scientific data analysis projects.
   * [Plotting a circle of triangles (in gitlab)](https://gitlab.com/haesleinhuepf/git-bob-gitlab-playground/-/issues/8)
   * [Pairplots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/48)
   * [Word clouds](https://github.com/haesleinhuepf/git-bob-playground/issues/76)
+  * [Plot simulated income data](https://github.com/haesleinhuepf/git-bob-playground/issues/195)
 * Science Communication
   * [Making slides for Deep Learning training](https://github.com/haesleinhuepf/git-bob-playground/issues/97)
   * [Making slides for Research Data Management training](https://github.com/haesleinhuepf/git-bob-playground/issues/96)
   * [Visualizing how Fourier-Transform works](https://github.com/haesleinhuepf/git-bob-playground/issues/22)
   * [Making Jupyter Notebooks for training](https://github.com/haesleinhuepf/git-bob-playground/issues/92)
   * [Making slides about text](https://github.com/haesleinhuepf/git-bob-playground/issues/98)
+  * [Visualizing processes using CPUs and GPUs](https://github.com/haesleinhuepf/git-bob-playground/issues/192)
 * Fun
   * [Playing Tic-Tac-Toe](https://github.com/haesleinhuepf/git-bob-playground/issues/91)
   * [Story Telling for kids](https://github.com/haesleinhuepf/git-bob-playground/issues/82)
