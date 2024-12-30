@@ -201,6 +201,7 @@ Some were parts of real scientific data analysis projects.
   * [Executing code in a sandbox](https://github.com/haesleinhuepf/git-bob-playground/issues/177)
   * [Summarize code in a repository](https://github.com/haesleinhuepf/git-bob/issues/444)
   * [Drawing multiple trees in a SVG file](https://github.com/haesleinhuepf/git-bob-playground/issues/187)
+  * [Complex code refactoring](https://github.com/haesleinhuepf/git-bob/issues/451)
 
 ## Installation for development
 
