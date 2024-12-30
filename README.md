@@ -149,6 +149,7 @@ Some were parts of real scientific data analysis projects.
   * [Summarize code of a file](https://github.com/haesleinhuepf/git-bob-playground/issues/178)
   * [Summarize code in a repository](https://github.com/haesleinhuepf/git-bob/issues/445)
   * [Programming Google Search](https://github.com/haesleinhuepf/git-bob-playground/issues/193)
+  * [Implementing a generic Factory patters](https://github.com/haesleinhuepf/git-bob-playground/issues/198)
 * Prompting
   * [Prompting for SVG files](https://github.com/haesleinhuepf/git-bob-playground/issues/184)
 * Continuous Integration and Deployment
@@ -203,6 +204,7 @@ Some were parts of real scientific data analysis projects.
   * [Executing code in a sandbox](https://github.com/haesleinhuepf/git-bob-playground/issues/177)
   * [Summarize code in a repository](https://github.com/haesleinhuepf/git-bob/issues/444)
   * [Drawing multiple trees in a SVG file](https://github.com/haesleinhuepf/git-bob-playground/issues/187)
+  * [Drawing relationships between agents in a multi-agent system](https://github.com/haesleinhuepf/git-bob-playground/issues/199)
   * [Complex code refactoring](https://github.com/haesleinhuepf/git-bob/issues/451)
 
 ## Installation for development
