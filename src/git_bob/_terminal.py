@@ -223,7 +223,7 @@ def init_prompt_handlers():
     import os
     from functools import partial
     from ._utilities import Config
-    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure, prompt_mistral
+    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure, prompt_mistral, prompt_huggingface
 
     return {
         "github_models:": PromptHandler(api_key=os.environ.get("GH_MODELS_API_KEY"),
@@ -232,6 +232,8 @@ def init_prompt_handlers():
                                         prompt_function=partial(prompt_chatgpt, model=Config.llm_name, base_url="https://chat-ai.academiccloud.de/v1", api_key=os.environ.get("KISSKI_API_KEY"))),
         "blablador:":     PromptHandler(api_key=os.environ.get("BLABLADOR_API_KEY"),
                                         prompt_function=partial(prompt_chatgpt, model=Config.llm_name, base_url="https://helmholtz-blablador.fz-juelich.de:8000/v1", api_key=os.environ.get("BLABLADOR_API_KEY"))),
+        "huggingface:":   PromptHandler(api_key=os.environ.get("HF_TOKEN"),
+                                        prompt_function=partial(prompt_huggingface, model=Config.llm_name)),
         "claude":         PromptHandler(api_key=os.environ.get("ANTHROPIC_API_KEY"),
                                         prompt_function=partial(prompt_claude, model=Config.llm_name)),
         "gpt":            PromptHandler(api_key=os.environ.get("OPENAI_API_KEY"),
