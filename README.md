@@ -38,16 +38,18 @@ There is a detailed [tutorial](https://github.com/haesleinhuepf/git-bob/blob/mai
     * `gpt-4o-2024-08-06`
     * `github_models:gpt-4o`
     * `github_models:meta-llama-3.1-405b-instruct`
+    * `huggingface:meta-llama/Llama-3.3-70B-Instruct`
     * `gemini-1.5-pro-002`
     * `mistral-large-2411` (uses `pixtral-12b-2409` for vision tasks)
-  * configure a GitHub secret called `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` or `GH_MODELS_API_KEY` or `GOOGLE_API_KEY` or `MISTRAL_API_KEY` or `KISSKI_API_KEY` or `BLABBLADOR_API_KEY` with the corresponding key from the LLM provider depending on the above configured LLM. You can get these keys here:
-    * [OpenAI (gpt)](https://openai.com/blog/openai-api)
-    * [Anthropic (claude)](https://www.anthropic.com/api)
-    * [GitHub Models Marketplace](https://github.com/marketplace/models)
-    * [Google AI](https://ai.google.dev/gemini-api/docs/api-key)
-    * [Mistral](https://console.mistral.ai/api-keys/)
-    * [KISSKI](https://services.kisski.de/services/en/service/?service=2-02-llm-service.json)
-    * [BLABLADOR](https://login.helmholtz.de/oauth2-as/oauth2-authz-web-entry)
+  * configure a GitHub secret with the corresponding key from the LLM provider depending on the above configured LLM:
+    * `OPENAI_API_KEY`: [OpenAI (gpt)](https://openai.com/blog/openai-api)
+    * `ANTHROPIC_API_KEY`: [Anthropic (claude)](https://www.anthropic.com/api)
+    * `GH_MODELS_API_KEY`: [GitHub Models Marketplace](https://github.com/marketplace/models)
+    * `GOOGLE_API_KEY`: [Google AI](https://ai.google.dev/gemini-api/docs/api-key)
+    * `HF_TOKEN`: [Huggingface tokens](https://huggingface.co/settings/tokens/new?tokenType=fineGrained), requires [HuggingFace Pro](https://huggingface.co/pricing)
+    * `MISTRAL_API_KEY`: [Mistral](https://console.mistral.ai/api-keys/)
+    * `KISSKI_API_KEY`: [KISSKI](https://services.kisski.de/services/en/service/?service=2-02-llm-service.json)
+    * `BLABBLADOR_API_KEY`: [BLABLADOR](https://login.helmholtz.de/oauth2-as/oauth2-authz-web-entry)
   * configure GitHub actions to run the workflow on issues and pull requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
 
 When using it in your repository, you can also set a custom system message, for example for:
