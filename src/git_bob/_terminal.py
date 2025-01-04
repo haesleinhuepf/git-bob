@@ -223,7 +223,7 @@ def init_prompt_handlers():
     import os
     from functools import partial
     from ._utilities import Config
-    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure, prompt_mistral
+    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure, prompt_mistral, prompt_huggingface
 
     return {
         "github_models:": PromptHandler(api_key=os.environ.get("GH_MODELS_API_KEY"),
@@ -244,6 +244,8 @@ def init_prompt_handlers():
                                         prompt_function=partial(prompt_mistral, model=Config.llm_name)),
         "pixtral":        PromptHandler(api_key=os.environ.get("MISTRAL_API_KEY"),
                                         prompt_function=partial(prompt_mistral, model=Config.llm_name)),
+        "huggingface":    PromptHandler(api_key=os.environ.get("HF_TOKEN"),
+                                        prompt_function=partial(prompt_huggingface, model=Config.llm_name)),
     }
 
 def remote_interface():
