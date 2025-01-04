@@ -283,3 +283,32 @@ def prompt_mistral(message: str, model="mistral-large-2411", image=None):
 
     # Print the content of the response
     return chat_response.choices[0].message.content
+
+
+def prompt_huggingface(message: str, model="meta-llama/Llama-2-70b-chat-hf"):
+    """A prompt helper function that uses Huggingface's serverless inference API
+    
+    Parameters
+    ----------
+    message : str
+        The message to send to the model
+    model : str, optional
+        The model to use, defaults to meta-llama/Llama-2-70b-chat-hf
+        
+    Returns
+    -------
+    str
+        The model's response
+    """
+    from huggingface_hub import InferenceClient
+    import os
+    
+    client = InferenceClient(token=os.environ["HF_TOKEN"])
+    
+    return client.text_generation(
+        message,
+        model=model,
+        temperature=0.7,
+        top_p=0.95,
+        stop_sequences=["\n\n"]
+    )
