@@ -184,6 +184,7 @@ Some were parts of real scientific data analysis projects.
   * [Pairplots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/48)
   * [Word clouds](https://github.com/haesleinhuepf/git-bob-playground/issues/76)
   * [Plot simulated income data](https://github.com/haesleinhuepf/git-bob-playground/issues/195)
+  * [Ploting the Dunning Kruger effect](https://github.com/haesleinhuepf/git-bob-playground/issues/202)
 * Science Communication
   * [Making slides for Deep Learning training](https://github.com/haesleinhuepf/git-bob-playground/issues/97)
   * [Making slides for Research Data Management training](https://github.com/haesleinhuepf/git-bob-playground/issues/96)
