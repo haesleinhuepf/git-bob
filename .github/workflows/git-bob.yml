@@ -54,6 +54,7 @@ jobs:
         MISTRAL_API_KEY: "${{ secrets.MISTRAL_API_KEY }}"
         GH_MODELS_API_KEY: "${{ secrets.GH_MODELS_API_KEY }}"
         KISSKI_API_KEY: "${{ secrets.KISSKI_API_KEY }}"
+        HF_TOKEN: "${{ secrets.HF_TOKEN }}"
         BLABLADOR_API_KEY: "${{ secrets.BLABLADOR_API_KEY }}"
         GITHUB_API_KEY: "${{ secrets.GITHUB_TOKEN }}"
         GITLAB_API_KEY: "${{ secrets.GITLAB_API_KEY }}"

@@ -21,3 +21,4 @@ python-gitlab
 python-pptx
 mistralai
 docx2markdown
+huggingface_hub
