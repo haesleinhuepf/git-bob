@@ -178,6 +178,23 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
     # extract answer
     return result
 
+@register_handler(api_key_entry="KISSKI_API_KEY")
+def prompt_kisski(message: str, model=None, image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
+    if base_url is None:
+        base_url = "https://chat-ai.academiccloud.de/v1"
+    if api_key is None:
+        api_key = os.environ.get("KISSKI_API_KEY")
+    return prompt_chatgpt(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
+
+
+@register_handler(api_key_entry="BLABLADOR_API_KEY")
+def prompt_blablador(message: str, model=None, image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
+    if base_url is None:
+        base_url = "https://helmholtz-blablador.fz-juelich.de:8000/v1"
+    if api_key is None:
+        api_key = os.environ.get("BLABLADOR_API_KEY")
+    return prompt_chatgpt(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
+
 
 @register_handler(api_key_entry="GOOGLE_API_KEY")
 def prompt_gemini(request, model="gemini-1.5-flash-001", image=None):
