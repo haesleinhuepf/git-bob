@@ -214,37 +214,25 @@ def command_line_interface():
     print("Done. Summary:")
     print("* " + "\n* ".join(Log().get()))
 
-class PromptHandler:
-    def __init__(self, api_key, prompt_function):
-        self.api_key = api_key
-        self.prompt_function = prompt_function
-
 def init_prompt_handlers():
-    import os
-    from functools import partial
-    from ._utilities import Config
-    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure, prompt_mistral
+    """Initialize and return prompt handlers from entry points.
 
-    return {
-        "github_models:": PromptHandler(api_key=os.environ.get("GH_MODELS_API_KEY"),
-                                        prompt_function=partial(prompt_azure, model=Config.llm_name)),
-        "kisski:":        PromptHandler(api_key=os.environ.get("KISSKI_API_KEY"),
-                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name, base_url="https://chat-ai.academiccloud.de/v1", api_key=os.environ.get("KISSKI_API_KEY"))),
-        "blablador:":     PromptHandler(api_key=os.environ.get("BLABLADOR_API_KEY"),
-                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name, base_url="https://helmholtz-blablador.fz-juelich.de:8000/v1", api_key=os.environ.get("BLABLADOR_API_KEY"))),
-        "claude":         PromptHandler(api_key=os.environ.get("ANTHROPIC_API_KEY"),
-                                        prompt_function=partial(prompt_claude, model=Config.llm_name)),
-        "gpt":            PromptHandler(api_key=os.environ.get("OPENAI_API_KEY"),
-                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name)),
-        "o1":            PromptHandler(api_key=os.environ.get("OPENAI_API_KEY"),
-                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name)),
-        "gemini":         PromptHandler(api_key=os.environ.get("GOOGLE_API_KEY"),
-                                        prompt_function=partial(prompt_gemini, model=Config.llm_name)),
-        "mistral":        PromptHandler(api_key=os.environ.get("MISTRAL_API_KEY"),
-                                        prompt_function=partial(prompt_mistral, model=Config.llm_name)),
-        "pixtral":        PromptHandler(api_key=os.environ.get("MISTRAL_API_KEY"),
-                                        prompt_function=partial(prompt_mistral, model=Config.llm_name)),
-    }
+    Returns
+    -------
+    dict
+        Dictionary mapping handler names to PromptHandler instances.
+    """
+    import pkg_resources
+    
+    handlers = {}
+    for entry_point in pkg_resources.iter_entry_points('git_bob.prompt_handlers'):
+        try:
+            register_func = entry_point.load()
+            handlers.update(register_func())
+        except Exception as e:
+            print(f"Failed to load handler {entry_point.name}: {e}")
+    
+    return handlers
 
 def remote_interface():
     """
