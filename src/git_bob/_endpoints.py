@@ -35,12 +35,17 @@ def register_handler(prompt_function, api_key_entry, base_url=None):
     PromptHandler
         Configured prompt handler instance
     """
-    return PromptHandler(
-        api_key=os.environ.get(api_key_entry),
-        prompt_function=partial(prompt_function, base_url=base_url, api_key=os.environ.get(api_key_entry))
-    )
+    def decorator():
+        return {
+            f":{prompt_function.__name__.replace('prompt_', '')}": PromptHandler(
+                api_key=os.environ.get(api_key_entry),
+                prompt_function=partial(prompt_function, base_url=base_url, api_key=os.environ.get(api_key_entry))
+            )
+        }
+    return decorator
 
 
+@register_handler(api_key_entry="ANTHROPIC_API_KEY")
 def prompt_claude(message: str, model="claude-3-5-sonnet-20241022", image=None):
     """
     A prompt helper function that sends a message to anthropic
@@ -107,6 +112,7 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20241022", image=None):
     return message.content[0].text
 
 
+@register_handler(api_key_entry="OPENAI_API_KEY")
 def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
     """A prompt helper function that sends a message to openAI
     and returns only the text response.
@@ -173,6 +179,7 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
     return result
 
 
+@register_handler(api_key_entry="GOOGLE_API_KEY")
 def prompt_gemini(request, model="gemini-1.5-flash-001", image=None):
     """Send a prompt to Google Gemini and return the response"""
     from google import generativeai as genai
@@ -191,6 +198,7 @@ def prompt_gemini(request, model="gemini-1.5-flash-001", image=None):
     return response.text
 
 
+@register_handler(api_key_entry="GH_MODELS_API_KEY", base_url="https://models.inference.ai.azure.com")
 def prompt_azure(message: str, model="gpt-4o", image=None):
     """A prompt helper function that sends a message to Azure's OpenAI Service
     and returns only the text response.
@@ -262,6 +270,7 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
     return response.choices[0].message.content
 
 
+@register_handler(api_key_entry="MISTRAL_API_KEY")
 def prompt_mistral(message: str, model="mistral-large-2411", image=None):
     """A prompt helper function that sends a message to Mistral.
     If an image is provided, it will use the Pixtral model."""
