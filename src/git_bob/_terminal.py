@@ -3,14 +3,14 @@
 # using AI models like GPT and Claude. The script can be run in a GitHub CI environment with a timeout.
 
 def command_line_interface():
-    import os
+    import os 
     import sys
     import signal
 
     from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues
     from ._github_utilities import check_access_and_ask_for_approval, get_repository_handle, get_most_recently_commented_issue
-    from ._utilities import quick_first_response, Config, deploy
+    from ._utilities import quick_first_response, Config, deploy 
     from ._logger import Log
     from github.GithubException import UnknownObjectException
     from ._utilities import run_cli
@@ -40,7 +40,7 @@ def command_line_interface():
     # Aliases for model names
     model_aliases = {
         "claude": "claude-3-5-sonnet-20241022",
-        "gemini": "gemini-1.5-pro-002",
+        "gemini": "gemini-1.5-pro-002", 
         "gpt-4o": "gpt-4o-20240806",
         "gpt4o": "gpt-4o-20240806",
         "mistral": "mistral-large-2411"
@@ -223,12 +223,14 @@ def init_prompt_handlers():
         Dictionary mapping handler names to PromptHandler instances.
     """
     import pkg_resources
+    from ._endpoints import register_handler
     
     handlers = {}
     for entry_point in pkg_resources.iter_entry_points('git_bob.prompt_handlers'):
         try:
-            register_func = entry_point.load()
-            handlers.update(register_func())
+            handler_func = entry_point.load()
+            key = entry_point.name
+            handlers[f":{key}"] = register_handler(handler_func, f"GIT_BOB_{key.upper()}_API_KEY")
         except Exception as e:
             print(f"Failed to load handler {entry_point.name}: {e}")
     
