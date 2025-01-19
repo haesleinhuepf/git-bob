@@ -5,6 +5,41 @@ Functions:
 - prompt_claude: Sends a message to the Claude language model and returns the text response.
 - prompt_chatgpt: Sends a message to the ChatGPT language model and returns the text response.
 """
+from functools import partial
+import os
+
+class PromptHandler:
+    """
+    A handler for language model prompts that contains the API key and prompt function.
+    """
+    def __init__(self, api_key, prompt_function):
+        self.api_key = api_key
+        self.prompt_function = prompt_function
+
+
+def register_handler(prompt_function, api_key_entry, base_url=None):
+    """
+    Decorator to register a prompt handler with the given configuration.
+
+    Parameters
+    ----------
+    prompt_function : callable
+        The function that handles the actual prompting
+    api_key_entry : str
+        Environment variable name containing the API key
+    base_url : str, optional
+        Base URL for the API endpoint
+
+    Returns
+    -------
+    PromptHandler
+        Configured prompt handler instance
+    """
+    return PromptHandler(
+        api_key=os.environ.get(api_key_entry),
+        prompt_function=partial(prompt_function, base_url=base_url, api_key=os.environ.get(api_key_entry))
+    )
+
 
 def prompt_claude(message: str, model="claude-3-5-sonnet-20241022", image=None):
     """
