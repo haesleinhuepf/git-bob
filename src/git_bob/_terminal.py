@@ -222,11 +222,11 @@ def init_prompt_handlers():
     dict
         Dictionary mapping handler names to PromptHandler instances.
     """
-    import pkg_resources
+    from importlib.metadata import entry_points
     from ._endpoints import register_handler
     
     handlers = {}
-    for entry_point in pkg_resources.iter_entry_points('git_bob.prompt_handlers'):
+    for entry_point in entry_points(group='git_bob.prompt_handlers'):
         try:
             handler_func = entry_point.load()
             key = entry_point.name
