@@ -7,6 +7,7 @@ Functions:
 """
 from functools import partial
 import os
+from importlib.metadata import entry_points
 
 class PromptHandler:
     """
