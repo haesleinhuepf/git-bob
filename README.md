@@ -273,6 +273,7 @@ There are similar projects out there
 * [agentless](https://github.com/OpenAutoCoder/Agentless)
 * [git-aid](https://github.com/Torantulino/git-aid)
 * [SWE-agent](https://github.com/princeton-nlp/SWE-agent)
+* [gh-gitgen](https://github.com/microsoft/gh-gitgen)
 
 ## Contributing
 
