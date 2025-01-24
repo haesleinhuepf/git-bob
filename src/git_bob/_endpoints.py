@@ -191,8 +191,7 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
             credential=AzureKeyCredential(token),
         )
 
-        if isinstance(message, str):
-            message = [UserMessage(content=message)]
+
         if image is not None:
             image_url = image_to_url(image)
             message = [UserMessage(
@@ -201,6 +200,9 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
                         ImageContentItem(image_url={"url": "data:image/png;base64," + image_url}),
                     ],
                 )]
+        else:
+            if isinstance(message, str):
+                message = [UserMessage(content=message)]
 
 
         response = client.complete(
