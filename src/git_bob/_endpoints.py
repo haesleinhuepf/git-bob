@@ -17,7 +17,7 @@ class PromptHandler:
         self.prompt_function = prompt_function
 
 
-def register_handler(prompt_function, api_key_entry):
+def register_prompt_handler(prompt_function, api_key_entry):
     """
     Decorator to register a prompt handler with the given configuration.
 
@@ -39,7 +39,7 @@ def register_handler(prompt_function, api_key_entry):
     return prompt_function
 
 
-@register_handler(api_key_entry="ANTHROPIC_API_KEY")
+@register_prompt_handler(api_key_entry="ANTHROPIC_API_KEY")
 def prompt_claude(message: str, model="claude-3-5-sonnet-20241022", image=None):
     """
     A prompt helper function that sends a message to anthropic
@@ -106,7 +106,7 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20241022", image=None):
     return message.content[0].text
 
 
-@register_handler(api_key_entry="OPENAI_API_KEY")
+@register_prompt_handler(api_key_entry="OPENAI_API_KEY")
 def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
     """A prompt helper function that sends a message to openAI
     and returns only the text response.
@@ -172,7 +172,7 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
     # extract answer
     return result
 
-@register_handler(api_key_entry="KISSKI_API_KEY")
+@register_prompt_handler(api_key_entry="KISSKI_API_KEY")
 def prompt_kisski(message: str, model=None, image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
     if base_url is None:
         base_url = "https://chat-ai.academiccloud.de/v1"
@@ -181,7 +181,7 @@ def prompt_kisski(message: str, model=None, image=None, max_accumulated_response
     return prompt_chatgpt(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
 
-@register_handler(api_key_entry="BLABLADOR_API_KEY")
+@register_prompt_handler(api_key_entry="BLABLADOR_API_KEY")
 def prompt_blablador(message: str, model=None, image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
     if base_url is None:
         base_url = "https://helmholtz-blablador.fz-juelich.de:8000/v1"
@@ -190,7 +190,7 @@ def prompt_blablador(message: str, model=None, image=None, max_accumulated_respo
     return prompt_chatgpt(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
 
-@register_handler(api_key_entry="GOOGLE_API_KEY")
+@register_prompt_handler(api_key_entry="GOOGLE_API_KEY")
 def prompt_gemini(request, model="gemini-1.5-pro-002", image=None):
     """Send a prompt to Google Gemini and return the response"""
     from google import generativeai as genai
@@ -209,7 +209,7 @@ def prompt_gemini(request, model="gemini-1.5-pro-002", image=None):
     return response.text
 
 
-@register_handler(api_key_entry="GH_MODELS_API_KEY")
+@register_prompt_handler(api_key_entry="GH_MODELS_API_KEY")
 def prompt_azure(message: str, model="gpt-4o", image=None):
     """A prompt helper function that sends a message to Azure's OpenAI Service
     and returns only the text response.
@@ -281,7 +281,7 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
     return response.choices[0].message.content
 
 
-@register_handler(api_key_entry="MISTRAL_API_KEY")
+@register_prompt_handler(api_key_entry="MISTRAL_API_KEY")
 def prompt_mistral(message: str, model="mistral-large-2411", image=None):
     """A prompt helper function that sends a message to Mistral.
     If an image is provided, it will use the Pixtral model."""

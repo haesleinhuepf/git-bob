@@ -223,14 +223,14 @@ def init_prompt_handlers():
         Dictionary mapping handler names to PromptHandler instances.
     """
     from importlib.metadata import entry_points
-    from ._endpoints import register_handler
+    from ._endpoints import register_prompt_handler
     
     handlers = {}
     for entry_point in entry_points(group='git_bob.prompt_handlers'):
         try:
             handler_func = entry_point.load()
             key = entry_point.name
-            handlers[f":{key}"] = register_handler(handler_func, f"GIT_BOB_{key.upper()}_API_KEY")
+            handlers[f":{key}"] = register_prompt_handler(handler_func, f"GIT_BOB_{key.upper()}_API_KEY")
         except Exception as e:
             print(f"Failed to load handler {entry_point.name}: {e}")
     
