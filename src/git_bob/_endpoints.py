@@ -139,6 +139,7 @@ def prompt_kisski(message: str, model=None, image=None, max_accumulated_response
         base_url = "https://chat-ai.academiccloud.de/v1"
     if api_key is None:
         api_key = os.environ.get("KISSKI_API_KEY")
+    model = model.replace("kisski:", "")
     return prompt_chatgpt(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
 
@@ -148,6 +149,7 @@ def prompt_blablador(message: str, model=None, image=None, max_accumulated_respo
         base_url = "https://helmholtz-blablador.fz-juelich.de:8000/v1"
     if api_key is None:
         api_key = os.environ.get("BLABLADOR_API_KEY")
+    model = model.replace("blablador:", "")
     return prompt_chatgpt(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
 
