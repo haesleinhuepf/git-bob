@@ -7,7 +7,6 @@ Functions:
 """
 from functools import partial
 import os
-from importlib.metadata import entry_points
 
 class PromptHandler:
     """
@@ -18,32 +17,26 @@ class PromptHandler:
         self.prompt_function = prompt_function
 
 
-def register_handler(prompt_function, api_key_entry, base_url=None):
+def register_handler(prompt_function, api_key_entry):
     """
     Decorator to register a prompt handler with the given configuration.
 
     Parameters
     ----------
     prompt_function : callable
-        The function that handles the actual prompting
+        The function that handles the actual prompting. These functions should have the signature
+        prompt_xyz(message, model, image)
     api_key_entry : str
         Environment variable name containing the API key
-    base_url : str, optional
-        Base URL for the API endpoint
 
     Returns
     -------
     PromptHandler
         Configured prompt handler instance
     """
-    def decorator():
-        return {
-            f":{prompt_function.__name__.replace('prompt_', '')}": PromptHandler(
-                api_key=os.environ.get(api_key_entry),
-                prompt_function=partial(prompt_function, base_url=base_url, api_key=os.environ.get(api_key_entry))
-            )
-        }
-    return decorator
+    prompt_handler = PromptHandler(os.environ.get(api_key_entry), prompt_function)
+    prompt_function.prompt_handler = prompt_handler
+    return prompt_function
 
 
 @register_handler(api_key_entry="ANTHROPIC_API_KEY")
@@ -198,7 +191,7 @@ def prompt_blablador(message: str, model=None, image=None, max_accumulated_respo
 
 
 @register_handler(api_key_entry="GOOGLE_API_KEY")
-def prompt_gemini(request, model="gemini-1.5-flash-001", image=None):
+def prompt_gemini(request, model="gemini-1.5-pro-002", image=None):
     """Send a prompt to Google Gemini and return the response"""
     from google import generativeai as genai
     import os
@@ -216,7 +209,7 @@ def prompt_gemini(request, model="gemini-1.5-flash-001", image=None):
     return response.text
 
 
-@register_handler(api_key_entry="GH_MODELS_API_KEY", base_url="https://models.inference.ai.azure.com")
+@register_handler(api_key_entry="GH_MODELS_API_KEY")
 def prompt_azure(message: str, model="gpt-4o", image=None):
     """A prompt helper function that sends a message to Azure's OpenAI Service
     and returns only the text response.
