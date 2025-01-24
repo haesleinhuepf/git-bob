@@ -497,7 +497,7 @@ def try_to_solve_github_issue(repository, issue, prompt_function, base_branch=No
     return solve_github_issue(repository=repository, issue=issue, prompt_function=prompt_function, base_branch=base_branch)
 
 
-def solve_github_issue(repository, issue, llm_model, prompt_function, base_branch=None):
+def solve_github_issue(repository, issue, prompt_function, base_branch=None):
     """
     Attempt to solve a GitHub issue by modifying a single file and sending a pull-request, or
     commenting on a pull-request.
@@ -508,8 +508,6 @@ def solve_github_issue(repository, issue, llm_model, prompt_function, base_branc
         The full name of the GitHub repository.
     issue : int
         The issue number to solve.
-    llm_model : str
-        The language model to use for generating the solution.
     prompt_function: function
         The function to use for generating prompts.
     base_branch : str
