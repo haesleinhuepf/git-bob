@@ -41,8 +41,8 @@ def command_line_interface():
     model_aliases = {
         "claude": "claude-3-5-sonnet-20241022",
         "gemini": "gemini-1.5-pro-002", 
-        "gpt-4o": "gpt-4o-20240806",
-        "gpt4o": "gpt-4o-20240806",
+        "gpt-4o": "gpt-4o-2024-08-06",
+        "gpt4o": "gpt-4o-2024-08-06",
         "mistral": "mistral-large-2411"
     }
 
