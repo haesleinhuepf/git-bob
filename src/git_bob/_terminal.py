@@ -137,9 +137,12 @@ def command_line_interface():
     text = text.replace(f"{agent_name}, ", f"{agent_name} ")
     text = text.replace(f"{agent_name} please ", f"{agent_name} ")
 
+    triggers = init_triggers()
+    print("Available triggers:", list(triggers.keys()))
+
     # determine task to do
     if Config.running_in_github_ci or Config.running_in_gitlab_ci:
-        if not (f"{agent_name} comment" in text or f"{agent_name} review" in text or f"{agent_name} solve" in text or f"{agent_name} try" in text or f"{agent_name} split" in text or f"{agent_name} deploy" in text):
+        if not (any(f"{agent_name} {trigger}" in text for trigger in triggers.keys())):
             print("They didn't speak to me. I show myself out:", text)
             sys.exit(0)
         ai_remark = setup_ai_remark()
@@ -189,8 +192,6 @@ def command_line_interface():
 
     # execute the task
     something_done = False
-    triggers = init_triggers()
-    print("Available triggers:", list(triggers.keys()))
     for trigger, handler in triggers:
         if trigger in text:
             print("Using trigger:", trigger)
