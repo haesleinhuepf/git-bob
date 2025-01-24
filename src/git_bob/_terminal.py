@@ -14,6 +14,7 @@ def command_line_interface():
     from ._logger import Log
     from github.GithubException import UnknownObjectException
     from ._utilities import run_cli
+    import inspect
 
     print("Hello")
 
@@ -37,16 +38,19 @@ def command_line_interface():
     Log().log(f"I am {agent_name} " + str(__version__))
     Log().log(f"Accessing {Config.git_server_url}")
 
-    # Aliases for model names
-    model_aliases = {
-        "claude": "claude-3-5-sonnet-20241022",
-        "gemini": "gemini-1.5-pro-002", 
-        "gpt-4o": "gpt-4o-2024-08-06",
-        "gpt4o": "gpt-4o-2024-08-06",
-        "mistral": "mistral-large-2411"
-    }
-
+    # initialize prompt handlers
     prompt_handlers = init_prompt_handlers()
+
+    # determine values for aliases
+    model_aliases = {}
+    for key, value in prompt_handlers.items():
+        if value is not None:
+            try:
+                signature = inspect.signature(value)
+                model_aliases[key] = signature.parameters['model'].default
+            except:
+                continue
+    print("model aliases:\n", model_aliases)
 
     available_handlers = {}
     for key, value in prompt_handlers.items():
