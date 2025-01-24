@@ -3,17 +3,18 @@
 # using AI models like GPT and Claude. The script can be run in a GitHub CI environment with a timeout.
 
 def command_line_interface():
-    import os
+    import os 
     import sys
     import signal
 
     from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues
     from ._github_utilities import check_access_and_ask_for_approval, get_repository_handle, get_most_recently_commented_issue
-    from ._utilities import quick_first_response, Config, deploy
+    from ._utilities import quick_first_response, Config, deploy 
     from ._logger import Log
     from github.GithubException import UnknownObjectException
     from ._utilities import run_cli
+    import inspect
 
     print("Hello")
 
@@ -37,16 +38,19 @@ def command_line_interface():
     Log().log(f"I am {agent_name} " + str(__version__))
     Log().log(f"Accessing {Config.git_server_url}")
 
-    # Aliases for model names
-    model_aliases = {
-        "claude": "claude-3-5-sonnet-20241022",
-        "gemini": "gemini-1.5-pro-002",
-        "gpt-4o": "gpt-4o-20240806",
-        "gpt4o": "gpt-4o-20240806",
-        "mistral": "mistral-large-2411"
-    }
-
+    # initialize prompt handlers
     prompt_handlers = init_prompt_handlers()
+
+    # determine values for aliases
+    model_aliases = {}
+    for key, value in prompt_handlers.items():
+        if value is not None:
+            try:
+                signature = inspect.signature(value)
+                model_aliases[key] = signature.parameters['model'].default
+            except:
+                continue
+    print("model aliases:\n", model_aliases)
 
     available_handlers = {}
     for key, value in prompt_handlers.items():
@@ -105,7 +109,7 @@ def command_line_interface():
     if f"{agent_name} ask" in text:
         # example:
         # git-bob ask gpt-4o to solve this issue -> git-bob solve this issue
-        print("Dynamic LLM selection")
+        print("Dynamic LLM selection using aliases")
         new_llm_name = text.split(f"{agent_name} ask")[-1].strip().split(" ")[0]
         text = text.replace(f"{agent_name} ask {new_llm_name} to ", f"{agent_name} ")
 
@@ -121,8 +125,8 @@ def command_line_interface():
     prompt = None
     prompt_handlers = init_prompt_handlers() # reinitialize, because configured LLM may have changed
     for key, value in prompt_handlers.items():
-        if key in Config.llm_name and value.api_key is not None:
-            prompt = value.prompt_function
+        if key in Config.llm_name:
+            prompt = value
             break
 
     if prompt is None:
@@ -214,37 +218,26 @@ def command_line_interface():
     print("Done. Summary:")
     print("* " + "\n* ".join(Log().get()))
 
-class PromptHandler:
-    def __init__(self, api_key, prompt_function):
-        self.api_key = api_key
-        self.prompt_function = prompt_function
-
 def init_prompt_handlers():
-    import os
-    from functools import partial
-    from ._utilities import Config
-    from ._endpoints import prompt_claude, prompt_chatgpt, prompt_gemini, prompt_azure, prompt_mistral
+    """Initialize and return prompt handlers from entry points.
 
-    return {
-        "github_models:": PromptHandler(api_key=os.environ.get("GH_MODELS_API_KEY"),
-                                        prompt_function=partial(prompt_azure, model=Config.llm_name)),
-        "kisski:":        PromptHandler(api_key=os.environ.get("KISSKI_API_KEY"),
-                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name, base_url="https://chat-ai.academiccloud.de/v1", api_key=os.environ.get("KISSKI_API_KEY"))),
-        "blablador:":     PromptHandler(api_key=os.environ.get("BLABLADOR_API_KEY"),
-                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name, base_url="https://helmholtz-blablador.fz-juelich.de:8000/v1", api_key=os.environ.get("BLABLADOR_API_KEY"))),
-        "claude":         PromptHandler(api_key=os.environ.get("ANTHROPIC_API_KEY"),
-                                        prompt_function=partial(prompt_claude, model=Config.llm_name)),
-        "gpt":            PromptHandler(api_key=os.environ.get("OPENAI_API_KEY"),
-                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name)),
-        "o1":            PromptHandler(api_key=os.environ.get("OPENAI_API_KEY"),
-                                        prompt_function=partial(prompt_chatgpt, model=Config.llm_name)),
-        "gemini":         PromptHandler(api_key=os.environ.get("GOOGLE_API_KEY"),
-                                        prompt_function=partial(prompt_gemini, model=Config.llm_name)),
-        "mistral":        PromptHandler(api_key=os.environ.get("MISTRAL_API_KEY"),
-                                        prompt_function=partial(prompt_mistral, model=Config.llm_name)),
-        "pixtral":        PromptHandler(api_key=os.environ.get("MISTRAL_API_KEY"),
-                                        prompt_function=partial(prompt_mistral, model=Config.llm_name)),
-    }
+    Returns
+    -------
+    dict
+        Dictionary mapping handler names to functions that can handle prompts
+    """
+    from importlib.metadata import entry_points
+    
+    handlers = {}
+    for entry_point in entry_points(group='git_bob.prompt_handlers'):
+        try:
+            handler_func = entry_point.load()
+            key = entry_point.name
+            handlers[key] = handler_func
+        except Exception as e:
+            print(f"Failed to load handler {entry_point.name}: {e}")
+    
+    return handlers
 
 def remote_interface():
     """

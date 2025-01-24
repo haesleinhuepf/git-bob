@@ -261,6 +261,39 @@ At the moment, these limitations can be observed:
 * `git-bob` is not allowed to modify workflow files, because it also uses GitHub workflows.
 * As git-bob is installed as part of git-hub workflows, its [download statistics](https://pypistats.org/packages/git-bob) might be misleading. There are not as many people downloading it as the numer of downloads suggest.
 
+## Extensibility
+
+git-bob can be extended in multiple ways.
+
+### Adding new LLMs / prompt handlers
+
+If you use institutional LLM-servers which are accessible from the internet (or from your gitlab-server), you can use them using git-bob. 
+All you need to do is to set up small python library which implements a prompt-handler function and exposes it using Pythons plugin system. 
+E.g. if your LLM-server is openai-compatible, you can reuse the `prompt_openai` function, and you just need to enter the url of your LLM-server like this:
+
+```python
+def prompt_my_custom_llm(message: str, model=None, image=None):
+  import os
+  from git_bob._endpoints import prompt_openai
+
+  model = model.replace("my_custom_llm:", "")
+  return prompt_openai(message,
+                       model=model,
+                       image=image,
+                       base_url="https://my_server/v1",
+                       api_key=os.environ.get("MY_CUSTOM_API_KEY"))
+```
+
+Additionally, you need to configure your plugin's entry point in its `setup.cfg` file:
+
+```
+git_bob.prompt_handlers =
+    my_custom_llm = my_library.my_python_file:prompt_my_custom_llm
+```
+
+git-bob will then detect your plugin and can use it if the `GIT_BOB_LLM_NAME` secret is set to any model containing `my_custom_llm`. 
+You could for example configure a llama model running on your LLM-server like this: `my_custom_llm:llama3.3-70b`.
+
 ## Similar projects
 
 There are similar projects out there

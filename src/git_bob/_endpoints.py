@@ -1,12 +1,8 @@
 """
 This module provides helper functions to interact with different language models.
-
-Functions:
-- prompt_claude: Sends a message to the Claude language model and returns the text response.
-- prompt_chatgpt: Sends a message to the ChatGPT language model and returns the text response.
 """
 
-def prompt_claude(message: str, model="claude-3-5-sonnet-20241022", image=None):
+def prompt_anthropic(message: str, model="claude-3-5-sonnet-20241022", image=None):
     """
     A prompt helper function that sends a message to anthropic
     and returns only the text response.
@@ -72,7 +68,7 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20241022", image=None):
     return message.content[0].text
 
 
-def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
+def prompt_openai(message: str, model="gpt-4o-2024-08-06", image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
     """A prompt helper function that sends a message to openAI
     and returns only the text response.
     """
@@ -137,14 +133,32 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
     # extract answer
     return result
 
+def prompt_kisski(message: str, model=None, image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
+    import os
+    if base_url is None:
+        base_url = "https://chat-ai.academiccloud.de/v1"
+    if api_key is None:
+        api_key = os.environ.get("KISSKI_API_KEY")
+    model = model.replace("kisski:", "")
+    return prompt_openai(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
-def prompt_gemini(request, model="gemini-1.5-flash-001", image=None):
+
+def prompt_blablador(message: str, model=None, image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
+    import os
+    if base_url is None:
+        base_url = "https://helmholtz-blablador.fz-juelich.de:8000/v1"
+    if api_key is None:
+        api_key = os.environ.get("BLABLADOR_API_KEY")
+    model = model.replace("blablador:", "")
+    return prompt_openai(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
+
+
+
+def prompt_googleai(request, model="gemini-1.5-pro-002", image=None):
     """Send a prompt to Google Gemini and return the response"""
     from google import generativeai as genai
     import os
-    from ._utilities import image_to_url
-    import base64
-    
+
     genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
     client = genai.GenerativeModel(model)
     
@@ -169,7 +183,7 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
 
     if "gpt" not in model and "o1" not in model:
         from azure.ai.inference import ChatCompletionsClient
-        from azure.ai.inference.models import SystemMessage, UserMessage
+        from azure.ai.inference.models import SystemMessage, UserMessage, TextContentItem, ImageContentItem
         from azure.core.credentials import AzureKeyCredential
 
         client = ChatCompletionsClient(
@@ -177,8 +191,7 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
             credential=AzureKeyCredential(token),
         )
 
-        if isinstance(message, str):
-            message = [UserMessage(content=message)]
+
         if image is not None:
             image_url = image_to_url(image)
             message = [UserMessage(
@@ -187,6 +200,9 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
                         ImageContentItem(image_url={"url": "data:image/png;base64," + image_url}),
                     ],
                 )]
+        else:
+            if isinstance(message, str):
+                message = [UserMessage(content=message)]
 
 
         response = client.complete(
