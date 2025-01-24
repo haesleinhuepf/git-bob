@@ -2,7 +2,7 @@
 This module provides helper functions to interact with different language models.
 """
 
-def prompt_claude(message: str, model="claude-3-5-sonnet-20241022", image=None):
+def prompt_anthropic(message: str, model="claude-3-5-sonnet-20241022", image=None):
     """
     A prompt helper function that sends a message to anthropic
     and returns only the text response.
@@ -68,7 +68,7 @@ def prompt_claude(message: str, model="claude-3-5-sonnet-20241022", image=None):
     return message.content[0].text
 
 
-def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
+def prompt_openai(message: str, model="gpt-4o-2024-08-06", image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
     """A prompt helper function that sends a message to openAI
     and returns only the text response.
     """
@@ -140,7 +140,7 @@ def prompt_kisski(message: str, model=None, image=None, max_accumulated_response
     if api_key is None:
         api_key = os.environ.get("KISSKI_API_KEY")
     model = model.replace("kisski:", "")
-    return prompt_chatgpt(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
+    return prompt_openai(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
 
 def prompt_blablador(message: str, model=None, image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
@@ -150,11 +150,11 @@ def prompt_blablador(message: str, model=None, image=None, max_accumulated_respo
     if api_key is None:
         api_key = os.environ.get("BLABLADOR_API_KEY")
     model = model.replace("blablador:", "")
-    return prompt_chatgpt(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
+    return prompt_openai(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
 
 
-def prompt_gemini(request, model="gemini-1.5-pro-002", image=None):
+def prompt_googleai(request, model="gemini-1.5-pro-002", image=None):
     """Send a prompt to Google Gemini and return the response"""
     from google import generativeai as genai
     import os

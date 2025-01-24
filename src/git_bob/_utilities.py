@@ -4,7 +4,7 @@ import warnings
 from functools import lru_cache
 from functools import wraps
 from toolz import curry
-from ._endpoints import prompt_chatgpt
+from ._endpoints import prompt_openai
 import os
 
 VISION_SYSTEM_MESSAGE = os.environ.get("VISION_SYSTEM_MESSAGE", "You are a AI-based vison system. You described images professionally and clearly.")
@@ -254,7 +254,7 @@ def image_to_url(image):
     return img_str
 
 
-def modify_discussion(discussion, prompt_visionlm=prompt_chatgpt):
+def modify_discussion(discussion, prompt_visionlm=prompt_openai):
     import re
     import docx2markdown
     #from ._github_utilities import get_conversation_on_issue, get_diff_of_pull_request, get_file_in_repository
