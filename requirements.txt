@@ -21,4 +21,3 @@ python-gitlab
 python-pptx
 mistralai
 docx2markdown
-toolz
