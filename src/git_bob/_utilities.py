@@ -7,7 +7,7 @@ from toolz import curry
 from ._endpoints import prompt_openai
 import os
 
-VISION_SYSTEM_MESSAGE = os.environ.get("VISION_SYSTEM_MESSAGE", "You are a AI-based vison system. You described images professionally and clearly.")
+VISION_SYSTEM_MESSAGE = os.environ.get("VISION_SYSTEM_MESSAGE", "You are a AI-based vision system. You described images professionally and clearly.")
 
 IMAGE_FILE_ENDINGS = [".jpg", ".png", ".gif", ".jpeg"]
 
