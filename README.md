@@ -266,7 +266,7 @@ At the moment, these limitations can be observed:
 git-bob can be extended in multiple ways. 
 All you need to do is to set up small python library which implements specific functions and exposes them using Pythons plugin system. 
 
-### Adding new triggers
+### Adding new trigger words
 
 If you want to add new trigger words and corresponding python functions, you can do so by implementing a new trigger handler function with a predefined signature in a small python library.
 The function can have the arguments `repository`, `issue`, `prompt_function` and `base_branch` and if you do not need all of them, just leave them out and add `**kwargs` at the end of the argument list. 
