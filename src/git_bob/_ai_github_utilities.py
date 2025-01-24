@@ -187,36 +187,6 @@ Just respond to the discussion.
 """)
 
 
-def summarize_github_issue(repository, issue, prompt_function):
-    """
-    Summarize a GitHub issue.
-
-    Parameters
-    ----------
-    repository : str
-        The full name of the GitHub repository.
-    issue : int
-        The issue number to summarize.
-    llm_model : str
-        The language model to use for generating the summary.
-    """
-    Log().log(f"-> summarize_github_issue({repository}, {issue})")
-    from ._utilities import Config
-
-    issue_conversation = Config.git_utilities.get_issue_details(repository, issue)
-
-    summary = prompt_function(f"""
-Summarize the most important details of this issue #{issue} in the repository {repository}. 
-In case filenames, variables and code-snippetes are mentioned, keep them in the summary, they are very important.
-
-## Issue to summarize:
-{issue_conversation}
-""")
-
-    print("Issue summary:", summary)
-    return summary
-
-
 def fix_error_in_notebook(new_content, error_message, prompt_function):
     """
     Attempt to fix an error in a Jupyter notebook.
