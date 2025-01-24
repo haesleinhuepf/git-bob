@@ -193,7 +193,7 @@ def command_line_interface():
     # execute the task
     something_done = False
     for trigger, handler in triggers.items():
-        if trigger in text:
+        if f"{agent_name} {trigger}" in text:
             print("Using trigger:", trigger)
             handler(repository=repository,
                     issue=issue,
