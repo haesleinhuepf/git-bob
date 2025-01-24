@@ -190,9 +190,10 @@ def command_line_interface():
     # execute the task
     something_done = False
     triggers = init_triggers()
+    print("Available triggers:", list(triggers.keys()))
     for trigger, handler in triggers:
         if trigger in text:
-            print("trigger:", trigger)
+            print("Using trigger:", trigger)
             handler(repository=repository,
                     issue=issue,
                     prompt_function=prompt_function,
