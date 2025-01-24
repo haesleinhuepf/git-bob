@@ -263,12 +263,31 @@ At the moment, these limitations can be observed:
 
 ## Extensibility
 
-git-bob can be extended in multiple ways.
+git-bob can be extended in multiple ways. 
+All you need to do is to set up small python library which implements specific functions and exposes them using Pythons plugin system. 
+
+### Adding new trigger words
+
+If you want to add new trigger words and corresponding python functions, you can do so by implementing a new trigger handler function with a predefined signature in a small python library.
+The function can have the arguments `repository`, `issue`, `prompt_function` and `base_branch` and if you do not need all of them, just leave them out and add `**kwargs` at the end of the argument list. 
+E.g. if you want to add a new trigger word `love`, you can implement a new function like this.
+
+```python
+def love_github_issue(repository, issue, **kwargs):
+    from git_bob._utilities import Config
+    Config.git_utilities.add_comment(repository, issue, "I love this issue! <3")
+```
+
+Additionally, you need to configure your plugin's entry point in its `setup.cfg` file:
+
+```
+git_bob.triggers =
+    love = my_library.my_python_file:love_github_issue
+```
 
 ### Adding new LLMs / prompt handlers
 
-If you use institutional LLM-servers which are accessible from the internet (or from your gitlab-server), you can use them using git-bob. 
-All you need to do is to set up small python library which implements a prompt-handler function and exposes it using Pythons plugin system. 
+If you use institutional LLM-servers which are accessible from the internet (or from your gitlab-server), you can use them using git-bob by implementing a new prompt handler function with a predefined signature.
 E.g. if your LLM-server is openai-compatible, you can reuse the `prompt_openai` function, and you just need to enter the url of your LLM-server like this:
 
 ```python
