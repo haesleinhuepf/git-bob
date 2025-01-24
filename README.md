@@ -290,7 +290,8 @@ git_bob.prompt_handlers =
     my_custom_llm = my_library.my_python_file:prompt_my_custom_llm
 ```
 
-git-bob will then detect your plugin and can use if GIT_BOB_LLM_NAME is set to any model containing `my_custom_llm`.
+git-bob will then detect your plugin and can use it if the `GIT_BOB_LLM_NAME` secret is set to any model containing `my_custom_llm`. 
+You could for example configure a llama model running on your LLM-server like this: `my_custom_llm:llama3.3-70b`.
 
 ## Similar projects
 
