@@ -5,8 +5,7 @@ Functions:
 - prompt_claude: Sends a message to the Claude language model and returns the text response.
 - prompt_chatgpt: Sends a message to the ChatGPT language model and returns the text response.
 """
-from functools import partial
-import os
+from toolz import curry
 
 class PromptHandler:
     """
@@ -16,10 +15,10 @@ class PromptHandler:
         self.api_key = api_key
         self.prompt_function = prompt_function
 
-
+@curry
 def register_prompt_handler(prompt_function, api_key_entry):
     """
-    Decorator to register a prompt handler with the given configuration.
+    Decorator to register a prompt handler function with the given configuration.
 
     Parameters
     ----------
@@ -34,6 +33,7 @@ def register_prompt_handler(prompt_function, api_key_entry):
     PromptHandler
         Configured prompt handler instance
     """
+    import os
     prompt_handler = PromptHandler(os.environ.get(api_key_entry), prompt_function)
     prompt_function.prompt_handler = prompt_handler
     return prompt_function
@@ -174,6 +174,7 @@ def prompt_chatgpt(message: str, model="gpt-4o-2024-08-06", image=None, max_accu
 
 @register_prompt_handler(api_key_entry="KISSKI_API_KEY")
 def prompt_kisski(message: str, model=None, image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
+    import os
     if base_url is None:
         base_url = "https://chat-ai.academiccloud.de/v1"
     if api_key is None:
@@ -183,6 +184,7 @@ def prompt_kisski(message: str, model=None, image=None, max_accumulated_response
 
 @register_prompt_handler(api_key_entry="BLABLADOR_API_KEY")
 def prompt_blablador(message: str, model=None, image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
+    import os
     if base_url is None:
         base_url = "https://helmholtz-blablador.fz-juelich.de:8000/v1"
     if api_key is None:
@@ -195,9 +197,7 @@ def prompt_gemini(request, model="gemini-1.5-pro-002", image=None):
     """Send a prompt to Google Gemini and return the response"""
     from google import generativeai as genai
     import os
-    from ._utilities import image_to_url
-    import base64
-    
+
     genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
     client = genai.GenerativeModel(model)
     
