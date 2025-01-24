@@ -192,7 +192,7 @@ def command_line_interface():
 
     # execute the task
     something_done = False
-    for trigger, handler in triggers:
+    for trigger, handler in triggers.items():
         if trigger in text:
             print("Using trigger:", trigger)
             handler(repository=repository,
