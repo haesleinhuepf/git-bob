@@ -463,7 +463,17 @@ def run_cli(command:str, check=False, verbose=False):
     return f"## Command\n```\n{command}\n```\n## StdOut\n```\n{result.stdout}\n```\n## StdErr\n```\n{result.stderr}\n```\n"
 
 
-def deploy(repository, issue):
+def deploy(repository, issue, **kwargs):
+    """
+    Deploy the package to PyPI.
+
+    Parameters
+    ----------
+    repository: str
+        The repository name.
+    issue: str
+        The issue number where to post the deployment report.
+    """
     #from ._github_utilities import add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark
     result1 = run_cli("python setup.py sdist bdist_wheel")

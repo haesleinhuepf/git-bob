@@ -122,30 +122,20 @@ def command_line_interface():
                 break
 
 
-    prompt = None
+    prompt_function = None
     prompt_handlers = init_prompt_handlers() # reinitialize, because configured LLM may have changed
     for key, value in prompt_handlers.items():
         if key in Config.llm_name:
-            prompt = value
+            prompt_function = value
             break
 
-    if prompt is None:
+    if prompt_function is None:
         llm_name = Config.llm_name[1:]
         raise NotImplementedError(f"Make sure to specify the environment variables GIT_BOB_LLM_NAME and corresponding API KEYs (llm_name:_{llm_name}).")
     Log().log("Using language model: _" + Config.llm_name[1:])
 
     text = text.replace(f"{agent_name}, ", f"{agent_name} ")
     text = text.replace(f"{agent_name} please ", f"{agent_name} ")
-    
-    # aliases for comment action
-    text = text.replace(f"{agent_name} respond", f"{agent_name} comment")
-    #text = text.replace(f"{agent_name} review", f"{agent_name} comment")
-    text = text.replace(f"{agent_name} think about", f"{agent_name} comment")
-    text = text.replace(f"{agent_name} answer", f"{agent_name} comment")
-
-    # aliases for solve action
-    text = text.replace(f"{agent_name} implement", f"{agent_name} solve")
-    text = text.replace(f"{agent_name} apply", f"{agent_name} solve")
 
     # determine task to do
     if Config.running_in_github_ci or Config.running_in_gitlab_ci:
@@ -160,6 +150,7 @@ def command_line_interface():
             sys.exit(1)
     else:
         # when running from terminal (e.g. for development), we modify the text to include the command from the terminal
+        # todo: Remove this block and replace it with something more flexible (and extensible)
         if task == "comment-on-issue":
             text = text + f"\n{agent_name} comment"
         elif task == "solve-issue":
@@ -197,26 +188,25 @@ def command_line_interface():
         base_branch = "main"
 
     # execute the task
-    if f"{agent_name} review" in text and Config.pull_request is not None:
-        review_pull_request(repository, issue, prompt)
-    elif f"{agent_name} comment" in text or  f"{agent_name} review" in text: # fallback to comment
-        comment_on_issue(repository, issue, prompt)
-    elif f"{agent_name} split" in text:
-        split_issue_in_sub_issues(repository, issue, prompt)
-    elif f"{agent_name} solve" in text or f"{agent_name} try" in text:
-        if f"{agent_name} try" in text:
-            target_branch = Config.git_utilities.create_branch(repository, base_branch)
-        else:
-            target_branch = base_branch
-        # could be issue or modifying code in a PR
-        solve_github_issue(repository, issue, Config.llm_name, prompt, base_branch=target_branch)
-    elif f"{agent_name} deploy" in text:
-        deploy(repository, issue)
-    else:
+    something_done = False
+    triggers = init_triggers()
+    for trigger, handler in triggers:
+        if trigger in text:
+            print("trigger:", trigger)
+            handler(repository=repository,
+                    issue=issue,
+                    prompt_function=prompt_function,
+                    base_branch=base_branch)
+
+            something_done = True
+            break
+
+    if not something_done:
         raise NotImplementedError(f"Unknown task. I show myself out.")
 
     print("Done. Summary:")
     print("* " + "\n* ".join(Log().get()))
+
 
 def init_prompt_handlers():
     """Initialize and return prompt handlers from entry points.
@@ -238,6 +228,28 @@ def init_prompt_handlers():
             print(f"Failed to load handler {entry_point.name}: {e}")
     
     return handlers
+
+def init_triggers():
+    """Initialize and return triggers from entry points.
+
+    Returns
+    -------
+    dict
+        Dictionary mapping trigger names to functions that can handle triggers
+    """
+    from importlib.metadata import entry_points
+
+    triggers = {}
+    for entry_point in entry_points(group='git_bob.triggers'):
+        try:
+            trigger_func = entry_point.load()
+            key = entry_point.name
+            triggers[key] = trigger_func
+        except Exception as e:
+            print(f"Failed to load trigger {entry_point.name}: {e}")
+
+    return triggers
+
 
 def remote_interface():
     """
