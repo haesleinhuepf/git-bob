@@ -247,7 +247,7 @@ def fix_error_in_notebook(new_content, error_message, prompt_function):
 
     ## Jupyter Notebook file content 
 
-    {new_content}
+    {notebook_without_output}
     
     ## Error message
     
@@ -263,7 +263,7 @@ def fix_error_in_notebook(new_content, error_message, prompt_function):
     return new_content, commit_message
 
 
-def create_or_modify_file(repository, issue, filename, branch_name, issue_summary, prompt_function, number_of_attempts:int=3):
+def create_or_modify_file(repository, issue, filename, branch_name, issue_summary, prompt_function, number_of_attempts:int=7):
     """
     Create or modify a file in a GitHub repository.
 
