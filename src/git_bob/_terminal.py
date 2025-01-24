@@ -125,7 +125,7 @@ def command_line_interface():
     prompt = None
     prompt_handlers = init_prompt_handlers() # reinitialize, because configured LLM may have changed
     for key, value in prompt_handlers.items():
-        if key in Config.llm_name and value.api_key is not None:
+        if key in Config.llm_name:
             prompt = value.prompt_function
             break
 
