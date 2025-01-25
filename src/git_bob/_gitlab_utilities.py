@@ -786,3 +786,26 @@ def get_default_branch_name(repository):
     """Determine name of default branch"""
     repo = get_repository_handle(repository)
     return repo.default_branch
+
+
+
+def close_issue(repository, issue_number):
+    """
+    Close an issue in a GitLab repository.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitLab project (e.g., "username/repo-name").
+    issue_number : int
+        The issue number to close.
+
+    Returns
+    -------
+    None
+    """
+    Log().log(f"-> close_issue({repository}, {issue_number})")
+    project = get_repository_handle(repository)
+    issue = project.issues.get(issue_number)
+    issue.state_event = 'close'
+    issue.save()

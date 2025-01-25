@@ -900,3 +900,24 @@ def get_default_branch_name(repository):
     """Determine name of default branch"""
     repo = get_repository_handle(repository)
     return repo.get_branch(repo.default_branch).name
+
+
+def close_issue(repository, issue_number):
+    """
+    Close a GitHub issue.
+
+    Parameters
+    ----------
+    repository : str
+        The full name of the GitHub repository (e.g., "username/repo-name").
+    issue_number : int
+        The number of the issue to close.
+    """
+    Log().log(f"-> close_issue({repository}, {issue_number})")
+    repo = get_repository_handle(repository)
+
+    # Get the issue by number
+    issue_obj = repo.get_issue(issue_number)
+
+    # Close the issue
+    issue_obj.edit(state="closed")
