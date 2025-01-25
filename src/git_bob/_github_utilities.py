@@ -889,6 +889,8 @@ def create_issue(repository, title, description):
     Log().log(f"-> create_issue({repository}, {title})")
     repo = get_repository_handle(repository)
 
+    print("repo", repo)
+
     # Create a new issue
     issue_obj = repo.create_issue(title=title, body=description)
 
