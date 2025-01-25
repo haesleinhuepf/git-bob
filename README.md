@@ -289,7 +289,7 @@ git_bob.triggers =
 ### Adding new LLMs / prompt handlers
 
 If you use institutional LLM-servers which are accessible from the internet (or from your gitlab-server), you can use them using git-bob by implementing a new prompt handler function with a predefined signature.
-E.g. if your LLM-server is openai-compatible, you can reuse the `prompt_openai` function, and you just need to enter the url of your LLM-server like this:
+E.g. if your LLM-server is openai-compatible, you can reuse the `prompt_openai` function, adjust parameters such as `max_response_tokens`, and the url of your LLM-server like this:
 
 ```python
 def prompt_my_custom_llm(message: str, model=None, image=None):
@@ -301,7 +301,8 @@ def prompt_my_custom_llm(message: str, model=None, image=None):
                        model=model,
                        image=image,
                        base_url="https://my_server/v1",
-                       api_key=os.environ.get("MY_CUSTOM_API_KEY"))
+                       api_key=os.environ.get("MY_CUSTOM_API_KEY"),
+                       max_response_tokens=8192)
 ```
 
 Additionally, you need to configure your plugin's entry point in its `setup.cfg` file:
