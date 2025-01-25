@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using these metadata."
+title: "citros"
+abstract: "A framework for managing and analyzing ROS2 data"
+authors:
+  - family-names: "liesaputra"
+    given-names: "Veronica"
+  - family-names: "Wang"
+    given-names: "Stephen"
+type: software
+version: 0.2.2
+date-released: "2024-02-01"
+repository-code: "https://github.com/lulav/citros"
+license: Apache-2.0
