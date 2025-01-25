@@ -56,3 +56,8 @@ def test_list_repository_files_filtered():
     assert "docs/images/banner2.png" in files
     assert "docs/troubleshooting.md" not in files
 
+def create_comment_on_issue():
+    from git_bob._github_utilities import add_comment_to_issue, create_issue, close_issue
+    new_issue = create_issue("haesleinhuepf/git-bob", "test", "This is a test issue")
+    add_comment_to_issue("haesleinhuepf/git-bob", new_issue, "This is a test comment")
+    close_issue("haesleinhuepf/git-bob", new_issue)
