@@ -148,7 +148,7 @@ def prompt_blablador(message: str, model=None, image=None, max_accumulated_respo
     return prompt_openai(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
 
-def prompt_deepseek(message: str, model="deepseek-chat", image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
+def prompt_deepseek(message: str, model="deepseek-chat", image=None, max_accumulated_responses=10, max_response_tokens=8192, base_url=None, api_key=None):
     import os
     if base_url is None:
         base_url = "https://api.deepseek.com"
