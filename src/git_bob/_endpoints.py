@@ -91,11 +91,6 @@ def prompt_openai(message: str, model="gpt-4o-2024-08-06", image=None, max_accum
                 }]}]
     original_message = message
 
-    if "kisski:" in model:
-        model = model.replace("kisski:", "")
-    if "blablador:" in model:
-        model = model.replace("blablador:", "")
-
     # setup connection to the LLM
     if base_url is not None and api_key is not None:
         client = openai.OpenAI(base_url=base_url, api_key=api_key)
@@ -152,6 +147,15 @@ def prompt_blablador(message: str, model=None, image=None, max_accumulated_respo
     model = model.replace("blablador:", "")
     return prompt_openai(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
+
+def prompt_deepseek(message: str, model="deepseek-chat", image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
+    import os
+    if base_url is None:
+        base_url = "https://api.deepseek.com"
+    if api_key is None:
+        api_key = os.environ.get("DEEPSEEK_API_KEY")
+    model = model.replace("deepseek:", "")
+    return prompt_openai(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
 
 def prompt_googleai(request, model="gemini-1.5-pro-002", image=None):
