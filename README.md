@@ -1,5 +1,6 @@
 # git-bob ![](logo_32x32.png)
 [![PyPI](https://img.shields.io/pypi/v/git-bob.svg?color=green)](https://pypi.org/project/git-bob)
+[![codecov](https://codecov.io/gh/haesleinhuepf/git-bob/branch/main/graph/badge.svg)](https://codecov.io/gh/haesleinhuepf/git-bob)
 [![DOI](https://zenodo.org/badge/831841421.svg)](https://doi.org/10.5281/zenodo.13970719)
 [![License](https://img.shields.io/pypi/l/git-bob.svg?color=green)](https://github.com/haesleinhuepf/git-bob/raw/main/LICENSE)
 <!--[![PyPI - Downloads](https://img.shields.io/pypi/dm/git-bob)](https://pypistats.org/packages/git-bob)-->
