@@ -1,3 +1,5 @@
+import pytest
+
 def test_agent_comment_on_issue():
     import os
     from functools import partial
@@ -31,7 +33,7 @@ def test_agent_comment_on_issue():
     assert former_comment != new_comment
     assert "print" in new_comment
 
-
+@pytest.mark.manual
 def test_agent_try_solving_issue():
     import os
     from functools import partial

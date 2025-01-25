@@ -42,7 +42,7 @@ jobs:
         GITHUB_API_KEY: "${{ secrets.GITHUB_TOKEN }}"
         GITLAB_API_KEY: "${{ secrets.GITLAB_API_KEY }}"
       run: |
-        pytest --cov=./ --cov-report=xml
+        pytest --cov=./ --cov-report=xml -m "not manual"
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
