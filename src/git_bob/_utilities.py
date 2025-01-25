@@ -520,7 +520,8 @@ SENSIBLE_ENV_KEYS = ["ANTHROPIC_API_KEY",
                     "GITLAB_API_KEY",
                     "TWINE_USERNAME",
                     "TWINE_PASSWORD",
-                    "HF_TOKEN"]
+                    "HF_TOKEN",
+                    "DEEPSEEK_API_KEY",]
 
 def save_and_clear_environment():
     """Clear all environment variables and store the entire env in a dictionary for restoration later"""
