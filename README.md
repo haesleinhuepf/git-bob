@@ -41,12 +41,14 @@ There is a detailed [tutorial](https://github.com/haesleinhuepf/git-bob/blob/mai
     * `github_models:meta-llama-3.1-405b-instruct`
     * `gemini-1.5-pro-002`
     * `mistral-large-2411` (uses `pixtral-12b-2409` for vision tasks)
+    * `deepseek-chat`
   * configure a GitHub secret with the corresponding key from the LLM provider depending on the above configured LLM:
     * `OPENAI_API_KEY`: [OpenAI (gpt)](https://openai.com/blog/openai-api)
     * `ANTHROPIC_API_KEY`: [Anthropic (claude)](https://www.anthropic.com/api)
     * `GH_MODELS_API_KEY`: [GitHub Models Marketplace](https://github.com/marketplace/models)
     * `GOOGLE_API_KEY`: [Google AI](https://ai.google.dev/gemini-api/docs/api-key)
     * `MISTRAL_API_KEY`: [Mistral](https://console.mistral.ai/api-keys/)
+    * `DEEPSEEK_API_KEY`: [DeepSeek](https://platform.deepseek.com/api_keys)
     * `KISSKI_API_KEY`: [KISSKI](https://services.kisski.de/services/en/service/?service=2-02-llm-service.json)
     * `BLABLADOR_API_KEY`: [BLABLADOR](https://login.helmholtz.de/oauth2-as/oauth2-authz-web-entry)
   * configure GitHub actions to run the workflow on issues and pull requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
