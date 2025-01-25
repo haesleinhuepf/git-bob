@@ -145,11 +145,8 @@ def test_clean_output2():
     import git_bob._github_utilities as gu
     Config.git_utilities = gu
 
-    test = """```
-    blabla
-```
-    """
-    reference = """blabla"""
+    test = """blabla @PETER"""
+    reference = """blabla @ PETER"""
 
     from git_bob._utilities import clean_output
     result = clean_output("haesleinhuepf/git-bob", test)
