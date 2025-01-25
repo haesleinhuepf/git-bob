@@ -31,6 +31,8 @@ jobs:
 
     - name: Test with pytest and generate coverage
       env:
+        GH_MODELS_API_KEY: "${{ secrets.GH_MODELS_API_KEY }}"
+        GITHUB_API_KEY: "${{ secrets.GITHUB_TOKEN }}"
         GITLAB_API_KEY: "${{ secrets.GITLAB_API_KEY }}"
       run: |
         pytest --cov=./ --cov-report=xml
