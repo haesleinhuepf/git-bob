@@ -1,3 +1,4 @@
+```
 # git-bob ![](logo_32x32.png)
 [![PyPI](https://img.shields.io/pypi/v/git-bob.svg?color=green)](https://pypi.org/project/git-bob)
 [![DOI](https://zenodo.org/badge/831841421.svg)](https://doi.org/10.5281/zenodo.13970719)
@@ -131,6 +132,15 @@ Here's the recommended workflow for using git-bob:
 7. Wait for git-bob to create new PR or modifying the existing PR with the requested changes.
 8. Repeat steps 3-5 as necessary until the issue is resolved satisfactorily.
 
+## Example Code
+
+Here's an example of a for-loop in Python that outputs numbers between 0 and 10:
+
+```python
+for i in range(11):
+    print(i)
+```
+
 ## Use-case examples
 
 A huge variety of use-cases for git-bob are thinkable. Here are some examples. Many serve purely demonstrative purposes. 
@@ -207,152 +217,3 @@ Some were parts of real scientific data analysis projects.
   * [How to use aider from python](https://github.com/haesleinhuepf/git-bob/issues/437#issuecomment-2539865080)
   * [How to use the atproto API](https://github.com/haesleinhuepf/git-bob-playground/issues/136)
   * [Executing code in a sandbox](https://github.com/haesleinhuepf/git-bob-playground/issues/177)
-  * [Summarize code in a repository](https://github.com/haesleinhuepf/git-bob/issues/444)
-  * [Drawing multiple trees in a SVG file](https://github.com/haesleinhuepf/git-bob-playground/issues/187)
-  * [Drawing relationships between agents in a multi-agent system](https://github.com/haesleinhuepf/git-bob-playground/issues/199)
-  * [Complex code refactoring](https://github.com/haesleinhuepf/git-bob/issues/451)
-
-## Installation for development
-
-```
-git clone https://github.com/haesleinhuepf/git-bob.git
-cd git-bob
-```
-
-### Usage as command-line tool (for development)
-
-You can also install git-bob locally and run it from the terminal. 
-In this case, create a [GitHub token](https://github.com/settings/tokens) and store it in an environment variable named `GITHUB_API_KEY`. 
-Also create an environment variable `GIT_BOB_LLM_NAME` with the name of the LLM you want to use, e.g. "gpt-4o-2024-05-13" or "claude-3-5-sonnet-20241022" or "github_models:gpt-4o".
-Then you can install git-bob using pip:
-
-```bash
-pip install git-bob
-```
-
-You can then use git-bob from the terminal on repositories you have read/write access to. 
-It is recommended to call it from the root folder of the repository you want to interact with.
-
-```bash
-git clone https://github.com/<organization>/<repository>
-cd <repository>
-git-bob <action> <organization>/<repository> <issue-number>
-```
-
-Available actions:
-* `review-pull-request`
-* `comment-on-issue`
-* `solve-issue`
-* `split-issue`
-
-## Limitations
-`git-bob` is a research project and has limitations. It serves as basis for discussion and further development. Once LLMs become better, `git-bob` will become better as well.
-
-At the moment, these limitations can be observed:
-* `git-bob` was tested for Python projects mostly. It seems to be able to process Java and C++ as well.
-* It can only execute code in Jupyter Notebooks. 
-* It sometimes hallucinates, especially in code reviews. E.g. it [claimed](https://github.com/haesleinhuepf/git-bob/pull/70) to have tested code, which was certainly not true.
-* It cannot solve issues where changing long files is required, as the output of the LLMs is limited by a maximum number of tokens (e.g. 16k for `gpt-4o-2024-08-06`). When using OpenAI's models it combines output of multiple requests to a maximum file length about 64k tokens. It may then miss some spaces or a line break where responses were stitched. 
-  When using GitHub models, the maximum file length is 4k tokens. When using Anthropic's Claude, the maximum file length is 8k tokens.
-* When changing multiple files, it may introduce conflicts between the files, as it does not know about the changed contents of the other files.
-* It has only limited logic to control who is allowed to trigger it. 
-  If you are a repository member, you can trigger it. 
-  If others send a pull request, a repository member must allow the action to run manually.
-* `git-bob` is incompatible with locally running open-source/-weight LLMs. 
-  This might make sense when being executed locally only. In the GitHub-CI this might be impossible.
-* Recently tested `claude-3-5-sonnet-20241022`, `gpt-4o-2024-08-06`, `github_models:gpt-4o`, `github_models:meta-llama-3.1-405b-instruct` and `gemini-1.5-pro-002` produced useful results.
-* `git-bob` is not allowed to modify workflow files, because it also uses GitHub workflows.
-* As git-bob is installed as part of git-hub workflows, its [download statistics](https://pypistats.org/packages/git-bob) might be misleading. There are not as many people downloading it as the numer of downloads suggest.
-
-## Extensibility
-
-git-bob can be extended in multiple ways. 
-All you need to do is to set up small python library which implements specific functions and exposes them using Pythons plugin system. 
-
-### Adding new trigger words
-
-If you want to add new trigger words and corresponding python functions, you can do so by implementing a new trigger handler function with a predefined signature in a small python library.
-The function can have the arguments `repository`, `issue`, `prompt_function` and `base_branch` and if you do not need all of them, just leave them out and add `**kwargs` at the end of the argument list. 
-E.g. if you want to add a new trigger word `love`, you can implement a new function like this.
-
-```python
-def love_github_issue(repository, issue, **kwargs):
-    from git_bob._utilities import Config
-    Config.git_utilities.add_comment(repository, issue, "I love this issue! <3")
-```
-
-Additionally, you need to configure your plugin's entry point in its `setup.cfg` file:
-
-```
-git_bob.triggers =
-    love = my_library.my_python_file:love_github_issue
-```
-
-### Adding new LLMs / prompt handlers
-
-If you use institutional LLM-servers which are accessible from the internet (or from your gitlab-server), you can use them using git-bob by implementing a new prompt handler function with a predefined signature.
-E.g. if your LLM-server is openai-compatible, you can reuse the `prompt_openai` function, adjust parameters such as `max_response_tokens`, and the url of your LLM-server like this:
-
-```python
-def prompt_my_custom_llm(message: str, model=None, image=None):
-  import os
-  from git_bob._endpoints import prompt_openai
-
-  model = model.replace("my_custom_llm:", "")
-  return prompt_openai(message,
-                       model=model,
-                       image=image,
-                       base_url="https://my_server/v1",
-                       api_key=os.environ.get("MY_CUSTOM_API_KEY"),
-                       max_response_tokens=8192)
-```
-
-Additionally, you need to configure your plugin's entry point in its `setup.cfg` file:
-
-```
-git_bob.prompt_handlers =
-    my_custom_llm = my_library.my_python_file:prompt_my_custom_llm
-```
-
-git-bob will then detect your plugin and can use it if the `GIT_BOB_LLM_NAME` secret is set to any model containing `my_custom_llm`. 
-You could for example configure a llama model running on your LLM-server like this: `my_custom_llm:llama3.3-70b`.
-
-## Similar projects
-
-There are similar projects out there
-* [Claude Engineer](https://github.com/Doriandarko/claude-engineer)
-* [BioChatter](https://github.com/biocypher/biochatter)
-* [aider](https://github.com/paul-gauthier/aider)
-* [OpenDevin](https://github.com/OpenDevin/OpenDevin)
-* [Devika](https://github.com/stitionai/devika)
-* [GPT-Codemaster](https://github.com/dex3r/GPT-Codemaster)
-* [GitHub Copilot Workspace](https://githubnext.com/projects/copilot-workspace)
-* [agentless](https://github.com/OpenAutoCoder/Agentless)
-* [git-aid](https://github.com/Torantulino/git-aid)
-* [SWE-agent](https://github.com/princeton-nlp/SWE-agent)
-* [gh-gitgen](https://github.com/microsoft/gh-gitgen)
-
-## Contributing
-
-Feedback and contributions are welcome! Just open an issue and let's discuss before you send a pull request. 
-A [human](https://haesleinhuepf.github.io) will respond and comment on your ideas!
-
-## Citation
-
-If you use git-bob, please cite it:
-```
-@misc{haase_2024_13928832,
-  author       = {Haase, Robert},
-  title        = {{Towards Transparency and Knowledge Exchange in AI- 
-                   assisted Data Analysis Code Generation}},
-  month        = oct,
-  year         = 2024,
-  publisher    = {Zenodo},
-  doi          = {10.5281/zenodo.13928832},
-  url          = {https://doi.org/10.5281/zenodo.13928832}
-}
-```
-
-## Acknowledgements
-
-We acknowledge the financial support by the Federal Ministry of Education and Research of Germany and by Sächsische Staatsministerium für Wissenschaft, Kultur und Tourismus in the programme Center of Excellence for AI-research „Center for Scalable Data Analytics and Artificial Intelligence Dresden/Leipzig", project identification number: ScaDS.AI
