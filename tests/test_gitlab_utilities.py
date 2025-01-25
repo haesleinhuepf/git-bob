@@ -89,3 +89,14 @@ def test_check_if_file_exists():
     from git_bob._gitlab_utilities import check_if_file_exists
     assert check_if_file_exists("haesleinhuepf/git-bob", "main", "README.md")
     assert not check_if_file_exists("haesleinhuepf/git-bob", "main", "readme2.md")
+
+def create_comment_on_issue():
+    from git_bob._gitlab_utilities import add_comment_to_issue, create_issue, close_issue
+    from git_bob._utilities import Config
+    import git_bob._gitlab_utilities as gu
+    Config.git_utilities = gu
+    Config.git_server_url = "https://gitlab.com"
+
+    new_issue = create_issue("haesleinhuepf/git-bob", "test", "This is a test issue")
+    add_comment_to_issue("haesleinhuepf/git-bob", new_issue, "This is a test comment")
+    close_issue("haesleinhuepf/git-bob", new_issue)
