@@ -4,6 +4,27 @@ def test_remove_outer_markdown():
 bla
 ```""") == "bla"
 
+
+def test_remove_outer_markdown2():
+    # this should stay as it was, because it ends with a comment.
+    from git_bob._utilities import remove_outer_markdown
+    test_text = """```python
+x = 5
+```
+This sets x to 5."""
+    assert remove_outer_markdown(test_text) == test_text
+
+
+def test_remove_outer_markdown3():
+    # this should stay as it was, because it ends with a comment.
+    from git_bob._utilities import remove_outer_markdown
+    test_text = """This sets x to 5:
+```python
+x = 5
+```"""
+    assert remove_outer_markdown(test_text) == test_text
+
+
 def test_split_content_and_summary():
     from git_bob._utilities import split_content_and_summary
     content, summary = split_content_and_summary("""blabla
@@ -124,7 +145,7 @@ def test_clean_output2():
     import git_bob._github_utilities as gu
     Config.git_utilities = gu
 
-    test = """    
+    test = """```
     blabla
 ```
     """

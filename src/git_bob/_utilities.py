@@ -33,15 +33,17 @@ def remove_outer_markdown(text):
 
     possible_endings = ["```", "</FILE>"]
 
-    for beginning in possible_beginnings:
-        if text.startswith(beginning):
-            text = text[len(beginning):]
-            break
+    if any([text.startswith(beginning) for beginning in possible_beginnings]) and any([text.endswith(ending) for ending in possible_endings]):
 
-    for ending in possible_endings:
-        if text.endswith(ending):
-            text = text[:-len(ending)]
-            break
+        for beginning in possible_beginnings:
+            if text.startswith(beginning):
+                text = text[len(beginning):]
+                break
+
+        for ending in possible_endings:
+            if text.endswith(ending):
+                text = text[:-len(ending)]
+                break
 
     text = text.strip("\n")
 
