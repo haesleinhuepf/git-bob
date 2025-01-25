@@ -44,7 +44,7 @@ def test_agent_try_solving_issue():
     from git_bob._endpoints import prompt_azure
 
     Config.repository  = "haesleinhuepf/git-bob"
-    Config.issue = create_issue(Config.repository, "for-loops", "git-bob answer with python code for demonstrating a for-loop that outputs numbers between 0 and 10.")
+    Config.issue = create_issue(Config.repository, "for-loops", "git-bob try python code for demonstrating a for-loop that outputs numbers between 0 and 10.")
 
     os.environ["GIT_BOB_LLM_NAME"] = "gh_models:gpt-4o-mini"
     Config.is_pull_request = False
@@ -78,7 +78,7 @@ def test_agent_solving_issue():
     from git_bob._endpoints import prompt_azure
 
     Config.repository  = "haesleinhuepf/git-bob"
-    Config.issue = create_issue(Config.repository, "for-loops", "git-bob answer with python code for demonstrating a for-loop that outputs numbers between 0 and 10.")
+    Config.issue = create_issue(Config.repository, "for-loops", "git-bob implement python code in a new 'for_loop.py' that demonstrates a for-loop that outputs numbers between 0 and 10.")
 
     os.environ["GIT_BOB_LLM_NAME"] = "gh_models:gpt-4o-mini"
     Config.is_pull_request = False
