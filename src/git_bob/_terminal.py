@@ -219,10 +219,15 @@ def init_prompt_handlers():
         Dictionary mapping handler names to functions that can handle prompts
     """
     from importlib.metadata import entry_points
+    import os
+    import re
     
     handlers = {}
+    module_filter = os.environ.get("GIT_BOB_EXTENSIONS_FILTER_REGEXP", ".*")
     for entry_point in entry_points(group='git_bob.prompt_handlers'):
         try:
+            if not re.match(module_filter, entry_point.module):
+                continue
             handler_func = entry_point.load()
             key = entry_point.name
             handlers[key] = handler_func
@@ -240,10 +245,15 @@ def init_triggers():
         Dictionary mapping trigger names to functions that can handle triggers
     """
     from importlib.metadata import entry_points
+    import os
+    import re
 
     triggers = {}
+    module_filter = os.environ.get("GIT_BOB_EXTENSIONS_FILTER_REGEXP", ".*")
     for entry_point in entry_points(group='git_bob.triggers'):
         try:
+            if not re.match(module_filter, entry_point.module):
+                continue
             trigger_func = entry_point.load()
             key = entry_point.name
             triggers[key] = trigger_func
