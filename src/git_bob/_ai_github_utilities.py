@@ -707,7 +707,7 @@ Do not add headlines or any other formatting. Just respond with the paragraph, t
         full_report = remark + clean_output(repository, pull_request_description) + error_messages
 
         try:
-            Config.git_utilities.send_pull_request(repository,
+            return Config.git_utilities.send_pull_request(repository,
                           source_branch=branch_name,
                           target_branch=base_branch,
                           title=redact_text(pull_request_title),
