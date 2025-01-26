@@ -47,6 +47,7 @@ jobs:
     - name: Run git-bob
       env:
         GIT_BOB_AGENT_NAME: "git-bob"
+        GIT_BOB_EXTENSIONS_FILTER_REGEXP: ".*"
         GIT_BOB_LLM_NAME: "${{ secrets.GIT_BOB_LLM_NAME }}"
         ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}"
         GOOGLE_API_KEY: "${{ secrets.GOOGLE_API_KEY }}"
