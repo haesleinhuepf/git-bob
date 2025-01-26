@@ -270,6 +270,7 @@ At the moment, these limitations can be observed:
 
 git-bob can be extended in multiple ways. 
 All you need to do is to set up small python library which implements specific functions and exposes them using Pythons plugin system. 
+You find an example implementation of the extensions described below in [this respository](https://github.com/haesleinhuepf/git-bob-plugin-example).
 
 ### Adding new trigger words
 
@@ -318,6 +319,27 @@ git_bob.prompt_handlers =
 
 git-bob will then detect your plugin and can use it if the `GIT_BOB_LLM_NAME` secret is set to any model containing `my_custom_llm`. 
 You could for example configure a llama model running on your LLM-server like this: `my_custom_llm:llama3.3-70b`.
+
+### Filtering extensions
+
+If you wish to extend git-bob with custom triggers or prompt handlers, but avoid default triggers and prompt handlers, you can configure a filter in the `git-bob.yml` workflow file. 
+Just overwrite this default regular expression accepting all extensions:
+
+```
+GIT_BOB_EXTENSIONS_FILTER_REGEXP: ".*"
+```
+
+If you want to only accept extensions starting with `my_library`, you can configure the filter like this:
+
+```
+GIT_BOB_EXTENSIONS_FILTER_REGEXP: "^my_library.*"
+```
+
+If you want to accept all extensions but not git-bob`s defaults, you can configure the filter like this:
+
+```
+GIT_BOB_EXTENSIONS_FILTER_REGEXP: "^(?!git_bob).*"
+```
 
 ## Similar projects
 
