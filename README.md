@@ -182,6 +182,7 @@ Some were parts of real scientific data analysis projects.
   * [Selecting ranges of columns](https://github.com/haesleinhuepf/git-bob-playground/issues/47)
   * [Summarizing data and plotting](https://github.com/NFDI4BIOIMAGE/training/issues/250)
   * [Writing text about well-known statistical methods](https://github.com/haesleinhuepf/git-bob-playground/issues/161)
+  * [Drawing a decision tree for statistial tests](https://github.com/haesleinhuepf/git-bob-playground/issues/223)
 * Plotting
   * [Violing plots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/44)
   * [UMAPs with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/41)
