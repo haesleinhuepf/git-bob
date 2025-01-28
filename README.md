@@ -175,6 +175,7 @@ Some were parts of real scientific data analysis projects.
   * [Convert SVG files to PNG images](https://github.com/haesleinhuepf/git-bob-playground/issues/216)
   * [Querying the arxiv](https://github.com/haesleinhuepf/git-bob-playground/issues/197)
   * [Retrieving meta-data of arxiv articles](https://github.com/haesleinhuepf/git-bob-playground/issues/196)
+  * [Counting PowerPoint slides in Zenodo records](https://github.com/NFDI4BIOIMAGE/training/issues/607)
 * Graphical User Interfaces
   * [Interactive drawing on an ipcanvas](https://github.com/haesleinhuepf/git-bob-playground/issues/121) 
 * Statistics
