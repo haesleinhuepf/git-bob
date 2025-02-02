@@ -6,6 +6,7 @@ def command_line_interface():
     import os 
     import sys
     import signal
+    from functools import partial
 
     from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues
@@ -126,7 +127,7 @@ def command_line_interface():
     prompt_handlers = init_prompt_handlers() # reinitialize, because configured LLM may have changed
     for key, value in prompt_handlers.items():
         if key in Config.llm_name:
-            prompt_function = value
+            prompt_function = partial(value, model=Config.llm_name) 
             break
 
     if prompt_function is None:
