@@ -127,7 +127,7 @@ def command_line_interface():
     prompt_handlers = init_prompt_handlers() # reinitialize, because configured LLM may have changed
     for key, value in prompt_handlers.items():
         if key in Config.llm_name:
-            prompt_function = partial(value, model=Config.llm_name)
+            prompt_function = partial(value, model=Config.llm_name) 
             break
 
     if prompt_function is None:
