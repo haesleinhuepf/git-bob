@@ -173,6 +173,7 @@ Some were parts of real scientific data analysis projects.
   * [Count citations of given DOIs](https://github.com/haesleinhuepf/git-bob-playground/issues/141)
   * [Convert PDF documents to PNG images](https://github.com/haesleinhuepf/git-bob-playground/issues/179)
   * [Convert PDF documents to animated GIFs](https://github.com/haesleinhuepf/git-bob-playground/issues/204)
+  * [Split PDFs](https://github.com/haesleinhuepf/git-bob-playground/issues/231)
   * [Convert SVG files to PNG images](https://github.com/haesleinhuepf/git-bob-playground/issues/216)
   * [Querying the arxiv](https://github.com/haesleinhuepf/git-bob-playground/issues/197)
   * [Retrieving meta-data of arxiv articles](https://github.com/haesleinhuepf/git-bob-playground/issues/196)
