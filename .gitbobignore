@@ -1,0 +1,6 @@
+.github/**
+.gitlab/**
+.**/tests/**
+*.secrets
+*password*
+*credentials*
