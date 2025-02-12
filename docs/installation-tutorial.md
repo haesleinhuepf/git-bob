@@ -18,6 +18,8 @@ by this one:
 pip install git-bob==0.16.0
 ```
 
+If your project does not contain a `requirements.txt` file, remove the line `pip install -r requirements.txt`.
+
 ## Step 2: Creating an OpenAI API Key
 
 We navigate to the [openai API website](https://openai.com/index/openai-api/) and log in.

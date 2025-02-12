@@ -12,6 +12,7 @@ For demonstration purposes, a [playground repository on gitlab.com](https://gitl
   In this file, make the following modifications:
   * If you are working with an own gitlab instance, modify the variable `GIT_SERVER_URL`. Enter the url of your server and finish with "/".
   * In the line `- pip install git-bob==0.16.0` consider updating the version number.
+  * If your project does not contain a `requirements.txt` file, remove the line `pip install -r requirements.txt`.
 * Add a requirements.txt (or remove the line `- pip install -r requirements.txt`) from the yml file.
 
 ## Setting access tokens
