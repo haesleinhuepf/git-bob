@@ -1,4 +1,3 @@
-```python
 # This module contains utility functions for interacting with GitHub issues and pull requests using AI.
 # It includes functions for setting up AI remarks, commenting on issues, reviewing pull requests, and solving issues.
 import os
@@ -733,6 +732,7 @@ The following changes were made in the files:
 Summarize the changes above to a one paragraph which will be Github pull-request message. 
 Write the message as if you were a human talking to a human.
 Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file. Keep the list as it is otherwise.
+
 Afterwards, summarize the summary in a single line, which will become the title of the pull-request.
 Do not add headlines or any other formatting. Just respond with the paragraph, the list of markdown links with explanations and the title in a new line below.
 """)
@@ -760,13 +760,20 @@ Do not add headlines or any other formatting. Just respond with the paragraph, t
 {SYSTEM_PROMPT}
 Given a Github issue description, a list of commit messages, and a list of mark-down links, summarize the changes you made in the files.
 Add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
+
 ## Github Issue #{issue} Discussion
+
 {discussion}
+
 ## Commit messages
 You committed these changes to these files
+
 {commit_messages_prompt}
+
 ## List of links
+
 {file_list_text}
+
 ## Your task
 Summarize the changes above to a one paragraph. Write your response as if you were a human talking to a human.
 Below add the list of markdown links but replace <explanation> with a single sentence describing what was changed in the respective file.
@@ -781,6 +788,7 @@ Do not add headline or any other formatting. Just respond with the paragraphe be
 def split_issue_in_sub_issues(repository, issue, prompt_function, base_branch=None):
     """
     Split a main issue into sub-issues for each sub-task.
+
     Parameters
     ----------
     repository : str
@@ -805,8 +813,10 @@ def split_issue_in_sub_issues(repository, issue, prompt_function, base_branch=No
 You need to extract sub-tasks from a given discussion.
 Hint: Sub-tasks are never about "Create an issue for X", but "X" instead. Also sub-tasks are never about "Propose X", but "X" instead.
 Return a JSON list with a short title for each sub-task.
+
 ## Discussion
 {discussion}
+
 ## Your task
 Extract and return sub-tasks as a JSON list of sub-task titles.
 """)
@@ -820,9 +830,12 @@ Extract and return sub-tasks as a JSON list of sub-task titles.
 {SYSTEM_PROMPT}
 Given description of a list of sub-tasks and extra details given in a discussion, 
 extract relevant information for one of the sub-tasks.
+
 ## Discussion
 {discussion}
+
 {created_sub_tasks}
+
 ## Your task
 Extract relevant information for the sub-task "{title}".
 Write the information down and make a proposal of how to solve the sub-task.
