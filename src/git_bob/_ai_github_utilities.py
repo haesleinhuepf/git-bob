@@ -237,6 +237,41 @@ def fix_error_in_notebook(new_content, error_message, prompt_function):
     return new_content, commit_message
 
 
+def is_ignored(filename, repository, branch_name):
+    """Check if a file is ignored according to .gitbobignore patterns
+
+    Parameters
+    ----------
+    filename : str
+        The filename to check
+    repository : str
+        The repository name
+    branch_name : str
+        The branch name
+
+    Returns
+    -------
+    bool
+        True if the file should be ignored
+    """
+    from ._utilities import Config
+    
+    # Always ignore .github and .gitlab files
+    if ".github" in filename or ".gitlab" in filename:
+        return True
+        
+    try:
+        gitbob_ignore = Config.git_utilities.decode_file(
+            Config.git_utilities.get_file_in_repository(repository, branch_name, ".gitbobignore")
+        )
+        patterns = gitbob_ignore.splitlines()
+        
+        from fnmatch import fnmatch
+        return any(fnmatch(filename, pattern.strip()) for pattern in patterns if pattern.strip())
+    except:
+        return False
+
+
 def create_or_modify_file(repository, issue, filename, branch_name, issue_summary, prompt_function, number_of_attempts:int=7):
     """
     Create or modify a file in a GitHub repository.
@@ -270,6 +305,9 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     image_file_endings = [".png", ".jpg", ".jpeg", ".gif"]
+
+    if is_ignored(filename, repository, branch_name):
+        raise ValueError(f"Access to {filename} is restricted by .gitbobignore")
 
     created_files = {}
     for attempt in range(number_of_attempts):
@@ -590,8 +628,8 @@ Respond with the actions as JSON list.
         for filename_key in ["filename", "new_filename", "old_filename", "target_filename"]:
             if filename_key in instruction.keys():
                 filename = instruction[filename_key]
-                if ".github" in filename or ".gitlab" in filename:
-                    errors.append(f"Error processing {filename}: Modifying workflow files is not allowed.")
+                if is_ignored(filename, repository, branch_name):
+                    errors.append(f"Error processing {filename}: Access is restricted by .gitbobignore")
                     continue
 
         try:
