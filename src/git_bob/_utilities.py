@@ -11,6 +11,9 @@ VISION_SYSTEM_MESSAGE = os.environ.get("VISION_SYSTEM_MESSAGE", "You are a AI-ba
 
 IMAGE_FILE_ENDINGS = [".jpg", ".png", ".gif", ".jpeg"]
 
+POSSBILE_MARKDOWN_FENCES = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy",
+                           "```jython", "```md", "```markdown", "```plaintext", "```tex", "```latex",
+                           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "```svg", "```xml", "<FILE>", "```"]
 
 def remove_outer_markdown(text):
     """
@@ -28,8 +31,7 @@ def remove_outer_markdown(text):
     """
     text = text.strip("\n").strip(" ")
 
-    possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy", "```jython", "```md", "```markdown",
-           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "```svg", "```xml", "<FILE>", "```"]
+    possible_beginnings = POSSBILE_MARKDOWN_FENCES
 
     possible_endings = ["```", "</FILE>"]
 
@@ -439,9 +441,7 @@ def append_result(a, b):
     if len(b) == 0:
         return a
 
-    possible_beginnings = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy",
-                           "```jython", "```md", "```markdown", "```plaintext",
-                           "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "```xml", "<FILE>", "```"]
+    possible_beginnings = POSSBILE_MARKDOWN_FENCES
 
     for beginning in possible_beginnings:
         if beginning in a and b.startswith(beginning + "\n"):
