@@ -131,11 +131,13 @@ def command_line_interface():
         provider = Config.llm_name.split(":")[0]
         for key, value in prompt_handlers.items():
             if key == provider:
+                Log().log(f"Selecting prompt handler by provider name ({provider}): " + value.__name__)
                 prompt_function = partial(value, model=Config.llm_name)
                 break
     else:
         for key, value in prompt_handlers.items():
             if key in Config.llm_name:
+                Log().log("Selecting prompt handler by llm_name: " + value.__name__)
                 prompt_function = partial(value, model=Config.llm_name)
                 break
 
