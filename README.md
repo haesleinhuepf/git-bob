@@ -37,13 +37,13 @@ There is a detailed [tutorial](https://github.com/haesleinhuepf/git-bob/blob/mai
   * Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.16.0`.
   * If your project does not contain a `requirements.txt` file, remove the line `pip install -r requirements.txt`.
   * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These were tested:
-    * `claude-3-5-sonnet-20241022`
-    * `gpt-4o-2024-08-06`
+    * `anthropic:claude-3-5-sonnet-20241022`
+    * `openai:gpt-4o-2024-08-06`
     * `github_models:gpt-4o`
     * `github_models:meta-llama-3.1-405b-instruct`
-    * `gemini-1.5-pro-002`
-    * `mistral-large-2411` (uses `pixtral-12b-2409` for vision tasks)
-    * `deepseek-chat`
+    * `google:gemini-1.5-pro-002`
+    * `mistral:mistral-large-2411` (uses `pixtral-12b-2409` for vision tasks)
+    * `mistral:deepseek-chat`
   * configure a GitHub secret with the corresponding key from the LLM provider depending on the above configured LLM:
     * `OPENAI_API_KEY`: [OpenAI (gpt)](https://openai.com/blog/openai-api)
     * `ANTHROPIC_API_KEY`: [Anthropic (claude)](https://www.anthropic.com/api)

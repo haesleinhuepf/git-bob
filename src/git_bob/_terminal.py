@@ -48,7 +48,7 @@ def command_line_interface():
         if value is not None:
             try:
                 signature = inspect.signature(value)
-                model_aliases[key] = signature.parameters['model'].default
+                model_aliases[key] = key + ":" + signature.parameters['model'].default
             except:
                 continue
     print("model aliases:\n", model_aliases)
@@ -106,7 +106,7 @@ def command_line_interface():
     print("text: ", text)
     print(f"{agent_name} ask in text", f"{agent_name} ask" in text)
 
-    # handle ask-llm task option
+    # handle ask-llm task option (using model names or aliases to select the LLM)
     if f"{agent_name} ask" in text:
         # example:
         # git-bob ask gpt-4o to solve this issue -> git-bob solve this issue
@@ -125,10 +125,21 @@ def command_line_interface():
 
     prompt_function = None
     prompt_handlers = init_prompt_handlers() # reinitialize, because configured LLM may have changed
-    for key, value in prompt_handlers.items():
-        if key in Config.llm_name:
-            prompt_function = partial(value, model=Config.llm_name) 
-            break
+
+    # search for the leading model provider (left of : )
+    if ":" in Config.llm_name:
+        provider = Config.llm_name.split(":")[0]
+        for key, value in prompt_handlers.items():
+            if key == provider:
+                Log().log(f"Selecting prompt handler by provider name ({provider}): " + value.__name__)
+                prompt_function = partial(value, model=Config.llm_name)
+                break
+    else:
+        for key, value in prompt_handlers.items():
+            if key in Config.llm_name:
+                Log().log("Selecting prompt handler by llm_name: " + value.__name__)
+                prompt_function = partial(value, model=Config.llm_name)
+                break
 
     if prompt_function is None:
         llm_name = Config.llm_name[1:]
