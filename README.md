@@ -216,6 +216,7 @@ Some were parts of real scientific data analysis projects.
   * [Drawing multiple trees in a SVG file](https://github.com/haesleinhuepf/git-bob-playground/issues/187)
   * [Drawing relationships between agents in a multi-agent system](https://github.com/haesleinhuepf/git-bob-playground/issues/199)
   * [Complex code refactoring](https://github.com/haesleinhuepf/git-bob/issues/451)
+  * [Debugging OpenCL error](https://github.com/clEsperanto/pyclesperanto_prototype/issues/344)
 
 ## Installation for development
 
