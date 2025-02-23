@@ -141,8 +141,10 @@ Some were parts of real scientific data analysis projects.
 * Question answering 
   * [About specific Python libraries](https://github.com/haesleinhuepf/stackview/issues/79)
   * [The capital of France](https://github.com/haesleinhuepf/git-bob-playground/issues/24)
+  * [Asking for git-bob's capabilities](https://github.com/haesleinhuepf/git-bob-playground/issues/232)
 * Translation
   * [Translating text in Jupyter notebooks in other Languages](https://github.com/haesleinhuepf/git-bob-playground/issues/118) 
+  * [Translating PowerPoint files](https://github.com/haesleinhuepf/git-bob-playground/issues/239)
 * Bio-image Analysis
   * [Nuclei segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/13)
   * [Cell segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/42)
@@ -178,6 +180,7 @@ Some were parts of real scientific data analysis projects.
   * [Querying the arxiv](https://github.com/haesleinhuepf/git-bob-playground/issues/197)
   * [Retrieving meta-data of arxiv articles](https://github.com/haesleinhuepf/git-bob-playground/issues/196)
   * [Counting PowerPoint slides in Zenodo records](https://github.com/NFDI4BIOIMAGE/training/issues/607)
+  * [Search for duplicate entries in a yml file](https://github.com/NFDI4BIOIMAGE/training/issues/664)
 * Graphical User Interfaces
   * [Interactive drawing on an ipcanvas](https://github.com/haesleinhuepf/git-bob-playground/issues/121) 
 * Statistics
@@ -194,6 +197,8 @@ Some were parts of real scientific data analysis projects.
   * [Word clouds](https://github.com/haesleinhuepf/git-bob-playground/issues/76)
   * [Plot simulated income data](https://github.com/haesleinhuepf/git-bob-playground/issues/195)
   * [Ploting the Dunning Kruger effect](https://github.com/haesleinhuepf/git-bob-playground/issues/202)
+  * [Reproducing a plot](https://github.com/haesleinhuepf/git-bob-playground/issues/235)
+  * [Animated zooming into an image](https://github.com/haesleinhuepf/git-bob-playground/issues/237)
 * Science Communication
   * [Making slides for Deep Learning training](https://github.com/haesleinhuepf/git-bob-playground/issues/97)
   * [Making slides for Research Data Management training](https://github.com/haesleinhuepf/git-bob-playground/issues/96)
@@ -208,6 +213,7 @@ Some were parts of real scientific data analysis projects.
   * [Solving Advent of Code 2024 puzzles](https://github.com/haesleinhuepf/git-bob-advent-of-code)
   * [Solving the Halting Problem](https://github.com/haesleinhuepf/git-bob-playground/issues/156) [[2nd attempt](https://github.com/haesleinhuepf/git-bob-playground/issues/157)]
   * [Drawing a Christmas tree as SVG](https://github.com/haesleinhuepf/git-bob-playground/issues/188)
+  * [Asking for the Meaning of Life](https://github.com/haesleinhuepf/git-bob-playground/issues/234)
 * Things that didn't work well
   * [How to use aider from python](https://github.com/haesleinhuepf/git-bob/issues/437#issuecomment-2539865080)
   * [How to use the atproto API](https://github.com/haesleinhuepf/git-bob-playground/issues/136)
