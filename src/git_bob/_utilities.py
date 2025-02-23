@@ -10,6 +10,7 @@ import os
 VISION_SYSTEM_MESSAGE = os.environ.get("VISION_SYSTEM_MESSAGE", "You are a AI-based vision system. You described images professionally and clearly.")
 
 IMAGE_FILE_ENDINGS = [".jpg", ".png", ".gif", ".jpeg"]
+TEXT_FILE_ENDINGS = [".txt", ".md", ".csv", ".yml", ".yaml", ".json", ".py", ".java", ".groovy", ".jython", ".md", ".markdown", ".plaintext", ".tex", ".latex", ".txt", ".csv", ".yml", ".yaml", ".json", ".py", ".svg", ".xml"]
 
 POSSBILE_MARKDOWN_FENCES = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy",
                            "```jython", "```md", "```markdown", "```plaintext", "```tex", "```latex",
@@ -340,6 +341,28 @@ def modify_discussion(discussion, prompt_visionlm=prompt_openai):
                 additional_content[url] = image_content
         except Exception as e:
             print(f"Error while processing URL {url}: {e}")
+
+    # read local files
+    temp = discussion.replace("\n", " ")
+    for potential_filename in temp.split(" "):
+        if len(potential_filename) < 4: # too short to be a filename
+            continue
+        # check if file exists
+        if os.path.exists(potential_filename):
+            if potential_filename.endswith('.ipynb'):
+                file_contents = read_text_file(potential_filename)
+                file_contents = erase_outputs_of_code_cells(file_contents)
+            elif potential_filename.endswith('.docx'):
+                docx2markdown.docx_to_markdown(potential_filename, potential_filename + ".md")
+                file_contents = read_text_file(potential_filename + ".md")
+                # remove the file
+                os.remove(potential_filename + ".md")
+            elif any([potential_filename.endswith(f) for f in TEXT_FILE_ENDINGS]):
+                file_contents = read_text_file(potential_filename)
+            else:
+                continue
+
+            additional_content[potential_filename] = file_contents
 
     # Modify the existing discussion content
     discussion = discussion.replace("\n#", "\n###")
