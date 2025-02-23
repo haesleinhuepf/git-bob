@@ -253,3 +253,13 @@ def test_make_slides():
     from pptx import Presentation
     presentation = Presentation("test_slides.pptx")
     assert len(presentation.slides) == 2
+
+
+def test_read_local_files_in_discussion():
+    from git_bob._utilities import modify_discussion
+    discussion = """
+    There is something important README.md
+    """
+    modified_discussion = modify_discussion(discussion)
+    assert "# git-bob ![](logo_32x32.png)" in modified_discussion
+
