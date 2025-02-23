@@ -145,10 +145,11 @@ Some were parts of real scientific data analysis projects.
 * Translation
   * [Translating text in Jupyter notebooks in other Languages](https://github.com/haesleinhuepf/git-bob-playground/issues/118) 
   * [Translating PowerPoint files](https://github.com/haesleinhuepf/git-bob-playground/issues/239)
-* Bio-image Analysis
+* Image Analysis
   * [Nuclei segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/13)
   * [Cell segmentation](https://github.com/haesleinhuepf/git-bob-playground/issues/42)
   * [Resizing images](https://github.com/NFDI4BIOIMAGE/training/issues/356)
+  * [Natural image classification](https://github.com/haesleinhuepf/git-bob-playground/issues/241)
 * Programming
   * [Caching](https://github.com/NFDI4BIOIMAGE/SlideInsight/issues/28)
   * [Fixing bugs in notebooks](https://github.com/haesleinhuepf/git-bob-playground/issues/174)
