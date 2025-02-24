@@ -29,3 +29,8 @@ def test_azure():
 def test_deepseek():
     from git_bob._endpoints import prompt_deepseek
     assert "ok" in str(prompt_deepseek("Answer with ok!")).lower()
+
+@pytest.mark.manual
+def test_openrouter():
+    from git_bob._endpoints import prompt_openrouter
+    assert "ok" in str(prompt_openrouter("Answer with ok!")).lower()
