@@ -158,6 +158,40 @@ def prompt_deepseek(message: str, model="deepseek-chat", image=None, max_accumul
     return prompt_openai(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
 
+def prompt_openrouter(message: str, model="anthropic/claude-3-opus", image=None, max_accumulated_responses=10, max_response_tokens=16384):
+    """A prompt helper function that sends a message to OpenRouter.
+
+    Parameters
+    ----------
+    message : str
+        The message to send to the model.
+    model : str, optional
+        The model to use, defaults to 'anthropic/claude-3-opus'.
+    image : array_like, optional
+        An image to include in the prompt.
+    max_accumulated_responses : int, optional
+        Maximum number of responses to accumulate.
+    max_response_tokens : int, optional
+        Maximum number of tokens in the response.
+
+    Returns
+    -------
+    str
+        The model's response.
+    """
+    import os
+    api_key = f"Bearer {os.environ.get('OPENROUTER_API_KEY')}"
+    return prompt_openai(
+        message, 
+        model=model, 
+        image=image, 
+        max_accumulated_responses=max_accumulated_responses, 
+        max_response_tokens=max_response_tokens, 
+        base_url="https://openrouter.ai/api/v1",
+        api_key=api_key
+    )
+
+
 def prompt_googleai(request, model="gemini-1.5-pro-002", image=None):
     """Send a prompt to Google Gemini and return the response"""
     from google import generativeai as genai
