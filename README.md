@@ -157,6 +157,7 @@ Some were parts of real scientific data analysis projects.
   * [Summarize code in a repository](https://github.com/haesleinhuepf/git-bob/issues/445)
   * [Programming Google Search](https://github.com/haesleinhuepf/git-bob-playground/issues/193)
   * [Implementing a generic Factory patters](https://github.com/haesleinhuepf/git-bob-playground/issues/198)
+  * [Generating a QR-Code](https://github.com/haesleinhuepf/git-bob-playground/issues/250)
 * Prompting
   * [Prompting for SVG files](https://github.com/haesleinhuepf/git-bob-playground/issues/184)
 * Continuous Integration and Deployment
@@ -182,6 +183,7 @@ Some were parts of real scientific data analysis projects.
   * [Retrieving meta-data of arxiv articles](https://github.com/haesleinhuepf/git-bob-playground/issues/196)
   * [Counting PowerPoint slides in Zenodo records](https://github.com/NFDI4BIOIMAGE/training/issues/607)
   * [Search for duplicate entries in a yml file](https://github.com/NFDI4BIOIMAGE/training/issues/664)
+  * [Running multiple notebooks and trace failures](https://github.com/haesleinhuepf/git-bob-playground/issues/243)
 * Graphical User Interfaces
   * [Interactive drawing on an ipcanvas](https://github.com/haesleinhuepf/git-bob-playground/issues/121) 
 * Statistics
@@ -190,6 +192,8 @@ Some were parts of real scientific data analysis projects.
   * [Summarizing data and plotting](https://github.com/NFDI4BIOIMAGE/training/issues/250)
   * [Writing text about well-known statistical methods](https://github.com/haesleinhuepf/git-bob-playground/issues/161)
   * [Drawing a decision tree for statistial tests](https://github.com/haesleinhuepf/git-bob-playground/issues/223)
+  * [Converting Dice and Jaccard indices](https://github.com/haesleinhuepf/git-bob-playground/issues/248)
+  * [Generating personal profile data of random scientists](https://github.com/haesleinhuepf/git-bob-playground/issues/249)
 * Plotting
   * [Violing plots with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/44)
   * [UMAPs with simulated data](https://github.com/haesleinhuepf/git-bob-playground/issues/41)
@@ -224,6 +228,7 @@ Some were parts of real scientific data analysis projects.
   * [Drawing relationships between agents in a multi-agent system](https://github.com/haesleinhuepf/git-bob-playground/issues/199)
   * [Complex code refactoring](https://github.com/haesleinhuepf/git-bob/issues/451)
   * [Debugging OpenCL error](https://github.com/clEsperanto/pyclesperanto_prototype/issues/344)
+  * [Signing PDFs with visual signature AND cryptographic signing](https://github.com/haesleinhuepf/git-bob-playground/issues/244)
 
 ## Installation for development
 
