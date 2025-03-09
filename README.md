@@ -158,6 +158,7 @@ Some were parts of real scientific data analysis projects.
   * [Programming Google Search](https://github.com/haesleinhuepf/git-bob-playground/issues/193)
   * [Implementing a generic Factory patters](https://github.com/haesleinhuepf/git-bob-playground/issues/198)
   * [Generating a QR-Code](https://github.com/haesleinhuepf/git-bob-playground/issues/250)
+  * [Caching LLM prompt responses](https://github.com/haesleinhuepf/translate-pptx/issues/3)
 * Prompting
   * [Prompting for SVG files](https://github.com/haesleinhuepf/git-bob-playground/issues/184)
 * Continuous Integration and Deployment
