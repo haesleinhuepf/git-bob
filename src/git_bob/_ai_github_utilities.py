@@ -328,7 +328,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
         elif filename.endswith('.docx'):
             format_specific_instructions = " Write the document in simple markdown format."
         elif filename.endswith('.mp3'):
-            format_specific_instructions = " Write the content in an enthusiastic and engaging way, like in a radio show."
+            format_specific_instructions = " The content you create will be converted to mp3 afterwards. Hence, write the content in an enthusiastic and engaging way, like in a radio show."
         elif filename.endswith('.pptx'):
             format_specific_instructions = """
 The file should be a presentation with slides, formatted as a JSON list containing dictionaries with a 'title' and a 'content' list with up to 2 strings.
