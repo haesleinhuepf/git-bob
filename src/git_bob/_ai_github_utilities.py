@@ -591,6 +591,7 @@ Decide which of these files need to be modified, created, downloaded, renamed, c
 Downloads are necessary, if there is a url in the discussion and the linked file is needed in the proposed code.
 Paintings should only be done if the user explicitly asks to "paint" a picture or "draw" a comic.
 Do NOT create new paintings if you already created them during the discussion.
+You can create audio files in mp3 format.
 If the user asks for executing a notebook, consider this as modification.
 Keep the list of actions minimal.
 Response format:
