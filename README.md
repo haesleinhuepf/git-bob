@@ -220,6 +220,7 @@ Some were parts of real scientific data analysis projects.
   * [Solving the Halting Problem](https://github.com/haesleinhuepf/git-bob-playground/issues/156) [[2nd attempt](https://github.com/haesleinhuepf/git-bob-playground/issues/157)]
   * [Drawing a Christmas tree as SVG](https://github.com/haesleinhuepf/git-bob-playground/issues/188)
   * [Asking for the Meaning of Life](https://github.com/haesleinhuepf/git-bob-playground/issues/234)
+  * [Creating audio files](https://github.com/haesleinhuepf/git-bob-playground/issues/254)
 * Things that didn't work well
   * [How to use aider from python](https://github.com/haesleinhuepf/git-bob/issues/437#issuecomment-2539865080)
   * [How to use the atproto API](https://github.com/haesleinhuepf/git-bob-playground/issues/136)
