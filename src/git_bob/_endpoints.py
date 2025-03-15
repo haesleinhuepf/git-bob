@@ -303,3 +303,18 @@ def prompt_mistral(message: str, model="mistral-large-2411", image=None):
 
     # Print the content of the response
     return chat_response.choices[0].message.content
+
+
+def text_to_speech_openai(text:str, filename:str, model:str="tts-1", voice:str="alloy"):
+    from openai import OpenAI
+
+    client = OpenAI()
+    response = client.audio.speech.create(
+        model=model,
+        voice=voice,
+        input=text
+    )
+
+    # Save the audio file
+    response.stream_to_file(filename)
+
