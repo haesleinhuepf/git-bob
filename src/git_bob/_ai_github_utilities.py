@@ -301,6 +301,7 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     import docx2markdown
     from ._utilities import read_text_file, write_text_file, write_binary_file, read_binary_file
     from datetime import datetime
+    from ._endpoints import text_to_speech_openai
 
     current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
@@ -326,6 +327,8 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
             format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors. Return the notebook in JSON format!"
         elif filename.endswith('.docx'):
             format_specific_instructions = " Write the document in simple markdown format."
+        elif filename.endswith('.mp3'):
+            format_specific_instructions = " Do not attempt to create an audio file. Write down the content of it instead only. Do not explain what you're doing, or what your capabilities are. In fact, the content you create here, will be converted to mp3 afterwards."
         elif filename.endswith('.pptx'):
             format_specific_instructions = """
 The file should be a presentation with slides, formatted as a JSON list containing dictionaries with a 'title' and a 'content' list with up to 2 strings.
@@ -433,11 +436,13 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
             new_content = read_binary_file(filename)
             # delete temporary markdown file
             os.remove(filename + current_datetime + ".md")
+        elif filename.endswith('.mp3'):
+            text_to_speech_openai(new_content, filename)
+            new_content = read_binary_file(filename)
         elif filename.endswith('.pptx'):
             from ._utilities import make_slides
             make_slides(new_content, filename)
             new_content = read_binary_file(filename)
-
         if do_execute_notebook:
             print("Executing the notebook", len(new_content))
             current_dir = os.getcwd()
@@ -586,6 +591,7 @@ Decide which of these files need to be modified, created, downloaded, renamed, c
 Downloads are necessary, if there is a url in the discussion and the linked file is needed in the proposed code.
 Paintings should only be done if the user explicitly asks to "paint" a picture or "draw" a comic.
 Do NOT create new paintings if you already created them during the discussion.
+You can create audio files in mp3 format.
 If the user asks for executing a notebook, consider this as modification.
 Keep the list of actions minimal.
 Response format:
