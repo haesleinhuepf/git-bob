@@ -133,6 +133,19 @@ Here's the recommended workflow for using git-bob:
 7. Wait for git-bob to create new PR or modifying the existing PR with the requested changes.
 8. Repeat steps 3-5 as necessary until the issue is resolved satisfactorily.
 
+## Supported file formats
+
+Git-bob can interact with a variety of file formats.
+* Jupyter Notebooks (.ipynb), can also be executed
+* Text and code files (.txt, .tex, .py, .csv, ...)
+* Markdown files (.md)
+* Markup files (.yml, .yaml, .xml)
+* Word Document files (.docx)
+* PowerPoint files (.pptx, write-only)
+* Audio files (.mp3, write-only, OPENAI_API_KEY required)
+* SVG files (.svg)
+* images files (.png, .jpg, ..., for reading images, a vision-capable LLM must be chosen, for creating images DALL-E is used, OPENAI_API_KEY required)
+
 ## Use-case examples
 
 A huge variety of use-cases for git-bob are thinkable. Here are some examples. Many serve purely demonstrative purposes. 
@@ -220,7 +233,7 @@ Some were parts of real scientific data analysis projects.
   * [Solving the Halting Problem](https://github.com/haesleinhuepf/git-bob-playground/issues/156) [[2nd attempt](https://github.com/haesleinhuepf/git-bob-playground/issues/157)]
   * [Drawing a Christmas tree as SVG](https://github.com/haesleinhuepf/git-bob-playground/issues/188)
   * [Asking for the Meaning of Life](https://github.com/haesleinhuepf/git-bob-playground/issues/234)
-  * [Creating audio files](https://github.com/haesleinhuepf/git-bob-playground/issues/254)
+  * [Creating audio files](https://github.com/haesleinhuepf/git-bob-playground/issues/254) (also in [German](https://github.com/haesleinhuepf/git-bob-playground/issues/258) and [French](https://github.com/haesleinhuepf/git-bob-playground/issues/259))
 * Things that didn't work well
   * [How to use aider from python](https://github.com/haesleinhuepf/git-bob/issues/437#issuecomment-2539865080)
   * [How to use the atproto API](https://github.com/haesleinhuepf/git-bob-playground/issues/136)
