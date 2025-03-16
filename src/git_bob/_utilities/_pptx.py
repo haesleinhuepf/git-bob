@@ -29,7 +29,7 @@ def make_slides(slides_description_json, filename="issue_slides.pptx"):
 
     file_location = "slide_template.pptx"
     if not os.path.exists(file_location):
-        file_location = Path(__file__).parent / "data" / "slide_template.pptx"
+        file_location = Path(__file__).parent.parent / "data" / "slide_template.pptx"
 
     # Create a presentation
     presentation = Presentation(file_location)
