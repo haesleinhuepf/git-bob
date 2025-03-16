@@ -13,6 +13,7 @@ def review_pull_request(repository, issue, prompt_function, **kwargs):
     """
     from .._utilities import modify_discussion, clean_output, redact_text, Config, SYSTEM_PROMPT, setup_ai_remark
     from ._comment_on_issue import comment_on_issue
+    from .._logger import Log
     Log().log(f"-> review_pull_request({repository}, {issue})")
 
     if Config.pull_request is None: # it's not a PR
