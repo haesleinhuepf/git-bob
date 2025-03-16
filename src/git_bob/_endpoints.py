@@ -318,3 +318,46 @@ def text_to_speech_openai(text:str, filename:str, model:str="tts-1", voice:str="
     # Save the audio file
     response.stream_to_file(filename)
 
+
+
+def paint_picture_openai(repository, branch_name, prompt, output_filename="image.png", model="dall-e-3", image_width=1024, image_height=1024, style='natural', quality='standard'):
+    """Generate an image using DALL-E3 based on a prompt and save it to the repository using PIL."""
+    from ._logger import Log
+    Log().log(f"-> paint_image({repository}, {branch_name}, ..., {output_filename}, {model}, ...)")
+    from openai import OpenAI
+    import io
+    from ._utilities import images_from_url_responses, Config
+    client = OpenAI()
+
+    size_str = f"{image_width}x{image_height}"
+
+    kwargs = {}
+    log_message = f"An image was generated using {model}"
+    if model == "dall-e-3":
+        kwargs['style'] = style
+        kwargs['quality'] = quality
+        log_message = log_message + f" with style {style} and quality {quality}"
+
+    response = client.images.generate(
+        prompt=prompt,
+        n=1,
+        model=model,
+        size=size_str,
+        **kwargs
+    )
+
+    if not log_message is Config.remarks:
+        Config.remarks.append(log_message + ". ")
+
+    image = images_from_url_responses(response)
+
+    # convert to bytes
+    img_byte_arr = io.BytesIO()
+    image.save(img_byte_arr, format='PNG')
+    img_byte_arr = img_byte_arr.getvalue()
+
+    # commit
+    commit_message = "Painted image"
+    Config.git_utilities.write_file_in_branch(repository, branch_name, output_filename, img_byte_arr, commit_message=commit_message)
+
+    return commit_message
