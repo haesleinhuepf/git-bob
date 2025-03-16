@@ -549,7 +549,7 @@ def check_access_and_ask_for_approval(user, repository, issue):
     Log().log(f"-> check_access_and_ask_for_approval({user}, {repository}, {issue})")
     groups = os.getenv('GIT_BOB_ACCESS_GROUPS', 'members').split(',')
 
-    from ._ai_github_utilities import setup_ai_remark
+    from ._utilities import setup_ai_remark
     access = False
 
     repo = get_repository_handle(repository)
