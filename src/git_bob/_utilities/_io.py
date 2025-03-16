@@ -158,7 +158,7 @@ def is_ignored(filename, repository, branch_name):
     bool
         True if the file should be ignored
     """
-    from ._utilities import Config
+    from ._config import Config
 
     # Always ignore .github and .gitlab files
     if ".github" in filename or ".gitlab" in filename:
