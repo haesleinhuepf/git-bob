@@ -6,6 +6,7 @@ SYSTEM_PROMPT = os.environ.get("SYSTEM_MESSAGE", f"You are an AI-based coding as
 VISION_SYSTEM_MESSAGE = os.environ.get("VISION_SYSTEM_MESSAGE", "You are a AI-based vision system. You described images professionally and clearly.")
 
 IMAGE_FILE_ENDINGS = [".jpg", ".png", ".gif", ".jpeg"]
+DOWNLOADABLE_FILE_ENDINGS = [".docx", ".pptx", ".mp3"]
 TEXT_FILE_ENDINGS = [".txt", ".md", ".csv", ".yml", ".yaml", ".json", ".py", ".java", ".groovy", ".jython", ".md", ".markdown", ".plaintext", ".tex", ".latex", ".txt", ".csv", ".yml", ".yaml", ".json", ".py", ".svg", ".xml"]
 
 

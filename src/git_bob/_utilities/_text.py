@@ -263,7 +263,7 @@ def redact_text(text):
 
 def file_list_from_commit_message_dict(repository, branch_name, commit_messages):
     """Takes commit messages and produces markdown-style links for a commit message where users can click to see files"""
-    from ._config import Config, IMAGE_FILE_ENDINGS
+    from ._config import Config, IMAGE_FILE_ENDINGS, DOWNLOADABLE_FILE_ENDINGS
     list_of_links = []
     for k, v in commit_messages.items():
 
@@ -274,12 +274,17 @@ def file_list_from_commit_message_dict(repository, branch_name, commit_messages)
 
         suffix = ""
         prefix = ""
+        #show images
         if any([k.endswith(f) for f in IMAGE_FILE_ENDINGS]):
             prefix = "!"
+
+        # offer download links for audio, presentation and document files
+        if any([k.endswith(f) for f in DOWNLOADABLE_FILE_ENDINGS]) or any([k.endswith(f) for f in IMAGE_FILE_ENDINGS]):
             if "https://github.com/" in Config.git_server_url:
                 suffix = "?raw=true"
             else:
                 url_template = url_template.replace("/blob/", "/raw/")
+
 
         list_of_links.append(f"{prefix}[{k}]({url_template}{k}{suffix})")
     return list_of_links
