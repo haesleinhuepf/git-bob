@@ -9,9 +9,10 @@ def command_line_interface():
     from functools import partial
 
     from ._github_utilities import get_most_recent_comment_on_issue, add_comment_to_issue
-    from ._ai_github_utilities import setup_ai_remark, solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues
+    from ._utilities import setup_ai_remark
+    from ._ai_github_utilities import solve_github_issue, review_pull_request, comment_on_issue, split_issue_in_sub_issues
     from ._github_utilities import check_access_and_ask_for_approval, get_repository_handle, get_most_recently_commented_issue
-    from ._utilities import quick_first_response, Config, deploy 
+    from ._utilities import quick_first_response, Config
     from ._logger import Log
     from github.GithubException import UnknownObjectException
     from ._utilities import run_cli
@@ -27,11 +28,11 @@ def command_line_interface():
     if "https://github.com" in Config.git_server_url:
         import git_bob._github_utilities as gu
         Config.git_utilities = gu
-        print("Using gitHUB utilities")
+        print("Using gitHUB _utilities")
     else:
         import git_bob._gitlab_utilities as gu
         Config.git_utilities = gu
-        print("Using gitLAB utilities")
+        print("Using gitLAB _utilities")
 
     agent_name = os.environ.get("GIT_BOB_AGENT_NAME", "git-bob")
 
