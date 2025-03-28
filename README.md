@@ -6,7 +6,7 @@
 <!--[![PyPI - Downloads](https://img.shields.io/pypi/dm/git-bob)](https://pypistats.org/packages/git-bob)-->
 
 git-bob uses AI to solve GitHub issues. It runs inside the GitHub CI, no need to install anything on your computer.
-Read more in the [preprint](https://doi.org/10.5281/zenodo.13928832). 
+Read more in the [publication](https://www.nature.com/articles/s43588-025-00781-1). 
 
 ![banner](https://github.com/haesleinhuepf/git-bob/raw/main/docs/images/banner2.png)
 
@@ -401,11 +401,11 @@ If you use git-bob, please cite it:
   author       = {Haase, Robert},
   title        = {{Towards Transparency and Knowledge Exchange in AI- 
                    assisted Data Analysis Code Generation}},
-  month        = oct,
-  year         = 2024,
-  publisher    = {Zenodo},
-  doi          = {10.5281/zenodo.13928832},
-  url          = {https://doi.org/10.5281/zenodo.13928832}
+  month        = mar,
+  year         = 2025,
+  publisher    = {Nature Computational Science},
+  doi          = {10.1038/s43588-025-00781-1},
+  url          = {https://doi.org/10.1038/s43588-025-00781-1}
 }
 ```
 
