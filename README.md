@@ -6,7 +6,7 @@
 <!--[![PyPI - Downloads](https://img.shields.io/pypi/dm/git-bob)](https://pypistats.org/packages/git-bob)-->
 
 git-bob uses AI to solve GitHub issues. It runs inside the GitHub CI, no need to install anything on your computer.
-Read more in the [preprint](https://doi.org/10.5281/zenodo.13928832). 
+Read more in the [publication](https://www.nature.com/articles/s43588-025-00781-1). 
 
 ![banner](https://github.com/haesleinhuepf/git-bob/raw/main/docs/images/banner2.png)
 
@@ -43,7 +43,7 @@ There is a detailed [tutorial](https://github.com/haesleinhuepf/git-bob/blob/mai
     * `github_models:meta-llama-3.1-405b-instruct`
     * `google:gemini-1.5-pro-002`
     * `mistral:mistral-large-2411` (uses `pixtral-12b-2409` for vision tasks)
-    * `mistral:deepseek-chat`
+    * `deepseek:deepseek-chat`
   * configure a GitHub secret with the corresponding key from the LLM provider depending on the above configured LLM:
     * `OPENAI_API_KEY`: [OpenAI (gpt)](https://openai.com/blog/openai-api)
     * `ANTHROPIC_API_KEY`: [Anthropic (claude)](https://www.anthropic.com/api)
@@ -172,6 +172,7 @@ Some were parts of real scientific data analysis projects.
   * [Implementing a generic Factory patters](https://github.com/haesleinhuepf/git-bob-playground/issues/198)
   * [Generating a QR-Code](https://github.com/haesleinhuepf/git-bob-playground/issues/250)
   * [Caching LLM prompt responses](https://github.com/haesleinhuepf/translate-pptx/issues/3)
+  * [Interactive bash inside a program](https://github.com/haesleinhuepf/git-bob-playground/issues/262)
 * Prompting
   * [Prompting for SVG files](https://github.com/haesleinhuepf/git-bob-playground/issues/184)
 * Continuous Integration and Deployment
@@ -230,10 +231,12 @@ Some were parts of real scientific data analysis projects.
   * [Story Telling for kids](https://github.com/haesleinhuepf/git-bob-playground/issues/82)
   * [PowerPoint Karaoke](https://github.com/haesleinhuepf/git-bob-playground/issues/99)
   * [Solving Advent of Code 2024 puzzles](https://github.com/haesleinhuepf/git-bob-advent-of-code)
-  * [Solving the Halting Problem](https://github.com/haesleinhuepf/git-bob-playground/issues/156) [[2nd attempt](https://github.com/haesleinhuepf/git-bob-playground/issues/157)]
   * [Drawing a Christmas tree as SVG](https://github.com/haesleinhuepf/git-bob-playground/issues/188)
   * [Asking for the Meaning of Life](https://github.com/haesleinhuepf/git-bob-playground/issues/234)
   * [Creating audio files](https://github.com/haesleinhuepf/git-bob-playground/issues/254) (also in [German](https://github.com/haesleinhuepf/git-bob-playground/issues/258) and [French](https://github.com/haesleinhuepf/git-bob-playground/issues/259))
+* `git-bob` refusing to help
+  * [Changing the working directory of the parent shell](https://github.com/haesleinhuepf/git-bob-playground/issues/266) 
+  * [Solving the Halting Problem](https://github.com/haesleinhuepf/git-bob-playground/issues/156) [[2nd attempt](https://github.com/haesleinhuepf/git-bob-playground/issues/157)]
 * Things that didn't work well
   * [How to use aider from python](https://github.com/haesleinhuepf/git-bob/issues/437#issuecomment-2539865080)
   * [How to use the atproto API](https://github.com/haesleinhuepf/git-bob-playground/issues/136)
@@ -244,6 +247,7 @@ Some were parts of real scientific data analysis projects.
   * [Complex code refactoring](https://github.com/haesleinhuepf/git-bob/issues/451)
   * [Debugging OpenCL error](https://github.com/clEsperanto/pyclesperanto_prototype/issues/344)
   * [Signing PDFs with visual signature AND cryptographic signing](https://github.com/haesleinhuepf/git-bob-playground/issues/244)
+  * [Extending cell types in Jupyter notebooks](https://github.com/haesleinhuepf/git-bob-playground/issues/270)
 
 ## Installation for development
 
@@ -400,11 +404,11 @@ If you use git-bob, please cite it:
   author       = {Haase, Robert},
   title        = {{Towards Transparency and Knowledge Exchange in AI- 
                    assisted Data Analysis Code Generation}},
-  month        = oct,
-  year         = 2024,
-  publisher    = {Zenodo},
-  doi          = {10.5281/zenodo.13928832},
-  url          = {https://doi.org/10.5281/zenodo.13928832}
+  month        = mar,
+  year         = 2025,
+  publisher    = {Nature Computational Science},
+  doi          = {10.1038/s43588-025-00781-1},
+  url          = {https://doi.org/10.1038/s43588-025-00781-1}
 }
 ```
 
