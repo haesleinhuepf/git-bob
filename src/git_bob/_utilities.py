@@ -12,7 +12,7 @@ VISION_SYSTEM_MESSAGE = os.environ.get("VISION_SYSTEM_MESSAGE", "You are a AI-ba
 IMAGE_FILE_ENDINGS = [".jpg", ".png", ".gif", ".jpeg"]
 TEXT_FILE_ENDINGS = [".txt", ".md", ".csv", ".yml", ".yaml", ".json", ".py", ".java", ".groovy", ".jython", ".md", ".markdown", ".plaintext", ".tex", ".latex", ".txt", ".csv", ".yml", ".yaml", ".json", ".py", ".svg", ".xml"]
 
-POSSBILE_MARKDOWN_FENCES = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy",
+POSSBILE_MARKDOWN_FENCES = ["```python", "```Python", "```nextflow", "```java", "```javascript", "```macro", "```groovy", "```cmd"
                            "```jython", "```md", "```markdown", "```plaintext", "```tex", "```latex",
                            "```txt", "```csv", "```yml", "```yaml", "```json", "```JSON", "```py", "```svg", "```xml", "<FILE>", "```"]
 
