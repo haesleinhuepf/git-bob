@@ -14,6 +14,8 @@ def prompt_anthropic(message: str, model="claude-3-5-sonnet-20241022", image=Non
     import base64
     import numpy as np
 
+    model = model.replace("anthropic:", "")
+
     def encode_image(image_array):
         """
         Encode a numpy image array to base64 string.
@@ -77,6 +79,8 @@ def prompt_openai(message: str, model="gpt-4o-2024-08-06", image=None, max_accum
     import openai
     import warnings
     from ._utilities import append_result
+
+    model = model.replace("openai:", "")
 
     if image is None:
         message = [{"role": "user", "content": message}]
@@ -163,6 +167,8 @@ def prompt_googleai(request, model="gemini-1.5-pro-002", image=None):
     from google import generativeai as genai
     import os
 
+    model = model.replace("googleai:", "")
+
     genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
     client = genai.GenerativeModel(model)
     
@@ -184,6 +190,7 @@ def prompt_azure(message: str, model="gpt-4o", image=None):
     token = os.environ["GH_MODELS_API_KEY"]
     endpoint = "https://models.inference.ai.azure.com"
     model = model.replace("github_models:", "")
+    model = model.replace("azure:", "")
 
     if "gpt" not in model and "o1" not in model:
         from azure.ai.inference import ChatCompletionsClient
@@ -253,6 +260,9 @@ def prompt_mistral(message: str, model="mistral-large-2411", image=None):
     import os
     from mistralai import Mistral
     from ._utilities import image_to_url
+
+    model = model.replace("mistral:", "")
+    model = model.replace("pixtral:", "")
 
     if model is None:
         if image is None:
