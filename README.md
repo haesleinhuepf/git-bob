@@ -36,7 +36,7 @@ There is a detailed [tutorial](https://github.com/haesleinhuepf/git-bob/blob/mai
 * Copy the [git-bob](https://github.com/haesleinhuepf/git-bob/blob/main/.github/workflows/git-bob.yml) GitHub workflow in folder `.github/workflows/` to your repository.
   * Make sure to replace `pip install -e .` with a specific git-bob version such as `pip install git-bob==0.16.0`.
   * If your project does not contain a `requirements.txt` file, remove the line `pip install -r requirements.txt`.
-  * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` environment variable. These were tested:
+  * Configure the LLM you want to use in the workflow files by specifying the `GIT_BOB_LLM_NAME` GitHub repository secret. These were tested:
     * `anthropic:claude-3-5-sonnet-20241022`
     * `openai:gpt-4o-2024-08-06`
     * `github_models:gpt-4o`
