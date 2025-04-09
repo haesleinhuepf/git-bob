@@ -44,6 +44,7 @@ There is a detailed [tutorial](https://github.com/haesleinhuepf/git-bob/blob/mai
     * `google:gemini-1.5-pro-002`
     * `mistral:mistral-large-2411` (uses `pixtral-12b-2409` for vision tasks)
     * `deepseek:deepseek-chat`
+    * `e-infra_cz:llama3.3:latest`
   * configure a GitHub secret with the corresponding key from the LLM provider depending on the above configured LLM:
     * `OPENAI_API_KEY`: [OpenAI (gpt)](https://openai.com/blog/openai-api)
     * `ANTHROPIC_API_KEY`: [Anthropic (claude)](https://www.anthropic.com/api)
@@ -53,6 +54,7 @@ There is a detailed [tutorial](https://github.com/haesleinhuepf/git-bob/blob/mai
     * `DEEPSEEK_API_KEY`: [DeepSeek](https://platform.deepseek.com/api_keys)
     * `KISSKI_API_KEY`: [KISSKI](https://services.kisski.de/services/en/service/?service=2-02-llm-service.json)
     * `BLABLADOR_API_KEY`: [BLABLADOR](https://login.helmholtz.de/oauth2-as/oauth2-authz-web-entry)
+    * `E_INFRA_CZ_API_KEY` [chat.ai.e-infra.cz docs](https://docs.cerit.io/en/docs/web-apps/chat-ai)
   * configure GitHub actions to run the workflow on issues and pull requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
 
 When using it in your repository, you can also set a custom system message, for example for:
