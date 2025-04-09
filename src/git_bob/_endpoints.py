@@ -337,7 +337,7 @@ def prompt_e_infra_cz(message: str, model="llama3.3:latest", image=None):
     from ._utilities import image_to_url
 
     base_url = "https://chat.ai.e-infra.cz/api/"
-    api_key = os.environ.get("E-INFRA_CZ_API_KEY")
+    api_key = os.environ.get("E_INFRA_CZ_API_KEY")
     model = model.replace("e-infra_cz:", "")
 
     return prompt_openai(message, model=model, image=image, base_url=base_url, api_key=api_key)
