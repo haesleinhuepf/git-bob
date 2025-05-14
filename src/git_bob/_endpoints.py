@@ -15,6 +15,7 @@ def prompt_anthropic(message: str, model="claude-3-5-sonnet-20241022", image=Non
     import numpy as np
 
     model = model.replace("anthropic:", "")
+    model = model.replace("claude:", "")
 
     def encode_image(image_array):
         """
