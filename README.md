@@ -381,6 +381,7 @@ GIT_BOB_EXTENSIONS_FILTER_REGEXP: "^(?!git_bob).*"
 ## Similar projects
 
 There are similar projects out there
+* [Claide github action](https://github.com/anthropics/claude-code-action/tree/main)
 * [Claude Engineer](https://github.com/Doriandarko/claude-engineer)
 * [BioChatter](https://github.com/biocypher/biochatter)
 * [aider](https://github.com/paul-gauthier/aider)
