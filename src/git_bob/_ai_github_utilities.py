@@ -400,6 +400,7 @@ Return the entire new file content, do not shorten it.
             print(filename, "will be created")
             file_content_instruction = f"""
 Create the file "{filename}" to solve the issue #{issue}. {format_specific_instructions}
+{more_instructions}
 
 ## Your task
 Generate content for the file "{filename}" to solve the issue above.
