@@ -317,11 +317,15 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
 
         created_files = {}
         original_ipynb_file_content = None
+        temp = filename.split("/")
+        working_directory = "/".join(temp[:-1])
+        if len(working_directory) > 0:
+            working_directory = working_directory + "/"
 
         all_files = """
 ## Other files in the repository
 
-You are working on file {filename}. When you are writing code that accesses other files, make sure to use the correct relative file-paths.
+You are in working directory {working_directory}. When you are writing code that accesses other files, make sure to use the correct relative file-paths.
 These are all files in the repository:
 """ + "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=branch_name))
 
