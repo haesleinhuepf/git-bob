@@ -310,12 +310,24 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
     if is_ignored(filename, repository, branch_name):
         raise ValueError(f"Access to {filename} is restricted by .gitbobignore")
 
+    more_instructions = ""
     created_files = {}
     for attempt in range(number_of_attempts):
         an_error_happened = False
 
         created_files = {}
         original_ipynb_file_content = None
+        temp = filename.split("/")
+        working_directory = "/".join(temp[:-1])
+        if len(working_directory) > 0:
+            working_directory = working_directory + "/"
+
+        all_files = """
+## Other files in the repository
+
+You are in working directory {working_directory}. When you are writing code that accesses other files, make sure to use the correct relative file-paths.
+These are all files in the repository:
+""" + "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=branch_name))
 
         format_specific_instructions = ""
         if any([filename.endswith(f) for f in image_file_endings]):
@@ -323,8 +335,10 @@ def create_or_modify_file(repository, issue, filename, branch_name, issue_summar
             return created_files
         elif filename.endswith('.py'):
             format_specific_instructions = " When writing new functions, use numpy-style docstrings."
-        elif filename.endswith('.ipynb'):
+            more_instructions = all_files
+        if filename.endswith('.ipynb'):
             format_specific_instructions = " In the notebook file, write short code snippets in code cells and avoid long code blocks. Make sure everything is done step-by-step and we can inspect intermediate results. Add explanatory markdown cells in front of every code cell. The notebook has NO cell outputs! Make sure that there is code that saves results such as plots, images or dataframes, e.g. as .png or .csv files. Numpy images have to be converted to np.uint8 before saving as .png. Plots must be saved to disk before the cell ends or it is shown. The notebook must be executable from top to bottom without errors. Return the notebook in JSON format!"
+            more_instructions = all_files
         elif filename.endswith('.docx'):
             format_specific_instructions = " Write the document in simple markdown format."
         elif filename.endswith('.mp3'):
@@ -370,6 +384,7 @@ Example 5: {"title":"Summary", "content":["In this slide-deck we learned about\n
 Modify the file "{filename}" to solve the issue #{issue}. {format_specific_instructions}
 If the discussion is long, some stuff might be already done. In that case, focus on what was said at the very end in the discussion.
 Keep your modifications absolutely minimal.
+{more_instructions}
 
 That's the file "{filename}" content you will find in the file:
 ```
@@ -385,6 +400,7 @@ Return the entire new file content, do not shorten it.
             print(filename, "will be created")
             file_content_instruction = f"""
 Create the file "{filename}" to solve the issue #{issue}. {format_specific_instructions}
+{more_instructions}
 
 ## Your task
 Generate content for the file "{filename}" to solve the issue above.
@@ -406,7 +422,10 @@ Given a github issue summary (#{issue}) and optionally file content (filename {f
 
 Respond ONLY the content of the file and afterwards a single line summarizing the changes you made (without mentioning the issue).
 """
+        print("Prompt:", prompt)
+
         print("Prompting for new file content...")
+        
         response = prompt_function(prompt)
 
         new_content, commit_message = split_content_and_summary(response)
