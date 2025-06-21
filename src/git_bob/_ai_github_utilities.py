@@ -421,7 +421,10 @@ Given a github issue summary (#{issue}) and optionally file content (filename {f
 
 Respond ONLY the content of the file and afterwards a single line summarizing the changes you made (without mentioning the issue).
 """
+        print("Prompt:", prompt)
+
         print("Prompting for new file content...")
+        
         response = prompt_function(prompt)
 
         new_content, commit_message = split_content_and_summary(response)
