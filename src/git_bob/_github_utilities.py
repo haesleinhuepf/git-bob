@@ -613,13 +613,15 @@ def get_diff_of_pull_request(repository, pull_request):
     Log().log(f"-> get_diff_of_pull_request({repository}, {pull_request})")
     # Authenticate with GitHub
     repo = get_repository_handle(repository)
+    access_token = os.getenv('GITHUB_API_KEY')
 
     pull_request = repo.get_pull(pull_request)
 
     print(pull_request.diff_url)
 
     # read the content of a url
-    response = requests.get(pull_request.diff_url)
+    headers = {'Authorization': f'token {access_token}'}
+    response = requests.get(pull_request.diff_url, headers=headers)
     if response.status_code == 200:
         # Return the content of the website
         return response.text
