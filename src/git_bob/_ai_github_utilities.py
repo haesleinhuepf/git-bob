@@ -394,7 +394,16 @@ That's the file "{filename}" content you will find in the file:
 ## Your task
 Modify content of the file "{filename}" to solve the issue above.
 Keep your modifications absolutely minimal.
-Return the entire new file content, do not shorten it.
+If the modifications are long, return the entire new file content, do not shorten it.
+If the modification is short, return the original part you would like to replace and the new part you would like to replace it with. 
+Do this in this format:
+
+<original_part>
+Original (unmodified) part of the file content you would like to replace.
+</original_part>
+<new_part>
+New (modified) part of the file content you would like to replace it with.
+</new_part>
 """
         else:
             print(filename, "will be created")
@@ -429,6 +438,12 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
         response = prompt_function(prompt)
 
         new_content, commit_message = split_content_and_summary(response)
+
+        if "<original_part>" in new_content and "<new_part>" in new_content:
+            for part in new_content.split("</new_part>")[:-1]:
+                original_part = part.split("<original_part>")[1].split("</original_part>")[0]
+                new_part = part.split("<new_part>")[1]
+                new_content = file_content.replace(original_part, new_part)
 
         print("New file content", len(new_content), "\n------------\n", new_content[:200], "\n------------")
 
