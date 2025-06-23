@@ -597,12 +597,14 @@ def get_contributors(repository):
 def get_diff_of_pull_request(repository, pull_request):
     """
     Get the diff of a specific pull request in a GitHub repository.
+
     Parameters
     ----------
     repository : str
         The full name of the GitHub repository (e.g., "username/repo-name").
     pull_request : int
         The pull request number to retrieve the diff for.
+        
     Returns
     -------
     str
@@ -611,19 +613,20 @@ def get_diff_of_pull_request(repository, pull_request):
     import requests
 
     Log().log(f"-> get_diff_of_pull_request({repository}, {pull_request})")
-    # Authenticate with GitHub
     repo = get_repository_handle(repository)
     access_token = os.getenv('GITHUB_API_KEY')
 
     pull_request = repo.get_pull(pull_request)
 
-    print(pull_request.diff_url)
-
-    # read the content of a url
-    headers = {'Authorization': f'token {access_token}'}
-    response = requests.get(pull_request.diff_url, headers=headers)
+    # Use GitHub's REST API endpoint for diffs with proper Accept header
+    api_url = f"https://api.github.com/repos/{repository}/pulls/{pull_request.number}"
+    headers = {
+        'Authorization': f'token {access_token}',
+        'Accept': 'application/vnd.github.v3.diff'
+    }
+    
+    response = requests.get(api_url, headers=headers)
     if response.status_code == 200:
-        # Return the content of the website
         return response.text
     else:
         print("Error:", response.status_code, response.text)
@@ -926,3 +929,4 @@ def close_issue(repository, issue_number):
 
     # Close the issue
     issue_obj.edit(state="closed")
+
