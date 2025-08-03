@@ -503,7 +503,7 @@ def deploy(repository, issue, **kwargs):
     """
     #from ._github_utilities import add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark
-    result1 = run_cli("python setup.py sdist bdist_wheel")
+    result1 = run_cli("python -m build")
     result2 = run_cli("twine upload dist/*")
     Config.git_utilities.add_comment_to_issue(repository, issue, setup_ai_remark() + remove_ansi_escape_sequences(f"\n# Deployment report\n\n{result1}\n{result2}"))
 
@@ -790,3 +790,4 @@ def write_binary_file(filename, content):
     """Write content to a binary file."""
     with open(filename, 'wb') as file:
         file.write(content)
+
