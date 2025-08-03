@@ -440,6 +440,7 @@ Respond ONLY the content of the file and afterwards a single line summarizing th
         new_content, commit_message = split_content_and_summary(response)
 
         if "<original_part>" in new_content and "<new_part>" in new_content:
+            print("handling <tags>")
             for part in new_content.split("</new_part>")[:-1]:
                 original_part = part.split("<original_part>")[1].split("</original_part>")[0]
                 new_part = part.split("<new_part>")[1]
