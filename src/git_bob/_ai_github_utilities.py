@@ -394,7 +394,7 @@ That's the file "{filename}" content you will find in the file:
 ## Your task
 Modify content of the file "{filename}" to solve the issue above.
 Keep your modifications absolutely minimal.
-If the modifications are long, return the entire new file content, do not shorten it.
+If the modifications are long, return the entire new file content (including your modifications), do not shorten the file.
 If the modification is short, return the original part you would like to replace and the new part you would like to replace it with. 
 Do this in this format:
 
