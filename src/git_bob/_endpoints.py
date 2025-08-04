@@ -163,12 +163,13 @@ def prompt_deepseek(message: str, model="deepseek-chat", image=None, max_accumul
     return prompt_openai(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
 
-def prompt_googleai(request, model="gemini-1.5-pro-002", image=None):
+def prompt_googleai(request, model="gemini-2.5-pro", image=None):
     """Send a prompt to Google Gemini and return the response"""
     from google import generativeai as genai
     import os
 
     model = model.replace("googleai:", "")
+    model = model.replace("gemini:", "")
 
     genai.configure(api_key=os.environ['GOOGLE_API_KEY'])
     client = genai.GenerativeModel(model)
