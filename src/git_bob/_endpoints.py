@@ -111,11 +111,18 @@ def prompt_openai(message: str, model="gpt-4o-2024-08-06", image=None, max_accum
     for _ in range(0, max_accumulated_responses):
 
         # submit prompt
-        response = client.chat.completions.create(
-            model=model,
-            messages=message,
-            max_tokens=max_response_tokens,
-        )
+        if model.startswith("gpt-5"):
+            response = client.chat.completions.create(
+                model=model,
+                messages=message,
+                max_completion_tokens=max_response_tokens,
+            )
+        else:
+            response = client.chat.completions.create(
+                model=model,
+                messages=message,
+                max_tokens=max_response_tokens,
+            )
 
         result = append_result(result, response.choices[0].message.content)
         print("finish_reason", response.choices[0].finish_reason)
