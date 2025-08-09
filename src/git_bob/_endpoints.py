@@ -140,6 +140,17 @@ def prompt_openai(message: str, model="gpt-4o-2024-08-06", image=None, max_accum
     # extract answer
     return result
 
+def prompt_scads(message: str, model="openai/gpt-oss-120b", image=None, max_accumulated_responses=10, max_response_tokens=128000, base_url=None, api_key=None):
+    import os
+    if base_url is None:
+        base_url = "hhttps://llm.scads.ai/v1"
+    if api_key is None:
+        api_key = os.environ.get("SCADS_API_KEY")
+    model = model.replace("scads:", "")
+    return prompt_openai(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
+
+
+
 def prompt_kisski(message: str, model=None, image=None, max_accumulated_responses=10, max_response_tokens=16384, base_url=None, api_key=None):
     import os
     if base_url is None:
