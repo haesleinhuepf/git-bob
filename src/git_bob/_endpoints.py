@@ -147,7 +147,7 @@ def prompt_scads(message: str, model="openai/gpt-oss-120b", image=None, max_accu
     if api_key is None:
         api_key = os.environ.get("SCADS_API_KEY")
     model = model.replace("scads:", "")
-    print("model", "_" + model[2:])
+    print("model", "_" + model[1:])
     return prompt_openai(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
 
