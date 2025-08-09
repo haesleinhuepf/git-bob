@@ -112,6 +112,8 @@ def prompt_openai(message: str, model="gpt-4o-2024-08-06", image=None, max_accum
 
         # submit prompt
         if model.startswith("gpt-5"):
+            if max_response_tokens == 16384: # overwrite default becasue gpt-5 is more capable
+                max_response_tokens=128000
             response = client.chat.completions.create(
                 model=model,
                 messages=message,
