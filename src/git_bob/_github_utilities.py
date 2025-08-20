@@ -322,7 +322,7 @@ def get_repository_file_contents(repository: str, branch_name, file_paths: list)
     for file_path in file_paths:
         try:
             # Get the file content
-            file_content = get_file_in_repository (repository, branch_name, file_path).decoded_content.decode()
+            file_content = decode_file(get_file_in_repository(repository, branch_name, file_path))
 
             # store the content
             file_contents[file_path] = file_content
@@ -751,7 +751,7 @@ def rename_file_in_repository(repository, branch_name, old_file_path, new_file_p
 
     file = get_file_in_repository(repository, branch_name, old_file_path)
     # Create a new file with the old content at the new path
-    repo.create_file(new_file_path, commit_message, file.decoded_content.decode(), branch=branch_name)
+    repo.create_file(new_file_path, commit_message, decode_file(file), branch=branch_name)
 
     # Delete the old file
     repo.delete_file(old_file_path, commit_message, file.sha, branch=branch_name)
@@ -762,7 +762,60 @@ def rename_file_in_repository(repository, branch_name, old_file_path, new_file_p
 
 
 def decode_file(file):
-    return file.decoded_content.decode()
+    """
+    Decode a GitHub ContentFile to a text string.
+
+    This function primarily uses PyGithub's decoded_content, which expects base64-encoded
+    content. For cases where GitHub returns encoding 'none' (e.g., for large files),
+    it falls back to downloading the raw content via download_url or the Git blob API.
+
+    Parameters
+    ----------
+    file : github.ContentFile.ContentFile
+        The file object retrieved from the GitHub API.
+
+    Returns
+    -------
+    str
+        The decoded text content of the file.
+
+    Raises
+    ------
+    AssertionError
+        If decoding fails and no fallback path is available.
+    UnicodeDecodeError
+        If the content is binary or cannot be decoded as text.
+    """
+    # Normal path for base64-encoded contents
+    try:
+        return file.decoded_content.decode()
+    except AssertionError:
+        # Fallback for "encoding: none" (e.g., large files)
+        import requests
+        import base64
+
+        token = os.getenv("GITHUB_API_KEY")
+        headers = {"Authorization": f"token {token}"} if token else {}
+
+        # 1) Try raw download URL
+        download_url = getattr(file, "download_url", None)
+        if download_url:
+            r = requests.get(download_url, headers=headers)
+            r.raise_for_status()
+            return r.content.decode()
+
+        # 2) Fallback to Git blob API (always base64)
+        git_url = getattr(file, "git_url", None)
+        if git_url:
+            r = requests.get(git_url, headers=headers)
+            r.raise_for_status()
+            data = r.json()
+            if data.get("encoding") == "base64" and "content" in data:
+                content = base64.b64decode(data["content"])
+                return content.decode()
+
+        # If neither path worked, re-raise for caller to handle
+        raise
 
 
 def delete_file_from_repository(repository, branch_name, file_path, commit_message="Delete file"):
@@ -822,7 +875,7 @@ def copy_file_in_repository(repository, branch_name, src_file_path, dest_file_pa
     repo = get_repository_handle(repository)
 
     file = get_file_in_repository(repository, branch_name, src_file_path)
-    file_content = file.decoded_content.decode()
+    file_content = decode_file(file)
 
     # Create a new file with the old content at the new path
     repo.create_file(dest_file_path, commit_message, file_content, branch=branch_name)
@@ -929,4 +982,3 @@ def close_issue(repository, issue_number):
 
     # Close the issue
     issue_obj.edit(state="closed")
-
