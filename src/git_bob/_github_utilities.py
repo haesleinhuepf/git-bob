@@ -1,6 +1,6 @@
 # This file contains utility functions using the github API via github-python:
 # https://github.com/PyGithub/PyGithub (licensed LGPL3)
-#
+# 
 import os
 from functools import lru_cache
 from ._logger import Log
