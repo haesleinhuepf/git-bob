@@ -616,7 +616,6 @@ def solve_github_issue(repository, issue, prompt_function, base_branch=None):
                                    prompt_visionlm=prompt_function,
                                    repository=repository,
                                    branch_name=base_branch)
-    repository=repository, branch_name=base_branch)
     print("Discussion:", discussion)
 
     all_files = "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=base_branch))
