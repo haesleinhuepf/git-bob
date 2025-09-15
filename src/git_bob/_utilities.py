@@ -261,9 +261,10 @@ def image_to_url(image):
     return img_str
 
 
-def modify_discussion(discussion, prompt_visionlm=prompt_openai):
+def modify_discussion(discussion, prompt_visionlm=prompt_openai, repository=None, branch_name=None):
     import re
     import docx2markdown
+    from ._ai_github_utilities import is_ignored
     #from ._github_utilities import get_conversation_on_issue, get_diff_of_pull_request, get_file_in_repository
 
     # Regex to find URLs in the discussion
@@ -272,6 +273,9 @@ def modify_discussion(discussion, prompt_visionlm=prompt_openai):
 
     # Placeholder for additional content extracted from URLs
     additional_content = {}
+
+    if branch_name is None:
+        branch_name = "main"
 
     # Process each URL based on its type
     for url in urls:
@@ -348,7 +352,7 @@ def modify_discussion(discussion, prompt_visionlm=prompt_openai):
         if len(potential_filename) < 4: # too short to be a filename
             continue
         # check if file exists
-        if os.path.exists(potential_filename):
+        if os.path.exists(potential_filename) and not is_ignored(potential_filename, repository, branch_name):
             if potential_filename.endswith('.ipynb'):
                 file_contents = read_text_file(potential_filename)
                 file_contents = erase_outputs_of_code_cells(file_contents)

@@ -60,7 +60,8 @@ def comment_on_issue(repository, issue, prompt_function, **kwargs):
         file_changes = ""
         conversation_type = "issue"
 
-    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), prompt_visionlm=prompt_function)
+    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), 
+                                   prompt_visionlm=prompt_function, repository=repository, branch_name="main")
     print("Discussion:", discussion)
 
     all_files = "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository))
@@ -83,6 +84,8 @@ Returning an empty list is also a valid answer.
 Respond with the filenames as JSON list.
 """)
     filenames = text_to_json(relevant_files)
+
+    filenames = [f for f in filenames if not is_ignored(f, repository, "main")]
 
     file_content_dict = Config.git_utilities.get_repository_file_contents(repository, "main", filenames)
 
@@ -148,7 +151,10 @@ def review_pull_request(repository, issue, prompt_function, **kwargs):
     if Config.pull_request is None: # it's not a PR
         return comment_on_issue(repository, issue, prompt_function)
 
-    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), prompt_visionlm=prompt_function)
+    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), 
+                                   prompt_visionlm=prompt_function, 
+                                   repository=repository, 
+                                   branch_name="main")
     print("Discussion:", discussion)
 
     file_changes = Config.git_utilities.get_diff_of_pull_request(repository, issue)
@@ -606,7 +612,11 @@ def solve_github_issue(repository, issue, prompt_function, base_branch=None):
 
     repo = Config.git_utilities.get_repository_handle(repository)
 
-    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), prompt_visionlm=prompt_function)
+    discussion = modify_discussion(Config.git_utilities.get_conversation_on_issue(repository, issue), 
+                                   prompt_visionlm=prompt_function,
+                                   repository=repository,
+                                   branch_name=base_branch)
+    repository=repository, branch_name=base_branch)
     print("Discussion:", discussion)
 
     all_files = "* " + "\n* ".join(Config.git_utilities.list_repository_files(repository, branch_name=base_branch))
