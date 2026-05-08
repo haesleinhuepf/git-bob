@@ -10,9 +10,7 @@ Read more in the [publication](https://www.nature.com/articles/s43588-025-00781-
 
 ![banner](https://github.com/haesleinhuepf/git-bob/raw/main/docs/images/banner2.png)
 
-Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api) or [OpenAI's chatGPT](https://openai.com/blog/openai-api) or [Google's Gemini](https://blog.google/technology/ai/google-gemini-ai/) to understand the text and 
-[pygithub](https://github.com/PyGithub/PyGithub) to interact with the issues and pull requests. As its discussions are conserved, you can document how things were done using AI and 
-others can learn how to prompt for the things you did. For example, the pair-plot discussion above is [available online](https://github.com/haesleinhuepf/git-bob-playground/issues/48).
+Under the hood it uses [Anthropic's Claude](https://www.anthropic.com/api) or [OpenAI's chatGPT](https://openai.com/blog/openai-api) or [Google's Gemini](https://blog.google/technology/ai/google-gemini-ai/) or your institutional LLM service provider to understand your request, interacts with your Github/Gitlab issues and pull requests. As its discussions are conserved, you can document how things were done using AI and others can learn how to prompt for the things you did. For example, the pair-plot discussion above is [available online](https://github.com/haesleinhuepf/git-bob-playground/issues/48).
 
 ## Disclaimer
 
