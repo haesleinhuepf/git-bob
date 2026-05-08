@@ -153,7 +153,7 @@ def prompt_scads(message: str, model="openai/gpt-oss-120b", image=None, max_accu
     return prompt_openai(message, model=model, image=image, max_accumulated_responses=max_accumulated_responses, max_response_tokens=max_response_tokens, base_url=base_url, api_key=api_key)
 
 
-def prompt_custom(message: str, model=None, image=None, max_accumulated_responses=10, max_response_tokens=128000, base_url=None, api_key=None):
+def prompt_custom(message: str, model=None, image=None, max_accumulated_responses=10, max_response_tokens=16000, base_url=None, api_key=None):
     import os
     if base_url is None:
         base_url = os.environ.get('CUSTOM_LLM_SERVER')
