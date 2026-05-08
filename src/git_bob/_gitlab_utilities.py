@@ -479,7 +479,7 @@ def check_access_and_ask_for_approval(user, repository, issue):
     project = get_repository_handle(repository)
 
     if "members" in groups:
-        members = project.members.list()
+        members = project.members_all.list()
         for member in members:
             if member.username == user:
                 access = True
