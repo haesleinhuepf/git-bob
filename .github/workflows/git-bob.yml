@@ -61,6 +61,8 @@ jobs:
         GITLAB_API_KEY: "${{ secrets.GITLAB_API_KEY }}"
         E_INFRA_CZ_API_KEY: "${{ secrets.E_INFRA_CZ_API_KEY }}"
         SCADS_API_KEY: "${{ secrets.SCADS_API_KEY }}"
+        CUSTOM_LLM_SERVER: "${{ secrets.CUSTOM_LLM_SERVER }}"
+        CUSTOM_API_KEY: "${{ secrets.CUSTOM_API_KEY }}"
         GITHUB_RUN_ID: "${{ github.run_id }}"
         TWINE_USERNAME: "${{ secrets.TWINE_USERNAME }}"
         TWINE_PASSWORD: "${{ secrets.TWINE_PASSWORD }}"

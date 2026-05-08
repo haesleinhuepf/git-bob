@@ -552,7 +552,9 @@ SENSIBLE_ENV_KEYS = ["ANTHROPIC_API_KEY",
                     "TWINE_PASSWORD",
                     "HF_TOKEN",
                     "DEEPSEEK_API_KEY",
-                    "CODECOV_TOKEN"]
+                    "CODECOV_TOKEN",
+                    "CUSTOM_API_KEY",
+                    "CUSTOM_LLM_SERVER"]
 
 def save_and_clear_environment():
     """Clear all environment variables and store the entire env in a dictionary for restoration later"""
