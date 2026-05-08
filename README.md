@@ -55,6 +55,7 @@ There is a detailed [tutorial](https://github.com/haesleinhuepf/git-bob/blob/mai
     * `KISSKI_API_KEY`: [KISSKI](https://services.kisski.de/services/en/service/?service=2-02-llm-service.json)
     * `BLABLADOR_API_KEY`: [BLABLADOR](https://login.helmholtz.de/oauth2-as/oauth2-authz-web-entry)
     * `E_INFRA_CZ_API_KEY` [chat.ai.e-infra.cz docs](https://docs.cerit.io/en/docs/web-apps/chat-ai)
+    * `CUSTOM_API_KEY`: An API key of a custom LLM server specified as secret `CUSTOM_LLM_SERVER` that supports the OpenAI API.
   * configure GitHub actions to run the workflow on issues and pull requests. Also give write-access to the Workflow using the `GITHUB_TOKEN`.
 
 When using it in your repository, you can also set a custom system message, for example for:
