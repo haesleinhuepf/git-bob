@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/pypi/l/git-bob.svg?color=green)](https://github.com/haesleinhuepf/git-bob/raw/main/LICENSE)
 <!--[![PyPI - Downloads](https://img.shields.io/pypi/dm/git-bob)](https://pypistats.org/packages/git-bob)-->
 
-git-bob uses AI to solve GitHub issues. It runs inside the GitHub CI, no need to install anything on your computer.
+git-bob uses AI to solve GitHub issues. It runs inside the GitHub CI or Gitlab runners, no need to install anything on your computer.
 Read more in the [publication](https://www.nature.com/articles/s43588-025-00781-1). 
 
 ![banner](https://github.com/haesleinhuepf/git-bob/raw/main/docs/images/banner2.png)
