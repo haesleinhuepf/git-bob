@@ -483,15 +483,28 @@ def remove_ansi_escape_sequences(text):
     return ansi_escape.sub('', text)
 
 
-def run_cli(command:str, check=False, verbose=False):
+def run_cli(command:list, check=False, verbose=False):
     import subprocess
+    import glob
 
-    result = subprocess.run(command, shell=True, check=check, capture_output=True, text=True)
+    if isinstance(command, str):
+        raise TypeError("run_cli expects command as a list of arguments")
+
+    # Expand wildcard file patterns explicitly because shell expansion is disabled.
+    expanded_command = []
+    for arg in command:
+        if isinstance(arg, str) and any(char in arg for char in "*?[]"):
+            matches = glob.glob(arg)
+            expanded_command.extend(matches if matches else [arg])
+        else:
+            expanded_command.append(arg)
+
+    result = subprocess.run(expanded_command, shell=False, check=check, capture_output=True, text=True)
     if verbose:
         print("\n", result.stdout)
         print("\n", result.stderr)
 
-    return f"## Command\n```\n{command}\n```\n## StdOut\n```\n{result.stdout}\n```\n## StdErr\n```\n{result.stderr}\n```\n"
+    return f"## Command\n```\n{expanded_command}\n```\n## StdOut\n```\n{result.stdout}\n```\n## StdErr\n```\n{result.stderr}\n```\n"
 
 
 def deploy(repository, issue, **kwargs):
@@ -507,8 +520,8 @@ def deploy(repository, issue, **kwargs):
     """
     #from ._github_utilities import add_comment_to_issue
     from ._ai_github_utilities import setup_ai_remark
-    result1 = run_cli("python -m build")
-    result2 = run_cli("twine upload dist/*")
+    result1 = run_cli(["python", "-m", "build"])
+    result2 = run_cli(["twine", "upload", "dist/*"])
     Config.git_utilities.add_comment_to_issue(repository, issue, setup_ai_remark() + remove_ansi_escape_sequences(f"\n# Deployment report\n\n{result1}\n{result2}"))
 
 

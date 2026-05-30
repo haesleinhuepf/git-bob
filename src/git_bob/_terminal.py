@@ -187,8 +187,8 @@ def command_line_interface():
             Config.pull_request = repo.get_pull(issue)
             base_branch = Config.pull_request.head.ref
             print("Issue is a a PR - switching to the branch", base_branch)
-            run_cli("git fetch --all", verbose=True)
-            run_cli(f"git checkout -b {base_branch} origin/{base_branch}", verbose=True)
+            run_cli(["git", "fetch", "--all"], verbose=True)
+            run_cli(["git", "checkout", "-b", base_branch, f"origin/{base_branch}"], verbose=True)
 
             # Extract source (head) and target (base) branches
             #base_branch = Config.pull_request.head.ref
@@ -301,7 +301,7 @@ def remote_interface():
         os.chdir(tmpdirname) # Switch to temporary directory
 
         # Execute git clone command
-        run_cli(f"git clone https://github.com/{repository}", verbose=True)
+        run_cli(["git", "clone", f"https://github.com/{repository}"], verbose=True)
 
         # Extract the repository name from the full repository path
         repo_name = repository.rsplit('/', 1)[1].replace('.git', '')
